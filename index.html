@@ -18,11 +18,29 @@
     }
 
     /* --- Header --- */
-    .header { margin-bottom: 40px; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 40px;
+    }
     .header h1 { font-size: 22px; font-weight: 700; }
     .header .sub { color: #888; font-size: 13px; margin-top: 4px; }
 
-    /* --- Score Cards --- */
+    .add-btn {
+      background: #111;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .add-btn:hover { background: #333; }
+
+    /* --- Scores --- */
     .scores {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -42,7 +60,23 @@
 
     /* --- Section --- */
     .section { margin-bottom: 40px; }
-    .section h2 { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .section h2 { font-size: 15px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-count { font-size: 12px; color: #999; }
+
+    /* --- Chart --- */
+    .chart-card {
+      background: #fff;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .chart-container { height: 200px; }
 
     /* --- Experiment Cards --- */
     .experiments { display: flex; flex-direction: column; gap: 8px; }
@@ -53,22 +87,29 @@
       border-radius: 10px;
       padding: 16px 20px;
       display: grid;
-      grid-template-columns: 1fr auto auto auto;
+      grid-template-columns: 1fr 80px 60px 180px;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
+      transition: border-color 0.2s;
     }
+    .exp-card:hover { border-color: #ccc; }
+    .exp-card.queued { opacity: 0.45; }
+    .exp-card.highlight { border-color: #3b82f6; background: #eff6ff; animation: fadeHighlight 3s ease-out forwards; }
 
-    .exp-card.queued { opacity: 0.5; }
+    @keyframes fadeHighlight {
+      0% { background: #eff6ff; border-color: #3b82f6; }
+      100% { background: #fff; border-color: #eee; }
+    }
 
     .exp-name { font-weight: 600; font-size: 14px; }
     .exp-variant { font-size: 12px; color: #888; margin-top: 2px; }
+    .exp-hypothesis { font-size: 11px; color: #aaa; margin-top: 4px; font-style: italic; }
 
-    .exp-metric {
-      text-align: center;
-      min-width: 70px;
-    }
+    .exp-metric { text-align: center; }
     .exp-metric .num { font-size: 18px; font-weight: 700; }
     .exp-metric .label { font-size: 10px; color: #888; text-transform: uppercase; }
+
+    .exp-right { text-align: right; }
 
     .badge {
       display: inline-block;
@@ -79,20 +120,13 @@
     }
     .badge.yes { background: #d1fae5; color: #065f46; }
     .badge.weak { background: #fef3c7; color: #92400e; }
-    .badge.early { background: #f3f4f6; color: #6b7280; }
+    .badge.early { background: #e0e7ff; color: #3730a3; }
     .badge.running { background: #dbeafe; color: #1e40af; }
     .badge.queued { background: #f3f4f6; color: #9ca3af; }
+    .badge.no { background: #fee2e2; color: #991b1b; }
 
-    .verdict { font-size: 12px; color: #555; max-width: 200px; text-align: right; }
-
-    /* --- Chart --- */
-    .chart-card {
-      background: #fff;
-      border: 1px solid #eee;
-      border-radius: 10px;
-      padding: 20px;
-    }
-    .chart-container { height: 200px; }
+    .verdict { font-size: 12px; color: #555; margin-top: 4px; }
+    .next-action { font-size: 11px; color: #3b82f6; margin-top: 2px; }
 
     /* --- Insight --- */
     .insight {
@@ -104,26 +138,94 @@
     .insight h3 { font-size: 13px; font-weight: 600; color: #92400e; margin-bottom: 8px; }
     .insight p { font-size: 13px; color: #78350f; line-height: 1.6; }
 
+    /* --- Modal --- */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px;
+      width: 560px;
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .modal .desc { font-size: 13px; color: #888; margin-bottom: 20px; line-height: 1.5; }
+
+    .modal textarea {
+      width: 100%;
+      height: 200px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      resize: vertical;
+      outline: none;
+    }
+    .modal textarea:focus { border-color: #111; }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary { background: #111; color: #fff; }
+    .btn-primary:hover { background: #333; }
+    .btn-secondary { background: #f3f4f6; color: #555; }
+    .btn-secondary:hover { background: #e5e7eb; }
+
+    .parse-error { color: #dc2626; font-size: 12px; margin-top: 8px; display: none; }
+    .parse-success { color: #059669; font-size: 12px; margin-top: 8px; display: none; }
+
+    /* --- Empty state --- */
+    .empty { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+
     /* --- Responsive --- */
     @media (max-width: 640px) {
       .scores { grid-template-columns: repeat(2, 1fr); }
       .exp-card { grid-template-columns: 1fr; gap: 8px; }
       .exp-metric { text-align: left; }
-      .verdict { text-align: left; max-width: 100%; }
+      .exp-right { text-align: left; }
     }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1 id="title">GTM Experiments</h1>
-    <div class="sub" id="subtitle"></div>
+    <div>
+      <h1 id="title">GTM Experiments</h1>
+      <div class="sub" id="subtitle"></div>
+    </div>
+    <button class="add-btn" onclick="openModal()">+ Add from Bot</button>
   </div>
 
   <div class="scores" id="scores"></div>
 
   <div class="section">
-    <h2>What's Working</h2>
+    <div class="section-header">
+      <h2>What's Working</h2>
+    </div>
     <div class="chart-card">
       <div class="chart-container">
         <canvas id="chart"></canvas>
@@ -131,42 +233,141 @@
     </div>
   </div>
 
-  <div class="section">
-    <h2>This Week</h2>
+  <div class="section" id="active-section">
+    <div class="section-header">
+      <h2>This Week</h2>
+      <span class="section-count" id="active-count"></span>
+    </div>
     <div class="experiments" id="active-experiments"></div>
   </div>
 
-  <div class="section">
-    <h2>Coming Up</h2>
+  <div class="section" id="queued-section">
+    <div class="section-header">
+      <h2>Coming Up</h2>
+      <span class="section-count" id="queued-count"></span>
+    </div>
     <div class="experiments" id="queued-experiments"></div>
   </div>
 
   <div class="section" id="insight-section"></div>
 
-<script type="module">
-async function init() {
-  const res = await fetch('./data/experiments.json');
-  const data = await res.json();
-  const { meta, insight, experiments } = data;
+  <!-- Add from Bot Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h2>Add Experiment from Bot</h2>
+      <div class="desc">
+        Paste the bot's output below. It will parse the structured format and add the experiment to your dashboard.
+        <br><br>
+        Expected format from bot:<br>
+        <strong>Idea:</strong> ...<br>
+        <strong>Hypothesis:</strong> ...<br>
+        <strong>KPI:</strong> ...<br>
+        <strong>This week's test:</strong> ...
+      </div>
+      <textarea id="bot-input" placeholder="Paste the bot's output here..."></textarea>
+      <div class="parse-error" id="parse-error">Could not parse the output. Make sure it has at least Idea and Hypothesis lines.</div>
+      <div class="parse-success" id="parse-success">Experiment added!</div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="addFromBot()">Add Experiment</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ==========================================
+// Data layer — localStorage backed
+// ==========================================
+
+const STORAGE_KEY = 'gtm_experiments';
+const META_KEY = 'gtm_meta';
+const INSIGHT_KEY = 'gtm_insight';
+
+const DEFAULT_META = {
+  company: 'Nevara',
+  week: 1,
+  weekOf: '2026-03-24',
+  operator: 'GTM Associate'
+};
+
+const DEFAULT_INSIGHT = {
+  title: 'Week 1 Key Insight',
+  body: 'Post-engagement and signal-based personalization are the top performers. Referencing a prospect\'s LinkedIn activity or using Clay hiring signals drives 21-25% response rates vs 17% for generic deal-context. Coffee events have the highest raw conversion (45%) but lowest volume.',
+  recommendation: 'Scale signal-based outbound (Clay) + post-engager targeting to 5 posts/week. Book 2 coffee events/month. Test referral post DMs next week.'
+};
+
+function getDefaultExperiments() {
+  return [
+    { id: 1, name: "LinkedIn autopilot", variant: "Signal-based (Clay: hiring + funding signals)", channel: "Outbound", week: 1, status: "done", sent: 65, responses: 16, demos: 3, cost: 0, responseRate: 24.6, costPerDemo: 0, signal: "yes", verdict: "Signal-based wins", hypothesis: "AEs at companies with 3+ recent sales hires respond to signal-based outreach at >20%" },
+    { id: 2, name: "LinkedIn autopilot", variant: "Post-engagement personalization", channel: "Outbound", week: 1, status: "done", sent: 65, responses: 14, demos: 3, cost: 0, responseRate: 21.5, costPerDemo: 0, signal: "yes", verdict: "Strong — scale alongside signal-based", hypothesis: "Referencing a prospect's post engagement lifts accept rate above 20%" },
+    { id: 3, name: "LinkedIn autopilot", variant: "Deal-context personalization", channel: "Outbound", week: 1, status: "done", sent: 70, responses: 12, demos: 2, cost: 0, responseRate: 17.1, costPerDemo: 0, signal: "yes", verdict: "Weakest variant — deprioritize", hypothesis: "Mentioning funding round or team growth converts at >15%" },
+    { id: 4, name: "Post-engager lead list", variant: "Commenters only (rmeadows post)", channel: "Outbound", week: 1, status: "done", sent: 34, responses: 8, demos: 3, cost: 0, responseRate: 23.5, costPerDemo: 0, signal: "yes", verdict: "Highest intent — run on 5 more posts", hypothesis: "Post commenters respond at 3x the rate of cold leads" },
+    { id: 5, name: "Post-engager lead list", variant: "Likers only", channel: "Outbound", week: 1, status: "done", sent: 55, responses: 5, demos: 1, cost: 0, responseRate: 9.1, costPerDemo: 0, signal: "weak", verdict: "Likers < commenters — cut this variant", hypothesis: "Post likers respond at 2x the rate of cold leads" },
+    { id: 6, name: "Coffee marketing", variant: "Local sales meetup", channel: "Events", week: 1, status: "done", sent: 40, responses: 18, demos: 6, cost: 150, responseRate: 45.0, costPerDemo: 25, signal: "yes", verdict: "Highest conversion — book 2/month", hypothesis: "In-person coffee conversations convert to demos at >30%" },
+    { id: 7, name: "Reddit listening", variant: "r/sales complaint threads", channel: "Social", week: 1, status: "running", sent: 20, responses: 4, demos: 0, cost: 0, responseRate: 20.0, costPerDemo: null, signal: "early", verdict: "Building presence — 60 day play", hypothesis: "Helpful replies to AE complaint threads get >15% reply-back rate" },
+    { id: 8, name: "Twitter listening", variant: "AE complaint tweets", channel: "Social", week: 1, status: "running", sent: 15, responses: 2, demos: 0, cost: 0, responseRate: 13.3, costPerDemo: null, signal: "early", verdict: "Lower signal than Reddit so far", hypothesis: "Replying to AE complaint tweets gets >15% engagement" },
+    { id: 9, name: "Referral post DMs", variant: "'Calling on my network' posts", channel: "Outbound", week: 2, status: "queued", sent: null, responses: null, demos: null, cost: 0, responseRate: null, costPerDemo: null, signal: null, verdict: null, hypothesis: "Sales leaders asking for tool recs respond to DMs at >30%" },
+    { id: 10, name: "Influencer monitoring", variant: "Mark Roberge + 4 others", channel: "Outbound", week: 2, status: "queued", sent: null, responses: null, demos: null, cost: 0, responseRate: null, costPerDemo: null, signal: null, verdict: null, hypothesis: "AEs engaging with thought leaders are in-market and respond at >20%" },
+    { id: 11, name: "Warm intros", variant: "Network mining via LinkedIn", channel: "Outbound", week: 2, status: "queued", sent: null, responses: null, demos: null, cost: 0, responseRate: null, costPerDemo: null, signal: null, verdict: null, hypothesis: "Warm intros convert to meetings at >40%" },
+    { id: 12, name: "Hyper-personalized + gift", variant: "$5 Starbucks + personal note", channel: "Outbound", week: 2, status: "queued", sent: null, responses: null, demos: null, cost: 75, responseRate: null, costPerDemo: null, signal: null, verdict: null, hypothesis: "$5 gift + personal reference lifts response rate to >25%" },
+    { id: 13, name: "Churned user re-engagement", variant: "'Here's what changed' email sequence", channel: "Product-Led", week: 3, status: "queued", sent: null, responses: null, demos: null, cost: 0, responseRate: null, costPerDemo: null, signal: null, verdict: null, hypothesis: "Churned users reactivate at >5% with targeted email" },
+    { id: 14, name: "Twitter presence building", variant: "Daily replies to AE/sales tweets", channel: "Social", week: 3, status: "queued", sent: null, responses: null, demos: null, cost: 0, responseRate: null, costPerDemo: null, signal: null, verdict: null, hypothesis: "Consistent replies generate >5 inbound DMs/week in 30 days" }
+  ];
+}
+
+function loadExperiments() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored) return JSON.parse(stored);
+  const defaults = getDefaultExperiments();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
+  return defaults;
+}
+
+function saveExperiments(experiments) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(experiments));
+}
+
+function loadMeta() {
+  const stored = localStorage.getItem(META_KEY);
+  if (stored) return JSON.parse(stored);
+  return DEFAULT_META;
+}
+
+function loadInsight() {
+  const stored = localStorage.getItem(INSIGHT_KEY);
+  if (stored) return JSON.parse(stored);
+  return DEFAULT_INSIGHT;
+}
+
+// ==========================================
+// Rendering
+// ==========================================
+
+let chartInstance = null;
+
+function render() {
+  const experiments = loadExperiments();
+  const meta = loadMeta();
+  const insight = loadInsight();
 
   // Header
   document.getElementById('title').textContent = `${meta.company} GTM Experiments`;
   document.getElementById('subtitle').textContent = `Week ${meta.week} \u2014 ${meta.weekOf}`;
 
-  // Compute metrics
+  // Metrics
   const active = experiments.filter(e => e.status !== 'queued');
   const done = experiments.filter(e => e.status === 'done');
   const totalDemos = done.reduce((s, e) => s + (e.demos || 0), 0);
   const totalCost = done.reduce((s, e) => s + (e.cost || 0), 0);
-  const signals = experiments.filter(e => e.signal === 'yes' || e.signal === 'weak').length;
+  const signalYes = experiments.filter(e => e.signal === 'yes').length;
+  const signalWeak = experiments.filter(e => e.signal === 'weak').length;
   const costPerDemo = totalDemos > 0 ? (totalCost / totalDemos).toFixed(0) : 0;
 
-  // Score cards
   document.getElementById('scores').innerHTML = [
     { num: active.length, label: 'Experiments', detail: `${done.length} completed` },
-    { num: signals, label: 'Signals', detail: `${experiments.filter(e => e.signal === 'yes').length} strong` },
+    { num: signalYes + signalWeak, label: 'Signals', detail: `${signalYes} strong, ${signalWeak} weak` },
     { num: totalDemos, label: 'Demos Booked', detail: '$0 ad spend' },
-    { num: `$${costPerDemo}`, label: 'Cost / Demo', detail: `$${totalCost} total spend` },
+    { num: `$${costPerDemo}`, label: 'Cost / Demo', detail: `$${totalCost} total` },
   ].map(c => `
     <div class="score">
       <div class="num">${c.num}</div>
@@ -175,12 +376,13 @@ async function init() {
     </div>
   `).join('');
 
-  // Chart — horizontal bar, sorted by response rate
+  // Chart
   const chartData = experiments
     .filter(e => e.responseRate !== null && e.status !== 'queued')
     .sort((a, b) => b.responseRate - a.responseRate);
 
-  new Chart(document.getElementById('chart'), {
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(document.getElementById('chart'), {
     type: 'bar',
     data: {
       labels: chartData.map(e => e.variant || e.name),
@@ -205,13 +407,19 @@ async function init() {
     }
   });
 
-  // Experiment cards — active
+  // Active experiments
   const activeExps = experiments.filter(e => e.status !== 'queued');
-  document.getElementById('active-experiments').innerHTML = activeExps.map(renderCard).join('');
+  document.getElementById('active-count').textContent = `${activeExps.length} experiments`;
+  document.getElementById('active-experiments').innerHTML = activeExps.length
+    ? activeExps.map(e => renderCard(e)).join('')
+    : '<div class="empty">No active experiments yet</div>';
 
-  // Experiment cards — queued
+  // Queued
   const queuedExps = experiments.filter(e => e.status === 'queued');
-  document.getElementById('queued-experiments').innerHTML = queuedExps.map(e => renderCard(e, true)).join('');
+  document.getElementById('queued-count').textContent = `${queuedExps.length} experiments`;
+  document.getElementById('queued-experiments').innerHTML = queuedExps.length
+    ? queuedExps.map(e => renderCard(e, true)).join('')
+    : '<div class="empty">No queued experiments</div>';
 
   // Insight
   document.getElementById('insight-section').innerHTML = `
@@ -226,19 +434,21 @@ async function init() {
 function renderCard(e, isQueued = false) {
   const signalBadge = e.signal
     ? `<span class="badge ${e.signal}">${
-        e.signal === 'yes' ? 'Signal: YES' :
-        e.signal === 'weak' ? 'Signal: WEAK' :
-        e.signal === 'early' ? 'Too Early' : e.signal
+        e.signal === 'yes' ? 'YES' :
+        e.signal === 'weak' ? 'WEAK' :
+        e.signal === 'early' ? 'TOO EARLY' :
+        e.signal === 'no' ? 'NO' : e.signal
       }</span>`
     : e.status === 'running'
       ? '<span class="badge running">Running</span>'
-      : '<span class="badge queued">Week ' + e.week + '</span>';
+      : '<span class="badge queued">W' + e.week + '</span>';
 
   return `
-    <div class="exp-card ${isQueued ? 'queued' : ''}">
+    <div class="exp-card ${isQueued ? 'queued' : ''}" id="exp-${e.id}">
       <div>
         <div class="exp-name">${e.name}</div>
         <div class="exp-variant">${e.variant || e.channel}</div>
+        ${e.hypothesis ? `<div class="exp-hypothesis">"${e.hypothesis}"</div>` : ''}
       </div>
       <div class="exp-metric">
         <div class="num">${e.responseRate !== null ? e.responseRate + '%' : '\u2014'}</div>
@@ -248,7 +458,7 @@ function renderCard(e, isQueued = false) {
         <div class="num">${e.demos !== null ? e.demos : '\u2014'}</div>
         <div class="label">Demos</div>
       </div>
-      <div style="text-align: right;">
+      <div class="exp-right">
         ${signalBadge}
         ${e.verdict ? `<div class="verdict">${e.verdict}</div>` : ''}
       </div>
@@ -256,7 +466,123 @@ function renderCard(e, isQueued = false) {
   `;
 }
 
-init();
+// ==========================================
+// Add from Bot — parser
+// ==========================================
+
+function parseBotOutput(text) {
+  const lines = text.trim().split('\n');
+  const result = {};
+
+  for (const line of lines) {
+    const stripped = line.replace(/^\*\*/, '').replace(/\*\*$/, '').replace(/\*\*/g, '').trim();
+
+    if (/^idea:/i.test(stripped)) {
+      result.name = stripped.replace(/^idea:\s*/i, '').trim();
+    } else if (/^hypothesis:/i.test(stripped)) {
+      result.hypothesis = stripped.replace(/^hypothesis:\s*/i, '').trim();
+    } else if (/^kpi:/i.test(stripped)) {
+      result.kpi = stripped.replace(/^kpi:\s*/i, '').trim();
+    } else if (/^this week'?s? test:/i.test(stripped)) {
+      result.test = stripped.replace(/^this week'?s? test:\s*/i, '').trim();
+    } else if (/^expected conversion:/i.test(stripped)) {
+      result.expectedConversion = stripped.replace(/^expected conversion:\s*/i, '').trim();
+    } else if (/^tools needed:/i.test(stripped)) {
+      result.tools = stripped.replace(/^tools needed:\s*/i, '').trim();
+    } else if (/^variants? to test:/i.test(stripped)) {
+      result.variants = stripped.replace(/^variants? to test:\s*/i, '').trim();
+    } else if (/^week:/i.test(stripped)) {
+      const weekMatch = stripped.match(/W?(\d+)/i);
+      if (weekMatch) result.week = parseInt(weekMatch[1]);
+    }
+  }
+
+  if (!result.name) return null;
+
+  const experiments = loadExperiments();
+  const maxId = experiments.reduce((max, e) => Math.max(max, e.id), 0);
+
+  return {
+    id: maxId + 1,
+    name: result.name,
+    variant: result.kpi || null,
+    channel: "Outbound",
+    week: result.week || loadMeta().week + 1,
+    status: "queued",
+    sent: null,
+    responses: null,
+    demos: null,
+    cost: 0,
+    responseRate: null,
+    costPerDemo: null,
+    signal: null,
+    verdict: null,
+    hypothesis: result.hypothesis || null,
+    test: result.test || null,
+  };
+}
+
+// ==========================================
+// Modal
+// ==========================================
+
+function openModal() {
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('bot-input').value = '';
+  document.getElementById('parse-error').style.display = 'none';
+  document.getElementById('parse-success').style.display = 'none';
+  document.getElementById('bot-input').focus();
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function addFromBot() {
+  const text = document.getElementById('bot-input').value;
+  const parsed = parseBotOutput(text);
+
+  if (!parsed) {
+    document.getElementById('parse-error').style.display = 'block';
+    document.getElementById('parse-success').style.display = 'none';
+    return;
+  }
+
+  const experiments = loadExperiments();
+  experiments.push(parsed);
+  saveExperiments(experiments);
+
+  document.getElementById('parse-error').style.display = 'none';
+  document.getElementById('parse-success').style.display = 'block';
+
+  setTimeout(() => {
+    closeModal();
+    render();
+    // Scroll to and highlight the new card
+    setTimeout(() => {
+      const card = document.getElementById(`exp-${parsed.id}`);
+      if (card) {
+        card.classList.add('highlight');
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  }, 600);
+}
+
+// Close modal on overlay click
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Close modal on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+// ==========================================
+// Init
+// ==========================================
+render();
 </script>
 
 </body>
