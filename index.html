@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nevara GTM Experiment Dashboard</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="header">
+    <h1 id="header-title">GTM Experiments</h1>
+    <p id="header-subtitle"></p>
+    <div class="pillar-legend">
+      <span><span class="pillar-dot p1"></span> P1: Signal Outbound</span>
+      <span><span class="pillar-dot p2"></span> P2: Content Trust</span>
+      <span><span class="pillar-dot p3"></span> P3: Inbound</span>
+    </div>
+  </div>
+
+  <div class="metrics" id="metrics"></div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Response Rate by Experiment</h2>
+      <div class="chart-container">
+        <canvas id="responseRateChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Cost per Demo</h2>
+      <div class="chart-container">
+        <canvas id="costPerDemoChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Experiments by Channel</h2>
+      <div class="chart-container">
+        <canvas id="channelBreakdownChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card" id="insight"></div>
+
+    <div class="card full-width">
+      <h2>All Experiments</h2>
+      <div id="experiment-table"></div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/app.js"></script>
+
+</body>
+</html>
