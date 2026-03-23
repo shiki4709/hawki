@@ -1,5 +1,5 @@
 /* ========================================
-   Nevara GTM Dashboard — Chart Module
+   GTM Hypothesis Dashboard — Chart Module
    ======================================== */
 
 const COLORS = {

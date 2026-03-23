@@ -1,5 +1,5 @@
 /* ========================================
-   Nevara GTM Dashboard — Metrics Module
+   GTM Hypothesis Dashboard — Metrics Module
    ======================================== */
 
 /**

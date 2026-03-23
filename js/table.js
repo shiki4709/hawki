@@ -1,5 +1,5 @@
 /* ========================================
-   Nevara GTM Dashboard — Table Module
+   GTM Hypothesis Dashboard — Table Module
    ======================================== */
 
 function getStatusBadge(status) {

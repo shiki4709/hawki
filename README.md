@@ -1,11 +1,11 @@
-# Nevara GTM Experiment Dashboard
+# GTM Hypothesis Dashboard
 
-A modular, data-driven dashboard for tracking GTM hypothesis experiments. Built on the [ColdIQ compounding flywheel](https://coldiq.com) framework: signal-based outbound → content trust layer → inbound that converts.
+A modular, data-driven dashboard for tracking B2B GTM hypothesis experiments. Plug in any company, any ICP, any channel mix. Built on the [ColdIQ compounding flywheel](https://coldiq.com) framework: signal-based outbound → content trust layer → inbound that converts.
 
 ## Structure
 
 ```
-nevara-gtm-dashboard/
+gtm-hypothesis-dashboard/
 ├── index.html              # Dashboard shell — no logic, no data
 ├── css/
 │   └── styles.css          # All styling — metric cards, tables, charts, responsive
@@ -17,6 +17,15 @@ nevara-gtm-dashboard/
 └── data/
     └── experiments.json    # ALL dashboard data — edit this file to update the dashboard
 ```
+
+## Quickstart — use for any company
+
+1. Fork this repo
+2. Edit `data/experiments.json` — change `company`, `operator`, and replace the sample experiments with yours
+3. Open `index.html` in a browser — done
+4. Deploy: drag the folder to [Netlify Drop](https://app.netlify.com/drop) for a live URL
+
+The dashboard is fully driven by `experiments.json`. No code changes needed to switch companies, channels, or experiments.
 
 ## How to use
 

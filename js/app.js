@@ -1,5 +1,5 @@
 /* ========================================
-   Nevara GTM Dashboard — App Entry Point
+   GTM Hypothesis Dashboard — App Entry Point
    ======================================== */
 
 import { renderResponseRateChart, renderCostPerDemoChart, renderChannelBreakdown } from './charts.js';
