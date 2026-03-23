@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GTM Hypothesis Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -12,201 +11,164 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: #fafafa;
       color: #111;
-      max-width: 960px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 32px 24px;
     }
 
-    /* --- Header --- */
+    /* Header */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 40px;
+      margin-bottom: 32px;
     }
     .header h1 { font-size: 22px; font-weight: 700; }
     .header .sub { color: #888; font-size: 13px; margin-top: 4px; }
 
     .add-btn {
-      background: #111;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
+      background: #111; color: #fff; border: none;
+      padding: 10px 20px; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
     }
     .add-btn:hover { background: #333; }
 
-    /* --- Scores --- */
-    .scores {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 40px;
-    }
-    .score {
+    /* Summary bar */
+    .summary {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 36px;
+      padding: 16px 20px;
       background: #fff;
       border: 1px solid #eee;
       border-radius: 10px;
-      padding: 16px;
-      text-align: center;
+      font-size: 14px;
     }
-    .score .num { font-size: 32px; font-weight: 700; }
-    .score .label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
-    .score .detail { font-size: 11px; color: #10b981; margin-top: 2px; }
+    .summary-item .num { font-weight: 700; font-size: 20px; }
+    .summary-item .label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.3px; }
 
-    /* --- Section --- */
-    .section { margin-bottom: 40px; }
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
+    /* Week group */
+    .week-group { margin-bottom: 36px; }
+    .week-label {
+      font-size: 13px; font-weight: 600; color: #888;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
     }
-    .section h2 { font-size: 15px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
-    .section-count { font-size: 12px; color: #999; }
+    .week-line { flex: 1; height: 1px; background: #e5e7eb; }
 
-    /* --- Chart --- */
-    .chart-card {
+    /* Experiment card */
+    .exp {
       background: #fff;
       border: 1px solid #eee;
       border-radius: 10px;
       padding: 20px;
-    }
-    .chart-container { height: 200px; }
-
-    /* --- Experiment Cards --- */
-    .experiments { display: flex; flex-direction: column; gap: 8px; }
-
-    .exp-card {
-      background: #fff;
-      border: 1px solid #eee;
-      border-radius: 10px;
-      padding: 16px 20px;
-      display: grid;
-      grid-template-columns: 1fr 80px 60px 180px;
-      align-items: center;
-      gap: 12px;
+      margin-bottom: 10px;
       transition: border-color 0.2s;
     }
-    .exp-card:hover { border-color: #ccc; }
-    .exp-card.queued { opacity: 0.45; }
-    .exp-card.highlight { border-color: #3b82f6; background: #eff6ff; animation: fadeHighlight 3s ease-out forwards; }
+    .exp:hover { border-color: #ccc; }
+    .exp.queued { opacity: 0.4; }
+    .exp.highlight { border-color: #3b82f6; background: #eff6ff; animation: fadeHL 3s ease-out forwards; }
+    @keyframes fadeHL { to { background: #fff; border-color: #eee; } }
 
-    @keyframes fadeHighlight {
-      0% { background: #eff6ff; border-color: #3b82f6; }
-      100% { background: #fff; border-color: #eee; }
+    .exp-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
     }
-
-    .exp-name { font-weight: 600; font-size: 14px; }
-    .exp-variant { font-size: 12px; color: #888; margin-top: 2px; }
-    .exp-hypothesis { font-size: 11px; color: #aaa; margin-top: 4px; font-style: italic; }
-
-    .exp-metric { text-align: center; }
-    .exp-metric .num { font-size: 18px; font-weight: 700; }
-    .exp-metric .label { font-size: 10px; color: #888; text-transform: uppercase; }
-
-    .exp-right { text-align: right; }
+    .exp-name { font-weight: 600; font-size: 15px; }
+    .exp-channel { font-size: 12px; color: #888; margin-top: 2px; }
 
     .badge {
-      display: inline-block;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
+      display: inline-block; padding: 3px 10px;
+      border-radius: 20px; font-size: 11px; font-weight: 600;
     }
     .badge.yes { background: #d1fae5; color: #065f46; }
     .badge.weak { background: #fef3c7; color: #92400e; }
     .badge.early { background: #e0e7ff; color: #3730a3; }
     .badge.running { background: #dbeafe; color: #1e40af; }
-    .badge.queued { background: #f3f4f6; color: #9ca3af; }
+    .badge.queued-badge { background: #f3f4f6; color: #9ca3af; }
     .badge.no { background: #fee2e2; color: #991b1b; }
 
-    .verdict { font-size: 12px; color: #555; margin-top: 4px; }
-    .next-action { font-size: 11px; color: #3b82f6; margin-top: 2px; }
+    .exp-hypothesis {
+      font-size: 13px; color: #555; line-height: 1.5;
+      margin-bottom: 12px; font-style: italic;
+    }
 
-    /* --- Insight --- */
+    /* KPI rows */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .kpi {
+      background: #f9fafb;
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .kpi .kpi-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.3px; }
+    .kpi .kpi-value { font-size: 16px; font-weight: 700; margin-top: 2px; }
+    .kpi .kpi-target { font-size: 10px; color: #aaa; margin-top: 1px; }
+
+    .kpi .kpi-value.good { color: #059669; }
+    .kpi .kpi-value.ok { color: #d97706; }
+    .kpi .kpi-value.bad { color: #dc2626; }
+    .kpi .kpi-value.neutral { color: #111; }
+
+    /* Verdict */
+    .exp-verdict {
+      font-size: 13px;
+      padding-top: 10px;
+      border-top: 1px solid #f3f4f6;
+      color: #444;
+    }
+    .exp-verdict strong { color: #111; }
+
+    /* Insight */
     .insight {
-      background: #fffbeb;
-      border: 1px solid #fde68a;
-      border-radius: 10px;
-      padding: 20px;
+      background: #fffbeb; border: 1px solid #fde68a;
+      border-radius: 10px; padding: 20px; margin-bottom: 36px;
     }
     .insight h3 { font-size: 13px; font-weight: 600; color: #92400e; margin-bottom: 8px; }
     .insight p { font-size: 13px; color: #78350f; line-height: 1.6; }
 
-    /* --- Modal --- */
+    /* Modal */
     .modal-overlay {
-      display: none;
-      position: fixed;
+      display: none; position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 100;
-      justify-content: center;
-      align-items: center;
+      background: rgba(0,0,0,0.5); z-index: 100;
+      justify-content: center; align-items: center;
     }
     .modal-overlay.open { display: flex; }
-
     .modal {
-      background: #fff;
-      border-radius: 14px;
-      padding: 28px;
-      width: 560px;
-      max-width: 90vw;
-      max-height: 90vh;
-      overflow-y: auto;
+      background: #fff; border-radius: 14px;
+      padding: 28px; width: 560px;
+      max-width: 90vw; max-height: 90vh; overflow-y: auto;
     }
     .modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
     .modal .desc { font-size: 13px; color: #888; margin-bottom: 20px; line-height: 1.5; }
-
     .modal textarea {
-      width: 100%;
-      height: 200px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 12px;
+      width: 100%; height: 200px; border: 1px solid #ddd;
+      border-radius: 8px; padding: 12px;
       font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 12px;
-      resize: vertical;
-      outline: none;
+      font-size: 12px; resize: vertical; outline: none;
     }
     .modal textarea:focus { border-color: #111; }
-
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 16px;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-    }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+    .btn { padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
     .btn-primary { background: #111; color: #fff; }
     .btn-primary:hover { background: #333; }
     .btn-secondary { background: #f3f4f6; color: #555; }
     .btn-secondary:hover { background: #e5e7eb; }
+    .parse-msg { font-size: 12px; margin-top: 8px; display: none; }
+    .parse-msg.error { color: #dc2626; }
+    .parse-msg.success { color: #059669; }
 
-    .parse-error { color: #dc2626; font-size: 12px; margin-top: 8px; display: none; }
-    .parse-success { color: #059669; font-size: 12px; margin-top: 8px; display: none; }
-
-    /* --- Empty state --- */
-    .empty { text-align: center; padding: 40px; color: #999; font-size: 14px; }
-
-    /* --- Responsive --- */
     @media (max-width: 640px) {
-      .scores { grid-template-columns: repeat(2, 1fr); }
-      .exp-card { grid-template-columns: 1fr; gap: 8px; }
-      .exp-metric { text-align: left; }
-      .exp-right { text-align: left; }
+      .summary { flex-wrap: wrap; gap: 16px; }
+      .kpis { grid-template-columns: 1fr 1fr; }
     }
   </style>
 </head>
@@ -220,53 +182,20 @@
     <button class="add-btn" onclick="openModal()">+ Add from Bot</button>
   </div>
 
-  <div class="scores" id="scores"></div>
+  <div class="summary" id="summary"></div>
+  <div id="insight-section"></div>
+  <div id="experiments"></div>
 
-  <div class="section">
-    <div class="section-header">
-      <h2>What's Working</h2>
-    </div>
-    <div class="chart-card">
-      <div class="chart-container">
-        <canvas id="chart"></canvas>
-      </div>
-    </div>
-  </div>
-
-  <div class="section" id="active-section">
-    <div class="section-header">
-      <h2>This Week</h2>
-      <span class="section-count" id="active-count"></span>
-    </div>
-    <div class="experiments" id="active-experiments"></div>
-  </div>
-
-  <div class="section" id="queued-section">
-    <div class="section-header">
-      <h2>Coming Up</h2>
-      <span class="section-count" id="queued-count"></span>
-    </div>
-    <div class="experiments" id="queued-experiments"></div>
-  </div>
-
-  <div class="section" id="insight-section"></div>
-
-  <!-- Add from Bot Modal -->
   <div class="modal-overlay" id="modal">
     <div class="modal">
       <h2>Add Experiment from Bot</h2>
       <div class="desc">
-        Paste the bot's output below. It will parse the structured format and add the experiment to your dashboard.
-        <br><br>
-        Expected format from bot:<br>
-        <strong>Idea:</strong> ...<br>
-        <strong>Hypothesis:</strong> ...<br>
-        <strong>KPI:</strong> ...<br>
-        <strong>This week's test:</strong> ...
+        Paste the bot's output. It reads lines starting with<br>
+        <strong>Idea:</strong>, <strong>Hypothesis:</strong>, <strong>KPI:</strong>, <strong>This week's test:</strong>
       </div>
       <textarea id="bot-input" placeholder="Paste the bot's output here..."></textarea>
-      <div class="parse-error" id="parse-error">Could not parse the output. Make sure it has at least Idea and Hypothesis lines.</div>
-      <div class="parse-success" id="parse-success">Experiment added!</div>
+      <div class="parse-msg error" id="parse-error">Could not parse. Needs at least an Idea line.</div>
+      <div class="parse-msg success" id="parse-success">Added!</div>
       <div class="modal-actions">
         <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
         <button class="btn btn-primary" onclick="addFromBot()">Add Experiment</button>
@@ -275,256 +204,287 @@
   </div>
 
 <script>
-// ==========================================
-// Data layer — localStorage backed
-// ==========================================
+const STORAGE_KEY = 'gtm_experiments_v2';
 
-const STORAGE_KEY = 'gtm_experiments';
-const META_KEY = 'gtm_meta';
-const INSIGHT_KEY = 'gtm_insight';
-
-const DEFAULT_META = {
-  company: 'Nevara',
-  week: 1,
-  weekOf: '2026-03-24',
-  operator: 'GTM Associate'
-};
-
-const DEFAULT_INSIGHT = {
-  title: 'Week 1 Key Insight',
-  body: 'Post-engagement and signal-based personalization are the top performers. Referencing a prospect\'s LinkedIn activity or using Clay hiring signals drives 21-25% response rates vs 17% for generic deal-context. Coffee events have the highest raw conversion (45%) but lowest volume.',
-  recommendation: 'Scale signal-based outbound (Clay) + post-engager targeting to 5 posts/week. Book 2 coffee events/month. Test referral post DMs next week.'
-};
-
-function getDefaultExperiments() {
+function getDefaults() {
   return [
-    { id: 1, name: "LinkedIn autopilot", variant: "Signal-based (Clay: hiring + funding signals)", channel: "Outbound", week: 1, status: "done", sent: 65, responses: 16, demos: 3, cost: 0, responseRate: 24.6, costPerDemo: 0, signal: "yes", verdict: "Signal-based wins", hypothesis: "AEs at companies with 3+ recent sales hires respond to signal-based outreach at >20%" },
-    { id: 2, name: "LinkedIn autopilot", variant: "Post-engagement personalization", channel: "Outbound", week: 1, status: "done", sent: 65, responses: 14, demos: 3, cost: 0, responseRate: 21.5, costPerDemo: 0, signal: "yes", verdict: "Strong — scale alongside signal-based", hypothesis: "Referencing a prospect's post engagement lifts accept rate above 20%" },
-    { id: 3, name: "LinkedIn autopilot", variant: "Deal-context personalization", channel: "Outbound", week: 1, status: "done", sent: 70, responses: 12, demos: 2, cost: 0, responseRate: 17.1, costPerDemo: 0, signal: "yes", verdict: "Weakest variant — deprioritize", hypothesis: "Mentioning funding round or team growth converts at >15%" },
-    { id: 4, name: "Post-engager lead list", variant: "Commenters only (rmeadows post)", channel: "Outbound", week: 1, status: "done", sent: 34, responses: 8, demos: 3, cost: 0, responseRate: 23.5, costPerDemo: 0, signal: "yes", verdict: "Highest intent — run on 5 more posts", hypothesis: "Post commenters respond at 3x the rate of cold leads" },
-    { id: 5, name: "Post-engager lead list", variant: "Likers only", channel: "Outbound", week: 1, status: "done", sent: 55, responses: 5, demos: 1, cost: 0, responseRate: 9.1, costPerDemo: 0, signal: "weak", verdict: "Likers < commenters — cut this variant", hypothesis: "Post likers respond at 2x the rate of cold leads" },
-    { id: 6, name: "Coffee marketing", variant: "Local sales meetup", channel: "Events", week: 1, status: "done", sent: 40, responses: 18, demos: 6, cost: 150, responseRate: 45.0, costPerDemo: 25, signal: "yes", verdict: "Highest conversion — book 2/month", hypothesis: "In-person coffee conversations convert to demos at >30%" },
-    { id: 7, name: "Reddit listening", variant: "r/sales complaint threads", channel: "Social", week: 1, status: "running", sent: 20, responses: 4, demos: 0, cost: 0, responseRate: 20.0, costPerDemo: null, signal: "early", verdict: "Building presence — 60 day play", hypothesis: "Helpful replies to AE complaint threads get >15% reply-back rate" },
-    { id: 8, name: "Twitter listening", variant: "AE complaint tweets", channel: "Social", week: 1, status: "running", sent: 15, responses: 2, demos: 0, cost: 0, responseRate: 13.3, costPerDemo: null, signal: "early", verdict: "Lower signal than Reddit so far", hypothesis: "Replying to AE complaint tweets gets >15% engagement" },
-    { id: 9, name: "Referral post DMs", variant: "'Calling on my network' posts", channel: "Outbound", week: 2, status: "queued", sent: null, responses: null, demos: null, cost: 0, responseRate: null, costPerDemo: null, signal: null, verdict: null, hypothesis: "Sales leaders asking for tool recs respond to DMs at >30%" },
-    { id: 10, name: "Influencer monitoring", variant: "Mark Roberge + 4 others", channel: "Outbound", week: 2, status: "queued", sent: null, responses: null, demos: null, cost: 0, responseRate: null, costPerDemo: null, signal: null, verdict: null, hypothesis: "AEs engaging with thought leaders are in-market and respond at >20%" },
-    { id: 11, name: "Warm intros", variant: "Network mining via LinkedIn", channel: "Outbound", week: 2, status: "queued", sent: null, responses: null, demos: null, cost: 0, responseRate: null, costPerDemo: null, signal: null, verdict: null, hypothesis: "Warm intros convert to meetings at >40%" },
-    { id: 12, name: "Hyper-personalized + gift", variant: "$5 Starbucks + personal note", channel: "Outbound", week: 2, status: "queued", sent: null, responses: null, demos: null, cost: 75, responseRate: null, costPerDemo: null, signal: null, verdict: null, hypothesis: "$5 gift + personal reference lifts response rate to >25%" },
-    { id: 13, name: "Churned user re-engagement", variant: "'Here's what changed' email sequence", channel: "Product-Led", week: 3, status: "queued", sent: null, responses: null, demos: null, cost: 0, responseRate: null, costPerDemo: null, signal: null, verdict: null, hypothesis: "Churned users reactivate at >5% with targeted email" },
-    { id: 14, name: "Twitter presence building", variant: "Daily replies to AE/sales tweets", channel: "Social", week: 3, status: "queued", sent: null, responses: null, demos: null, cost: 0, responseRate: null, costPerDemo: null, signal: null, verdict: null, hypothesis: "Consistent replies generate >5 inbound DMs/week in 30 days" }
+    {
+      id: 1, name: "LinkedIn Autopilot — Signal-Based (Clay)", channel: "LinkedIn Outbound", week: 1, status: "done",
+      hypothesis: "AEs at companies with 3+ recent sales hires respond to signal-based outreach at >20%",
+      kpis: [
+        { label: "Requests Sent", value: "65", target: null, status: "neutral" },
+        { label: "Accept Rate", value: "41%", target: ">25%", status: "good" },
+        { label: "Reply Rate", value: "24.6%", target: ">20%", status: "good" },
+        { label: "Demos", value: "3", target: null, status: "neutral" },
+      ],
+      signal: "yes",
+      verdict: "Signal-based wins. Clay hiring signals (companies adding 3+ sales roles) produce the highest-intent leads. Scale this variant to 150 requests/week."
+    },
+    {
+      id: 2, name: "LinkedIn Autopilot — Post-Engagement", channel: "LinkedIn Outbound", week: 1, status: "done",
+      hypothesis: "Referencing a prospect's post engagement lifts reply rate above 20%",
+      kpis: [
+        { label: "Requests Sent", value: "65", target: null, status: "neutral" },
+        { label: "Accept Rate", value: "38%", target: ">25%", status: "good" },
+        { label: "Reply Rate", value: "21.5%", target: ">20%", status: "good" },
+        { label: "Demos", value: "3", target: null, status: "neutral" },
+      ],
+      signal: "yes",
+      verdict: "Strong second variant. Run alongside signal-based. Post-engagement personalization works best when referencing a specific comment they made."
+    },
+    {
+      id: 3, name: "LinkedIn Autopilot — Deal-Context", channel: "LinkedIn Outbound", week: 1, status: "done",
+      hypothesis: "Mentioning funding round or team growth converts at >15%",
+      kpis: [
+        { label: "Requests Sent", value: "70", target: null, status: "neutral" },
+        { label: "Accept Rate", value: "30%", target: ">25%", status: "ok" },
+        { label: "Reply Rate", value: "17.1%", target: ">15%", status: "ok" },
+        { label: "Demos", value: "2", target: null, status: "neutral" },
+      ],
+      signal: "weak",
+      verdict: "Above minimum threshold but clearly the weakest variant. Deprioritize in favor of signal-based and post-engagement. Use deal-context only as a fallback when other signals aren't available."
+    },
+    {
+      id: 4, name: "Post-Engager Lead List — Commenters", channel: "LinkedIn Content Mining", week: 1, status: "done",
+      hypothesis: "People who comment on viral GTM posts respond at 3x the rate of cold leads",
+      kpis: [
+        { label: "Engagers Extracted", value: "89", target: null, status: "neutral" },
+        { label: "ICP Match", value: "38%", target: ">10%", status: "good" },
+        { label: "Reply Rate", value: "23.5%", target: ">15%", status: "good" },
+        { label: "Demos from 34 leads", value: "3", target: null, status: "neutral" },
+      ],
+      signal: "yes",
+      verdict: "Commenters are the highest-intent audience we've tested. 38% ICP density on the rmeadows post is exceptional. Run this on 5 more viral posts this week to validate the ratio holds."
+    },
+    {
+      id: 5, name: "Post-Engager Lead List — Likers", channel: "LinkedIn Content Mining", week: 1, status: "done",
+      hypothesis: "People who like viral GTM posts respond at 2x the rate of cold leads",
+      kpis: [
+        { label: "Likers Extracted", value: "210", target: null, status: "neutral" },
+        { label: "ICP Match", value: "12%", target: ">10%", status: "ok" },
+        { label: "Reply Rate", value: "9.1%", target: ">10%", status: "bad" },
+        { label: "Demos from 55 leads", value: "1", target: null, status: "neutral" },
+      ],
+      signal: "weak",
+      verdict: "Likers have 3x less intent than commenters. Higher volume but much lower quality. Cut this variant — focus entirely on commenters."
+    },
+    {
+      id: 6, name: "Coffee Marketing — Sales Meetup", channel: "In-Person Events", week: 1, status: "done",
+      hypothesis: "In-person coffee conversations at sales events convert to demos at >30%",
+      kpis: [
+        { label: "Conversations", value: "40", target: null, status: "neutral" },
+        { label: "Emails Collected", value: "18", target: null, status: "neutral" },
+        { label: "Conv → Email", value: "45%", target: ">30%", status: "good" },
+        { label: "Demos Booked", value: "6", target: ">3", status: "good" },
+        { label: "Cost", value: "$150", target: null, status: "neutral" },
+        { label: "Cost/Demo", value: "$25", target: "<$50", status: "good" },
+      ],
+      signal: "yes",
+      verdict: "Highest single-touch conversion rate of any channel. The coffee creates a 60-second forced conversation window. Book 2 events per month. Test: branded cups + QR code vs iPad demo at next event."
+    },
+    {
+      id: 7, name: "Reddit Social Listening — r/sales", channel: "Reddit", week: 1, status: "running",
+      hypothesis: "Helpful replies to AE complaint threads on r/sales get >15% reply-back rate",
+      kpis: [
+        { label: "Threads Found", value: "14", target: null, status: "neutral" },
+        { label: "Replies Posted", value: "20", target: null, status: "neutral" },
+        { label: "Reply-Backs", value: "4", target: null, status: "neutral" },
+        { label: "Reply-Back Rate", value: "20%", target: ">15%", status: "good" },
+        { label: "Demos", value: "0", target: null, status: "neutral" },
+      ],
+      signal: "early",
+      verdict: "Engagement rate is promising but Reddit is a 60-day play. No demos expected yet — we're building reputation first. r/sales has the highest AE density. Continue daily: 5 genuine replies/day, zero mentions of Nevara for the first 30 days."
+    },
+    {
+      id: 8, name: "Twitter/X Social Listening", channel: "Twitter", week: 1, status: "running",
+      hypothesis: "Replying to AE complaint tweets gets >15% engagement rate",
+      kpis: [
+        { label: "Tweets Found", value: "9", target: null, status: "neutral" },
+        { label: "Replies Posted", value: "15", target: null, status: "neutral" },
+        { label: "Engagements", value: "2", target: null, status: "neutral" },
+        { label: "Engagement Rate", value: "13%", target: ">15%", status: "ok" },
+      ],
+      signal: "early",
+      verdict: "Below threshold so far. AE complaints on Twitter are mostly buried in replies, harder to surface than Reddit. Continue at lower priority — 3 replies/day vs 5 on Reddit."
+    },
+    {
+      id: 9, name: "Referral Post DMs", channel: "LinkedIn Inbound Signal", week: 2, status: "queued",
+      hypothesis: "Sales leaders posting 'anyone recommend a sales tool?' respond to DMs at >30%",
+      kpis: [], signal: null, verdict: null
+    },
+    {
+      id: 10, name: "Influencer Engagement Monitoring", channel: "LinkedIn Content Mining", week: 2, status: "queued",
+      hypothesis: "AEs engaging with Mark Roberge etc. are in-market and respond to DMs at >20%",
+      kpis: [], signal: null, verdict: null
+    },
+    {
+      id: 11, name: "Warm Intros via Network Mining", channel: "LinkedIn Network", week: 2, status: "queued",
+      hypothesis: "Warm intros through mutual connections convert to meetings at >40%",
+      kpis: [], signal: null, verdict: null
+    },
+    {
+      id: 12, name: "Hyper-Personalized + $5 Gift", channel: "LinkedIn Outbound", week: 2, status: "queued",
+      hypothesis: "$5 Starbucks eGift + personal reference lifts response rate to >25% vs no-gift",
+      kpis: [], signal: null, verdict: null
+    },
+    {
+      id: 13, name: "Churned User Re-Engagement", channel: "Email / Product-Led", week: 3, status: "queued",
+      hypothesis: "Churned users (last 90 days) reactivate at >5% with targeted 'here's what changed' email",
+      kpis: [], signal: null, verdict: null
+    },
+    {
+      id: 14, name: "Twitter Presence Building", channel: "Twitter", week: 3, status: "queued",
+      hypothesis: "Consistent daily replies to AE tweets generate >5 inbound DMs/week within 30 days",
+      kpis: [], signal: null, verdict: null
+    },
   ];
 }
 
-function loadExperiments() {
+function load() {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) return JSON.parse(stored);
-  const defaults = getDefaultExperiments();
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(defaults));
-  return defaults;
+  const d = getDefaults();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+  return d;
 }
 
-function saveExperiments(experiments) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(experiments));
-}
+function save(exps) { localStorage.setItem(STORAGE_KEY, JSON.stringify(exps)); }
 
-function loadMeta() {
-  const stored = localStorage.getItem(META_KEY);
-  if (stored) return JSON.parse(stored);
-  return DEFAULT_META;
-}
-
-function loadInsight() {
-  const stored = localStorage.getItem(INSIGHT_KEY);
-  if (stored) return JSON.parse(stored);
-  return DEFAULT_INSIGHT;
-}
-
-// ==========================================
-// Rendering
-// ==========================================
-
-let chartInstance = null;
+// ---- Render ----
 
 function render() {
-  const experiments = loadExperiments();
-  const meta = loadMeta();
-  const insight = loadInsight();
+  const exps = load();
 
-  // Header
-  document.getElementById('title').textContent = `${meta.company} GTM Experiments`;
-  document.getElementById('subtitle').textContent = `Week ${meta.week} \u2014 ${meta.weekOf}`;
+  document.getElementById('title').textContent = 'Nevara GTM Experiments';
+  document.getElementById('subtitle').textContent = 'Week 1 \u2014 March 24, 2026';
 
-  // Metrics
-  const active = experiments.filter(e => e.status !== 'queued');
-  const done = experiments.filter(e => e.status === 'done');
-  const totalDemos = done.reduce((s, e) => s + (e.demos || 0), 0);
-  const totalCost = done.reduce((s, e) => s + (e.cost || 0), 0);
-  const signalYes = experiments.filter(e => e.signal === 'yes').length;
-  const signalWeak = experiments.filter(e => e.signal === 'weak').length;
-  const costPerDemo = totalDemos > 0 ? (totalCost / totalDemos).toFixed(0) : 0;
+  // Summary
+  const done = exps.filter(e => e.status === 'done');
+  const active = exps.filter(e => e.status !== 'queued');
+  const signals = exps.filter(e => e.signal === 'yes').length;
+  const totalDemos = done.reduce((s, e) => {
+    const demoKpi = e.kpis.find(k => /demo/i.test(k.label));
+    return s + (demoKpi ? parseInt(demoKpi.value) || 0 : 0);
+  }, 0);
 
-  document.getElementById('scores').innerHTML = [
-    { num: active.length, label: 'Experiments', detail: `${done.length} completed` },
-    { num: signalYes + signalWeak, label: 'Signals', detail: `${signalYes} strong, ${signalWeak} weak` },
-    { num: totalDemos, label: 'Demos Booked', detail: '$0 ad spend' },
-    { num: `$${costPerDemo}`, label: 'Cost / Demo', detail: `$${totalCost} total` },
-  ].map(c => `
-    <div class="score">
-      <div class="num">${c.num}</div>
-      <div class="label">${c.label}</div>
-      <div class="detail">${c.detail}</div>
-    </div>
-  `).join('');
-
-  // Chart
-  const chartData = experiments
-    .filter(e => e.responseRate !== null && e.status !== 'queued')
-    .sort((a, b) => b.responseRate - a.responseRate);
-
-  if (chartInstance) chartInstance.destroy();
-  chartInstance = new Chart(document.getElementById('chart'), {
-    type: 'bar',
-    data: {
-      labels: chartData.map(e => e.variant || e.name),
-      datasets: [{
-        data: chartData.map(e => e.responseRate),
-        backgroundColor: chartData.map(e =>
-          e.signal === 'yes' ? '#059669' :
-          e.signal === 'weak' ? '#d97706' : '#9ca3af'
-        ),
-        borderRadius: 6,
-      }]
-    },
-    options: {
-      indexAxis: 'y',
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { beginAtZero: true, ticks: { callback: v => v + '%' }, grid: { color: '#f5f5f5' } },
-        y: { grid: { display: false }, ticks: { font: { size: 11 } } }
-      }
-    }
-  });
-
-  // Active experiments
-  const activeExps = experiments.filter(e => e.status !== 'queued');
-  document.getElementById('active-count').textContent = `${activeExps.length} experiments`;
-  document.getElementById('active-experiments').innerHTML = activeExps.length
-    ? activeExps.map(e => renderCard(e)).join('')
-    : '<div class="empty">No active experiments yet</div>';
-
-  // Queued
-  const queuedExps = experiments.filter(e => e.status === 'queued');
-  document.getElementById('queued-count').textContent = `${queuedExps.length} experiments`;
-  document.getElementById('queued-experiments').innerHTML = queuedExps.length
-    ? queuedExps.map(e => renderCard(e, true)).join('')
-    : '<div class="empty">No queued experiments</div>';
+  document.getElementById('summary').innerHTML = `
+    <div class="summary-item"><div class="num">${exps.length}</div><div class="label">Total Ideas</div></div>
+    <div class="summary-item"><div class="num">${active.length}</div><div class="label">In Progress</div></div>
+    <div class="summary-item"><div class="num">${signals}</div><div class="label">Signals Found</div></div>
+    <div class="summary-item"><div class="num">${totalDemos}</div><div class="label">Demos Booked</div></div>
+  `;
 
   // Insight
   document.getElementById('insight-section').innerHTML = `
     <div class="insight">
-      <h3>${insight.title}</h3>
-      <p>${insight.body}</p>
-      <p style="margin-top: 8px"><strong>Next:</strong> ${insight.recommendation}</p>
+      <h3>Week 1 Takeaway</h3>
+      <p><strong>Signal-based outbound (Clay) and post-commenters are the two winning motions.</strong> Both produce >20% reply rates at $0 cost. Coffee events have the highest per-touch conversion but lowest volume. LinkedIn likers are not worth pursuing — commenters are 3x better.</p>
+      <p style="margin-top:8px"><strong>Week 2 plan:</strong> Scale signal-based outbound to 150/week. Mine 5 more viral posts for commenters. Test referral post DMs and warm intros — both target prospects who are already in-market.</p>
     </div>
   `;
+
+  // Group by week
+  const weeks = {};
+  for (const e of exps) {
+    const wk = e.week <= 3 ? `Week ${e.week}` : 'Week 4+';
+    if (!weeks[wk]) weeks[wk] = [];
+    weeks[wk].push(e);
+  }
+
+  let html = '';
+  for (const [weekLabel, weekExps] of Object.entries(weeks)) {
+    const statusCounts = { done: 0, running: 0, queued: 0 };
+    weekExps.forEach(e => statusCounts[e.status] = (statusCounts[e.status] || 0) + 1);
+    const statusText = [
+      statusCounts.done ? `${statusCounts.done} done` : '',
+      statusCounts.running ? `${statusCounts.running} running` : '',
+      statusCounts.queued ? `${statusCounts.queued} queued` : '',
+    ].filter(Boolean).join(', ');
+
+    html += `
+      <div class="week-group">
+        <div class="week-label">${weekLabel} <span style="font-weight:400;color:#bbb">\u2014 ${statusText}</span> <div class="week-line"></div></div>
+        ${weekExps.map(renderExp).join('')}
+      </div>
+    `;
+  }
+  document.getElementById('experiments').innerHTML = html;
 }
 
-function renderCard(e, isQueued = false) {
+function renderExp(e) {
+  const isQueued = e.status === 'queued';
+
   const signalBadge = e.signal
     ? `<span class="badge ${e.signal}">${
-        e.signal === 'yes' ? 'YES' :
-        e.signal === 'weak' ? 'WEAK' :
-        e.signal === 'early' ? 'TOO EARLY' :
-        e.signal === 'no' ? 'NO' : e.signal
+        e.signal === 'yes' ? 'Signal: YES' :
+        e.signal === 'weak' ? 'Signal: WEAK' :
+        e.signal === 'early' ? 'Running \u2014 Too Early' :
+        e.signal === 'no' ? 'Signal: NO' : ''
       }</span>`
     : e.status === 'running'
       ? '<span class="badge running">Running</span>'
-      : '<span class="badge queued">W' + e.week + '</span>';
+      : '<span class="badge queued-badge">Queued</span>';
+
+  const kpiHtml = e.kpis.length ? `
+    <div class="kpis">
+      ${e.kpis.map(k => `
+        <div class="kpi">
+          <div class="kpi-label">${k.label}</div>
+          <div class="kpi-value ${k.status}">${k.value}</div>
+          ${k.target ? `<div class="kpi-target">Target: ${k.target}</div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
+  const verdictHtml = e.verdict ? `
+    <div class="exp-verdict"><strong>Verdict:</strong> ${e.verdict}</div>
+  ` : '';
 
   return `
-    <div class="exp-card ${isQueued ? 'queued' : ''}" id="exp-${e.id}">
-      <div>
-        <div class="exp-name">${e.name}</div>
-        <div class="exp-variant">${e.variant || e.channel}</div>
-        ${e.hypothesis ? `<div class="exp-hypothesis">"${e.hypothesis}"</div>` : ''}
-      </div>
-      <div class="exp-metric">
-        <div class="num">${e.responseRate !== null ? e.responseRate + '%' : '\u2014'}</div>
-        <div class="label">Response</div>
-      </div>
-      <div class="exp-metric">
-        <div class="num">${e.demos !== null ? e.demos : '\u2014'}</div>
-        <div class="label">Demos</div>
-      </div>
-      <div class="exp-right">
+    <div class="exp ${isQueued ? 'queued' : ''}" id="exp-${e.id}">
+      <div class="exp-top">
+        <div>
+          <div class="exp-name">${e.name}</div>
+          <div class="exp-channel">${e.channel}</div>
+        </div>
         ${signalBadge}
-        ${e.verdict ? `<div class="verdict">${e.verdict}</div>` : ''}
       </div>
+      <div class="exp-hypothesis">"${e.hypothesis}"</div>
+      ${kpiHtml}
+      ${verdictHtml}
     </div>
   `;
 }
 
-// ==========================================
-// Add from Bot — parser
-// ==========================================
+// ---- Add from Bot ----
 
 function parseBotOutput(text) {
-  const lines = text.trim().split('\n');
-  const result = {};
-
+  const lines = text.split('\n');
+  const r = {};
   for (const line of lines) {
-    const stripped = line.replace(/^\*\*/, '').replace(/\*\*$/, '').replace(/\*\*/g, '').trim();
-
-    if (/^idea:/i.test(stripped)) {
-      result.name = stripped.replace(/^idea:\s*/i, '').trim();
-    } else if (/^hypothesis:/i.test(stripped)) {
-      result.hypothesis = stripped.replace(/^hypothesis:\s*/i, '').trim();
-    } else if (/^kpi:/i.test(stripped)) {
-      result.kpi = stripped.replace(/^kpi:\s*/i, '').trim();
-    } else if (/^this week'?s? test:/i.test(stripped)) {
-      result.test = stripped.replace(/^this week'?s? test:\s*/i, '').trim();
-    } else if (/^expected conversion:/i.test(stripped)) {
-      result.expectedConversion = stripped.replace(/^expected conversion:\s*/i, '').trim();
-    } else if (/^tools needed:/i.test(stripped)) {
-      result.tools = stripped.replace(/^tools needed:\s*/i, '').trim();
-    } else if (/^variants? to test:/i.test(stripped)) {
-      result.variants = stripped.replace(/^variants? to test:\s*/i, '').trim();
-    } else if (/^week:/i.test(stripped)) {
-      const weekMatch = stripped.match(/W?(\d+)/i);
-      if (weekMatch) result.week = parseInt(weekMatch[1]);
-    }
+    const s = line.replace(/\*\*/g, '').trim();
+    if (/^idea:/i.test(s)) r.name = s.replace(/^idea:\s*/i, '');
+    else if (/^hypothesis:/i.test(s)) r.hypothesis = s.replace(/^hypothesis:\s*/i, '');
+    else if (/^kpi:/i.test(s)) r.kpi = s.replace(/^kpi:\s*/i, '');
+    else if (/^this week'?s? test:/i.test(s)) r.test = s.replace(/^this week'?s? test:\s*/i, '');
   }
+  if (!r.name) return null;
 
-  if (!result.name) return null;
-
-  const experiments = loadExperiments();
-  const maxId = experiments.reduce((max, e) => Math.max(max, e.id), 0);
-
+  const exps = load();
+  const maxId = exps.reduce((m, e) => Math.max(m, e.id), 0);
   return {
     id: maxId + 1,
-    name: result.name,
-    variant: result.kpi || null,
-    channel: "Outbound",
-    week: result.week || loadMeta().week + 1,
+    name: r.name,
+    channel: "New",
+    week: 2,
     status: "queued",
-    sent: null,
-    responses: null,
-    demos: null,
-    cost: 0,
-    responseRate: null,
-    costPerDemo: null,
+    hypothesis: r.hypothesis || "To be defined",
+    kpis: r.kpi ? [{ label: "Target KPI", value: "pending", target: r.kpi, status: "neutral" }] : [],
     signal: null,
-    verdict: null,
-    hypothesis: result.hypothesis || null,
-    test: result.test || null,
+    verdict: r.test ? `Planned test: ${r.test}` : null,
   };
 }
-
-// ==========================================
-// Modal
-// ==========================================
 
 function openModal() {
   document.getElementById('modal').classList.add('open');
@@ -534,56 +494,30 @@ function openModal() {
   document.getElementById('bot-input').focus();
 }
 
-function closeModal() {
-  document.getElementById('modal').classList.remove('open');
-}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
 
 function addFromBot() {
-  const text = document.getElementById('bot-input').value;
-  const parsed = parseBotOutput(text);
-
+  const parsed = parseBotOutput(document.getElementById('bot-input').value);
   if (!parsed) {
     document.getElementById('parse-error').style.display = 'block';
     document.getElementById('parse-success').style.display = 'none';
     return;
   }
-
-  const experiments = loadExperiments();
-  experiments.push(parsed);
-  saveExperiments(experiments);
-
+  const exps = load();
+  exps.push(parsed);
+  save(exps);
   document.getElementById('parse-error').style.display = 'none';
   document.getElementById('parse-success').style.display = 'block';
-
-  setTimeout(() => {
-    closeModal();
-    render();
-    // Scroll to and highlight the new card
-    setTimeout(() => {
-      const card = document.getElementById(`exp-${parsed.id}`);
-      if (card) {
-        card.classList.add('highlight');
-        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 100);
-  }, 600);
+  setTimeout(() => { closeModal(); render(); setTimeout(() => {
+    const card = document.getElementById(`exp-${parsed.id}`);
+    if (card) { card.classList.add('highlight'); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  }, 100); }, 500);
 }
 
-// Close modal on overlay click
-document.getElementById('modal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
+document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-// Close modal on Escape
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeModal();
-});
-
-// ==========================================
-// Init
-// ==========================================
 render();
 </script>
-
 </body>
 </html>
