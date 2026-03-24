@@ -54,7 +54,9 @@ function openModal() {
         '<span class="qa-chip-dot" style="background:' + p[1].color + '"></span>' + p[1].label + '</button>';
     }).join('') + '</div></div>' +
     '<div class="qa-field"><label class="qa-label">Target</label>' +
-    '<input type="text" class="qa-input qa-input-sm" id="qa-target" placeholder="e.g. >20% reply rate"></div>' +
+    '<div class="qa-target-row"><input type="text" class="qa-input qa-input-sm" id="qa-target" placeholder="e.g. >20% reply rate">' +
+    (getAIKey() ? '<button class="qa-ai-btn" onclick="qaSuggestTarget()" id="qa-ai-btn" title="AI suggest target">AI</button>' : '') + '</div>' +
+    '<div class="qa-target-hint" id="qa-target-hint">Pick a channel to see benchmarks</div></div>' +
     '<div class="qa-field"><label class="qa-label">Idea / Context</label>' +
     '<input type="text" class="qa-input qa-input-sm" id="qa-idea" placeholder="Brief description (optional)"></div>' +
     '<div class="qa-field"><label class="qa-label">Tools</label>' +
@@ -62,6 +64,8 @@ function openModal() {
     '</div><div class="qa-footer"><button class="qa-cancel" onclick="closeModal()">Cancel</button>' +
     '<button class="qa-submit" onclick="qaSubmit()">Add to Sprint</button></div></div>';
 
+  // Auto-fill target for initially selected channel
+  qaPickChannel(qaChannel);
   setTimeout(function() { var n = document.getElementById('qa-name'); if (n) n.focus(); }, 100);
 }
 
@@ -75,6 +79,80 @@ function qaPickChannel(ch) {
   document.querySelectorAll('.qa-chip').forEach(function(c) { c.classList.remove('active'); });
   var t = document.querySelector('.qa-chip[onclick*="' + ch + '"]');
   if (t) t.classList.add('active');
+
+  // Auto-fill target from benchmark
+  var bm = CHANNEL_BENCHMARKS[ch];
+  if (bm) {
+    var info = CH[ch];
+    var targetInput = document.getElementById('qa-target');
+    if (targetInput && !targetInput.value.trim()) {
+      targetInput.value = '>' + (bm.good * 100).toFixed(0) + '% ' + (info ? info.metric.toLowerCase() : 'rate');
+      targetInput.style.color = 'var(--text)';
+    }
+    // Show benchmark context
+    var hint = document.getElementById('qa-target-hint');
+    if (hint) {
+      hint.textContent = 'Avg: ' + (bm.avg * 100).toFixed(0) + '% · Good: ' + (bm.good * 100).toFixed(0) + '% · Great: ' + (bm.great * 100).toFixed(0) + '%';
+    }
+  }
+}
+
+function qaSuggestTarget() {
+  var name = document.getElementById('qa-name').value.trim();
+  var idea = document.getElementById('qa-idea').value.trim();
+  var ch = qaChannel || activeFlow;
+  var info = CH[ch];
+  var key = getAIKey();
+
+  if (!key) { showToast('Set API key in Settings first'); return; }
+  if (!name) { document.getElementById('qa-name').focus(); return; }
+
+  var btn = document.getElementById('qa-ai-btn');
+  if (btn) { btn.textContent = '...'; btn.disabled = true; }
+
+  var prompt = 'You are a B2B SaaS GTM expert. Suggest a target metric for this experiment.\n\n' +
+    'Experiment: ' + name + '\n' +
+    'Channel: ' + (info ? info.label : ch) + ' (' + (info ? info.mode : 'outbound') + ')\n' +
+    'Key metric: ' + (info ? info.metric : 'rate') + '\n' +
+    (idea ? 'Idea: ' + idea + '\n' : '') +
+    '\nRespond with ONLY a JSON object (no markdown):\n' +
+    '{"target": "<target string like >15% reply rate>", "reasoning": "<1 sentence why>"}';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'https://api.anthropic.com/v1/messages');
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.setRequestHeader('x-api-key', key);
+  xhr.setRequestHeader('anthropic-version', '2023-06-01');
+  xhr.setRequestHeader('anthropic-dangerous-direct-browser-access', 'true');
+
+  xhr.onload = function() {
+    if (btn) { btn.textContent = 'AI'; btn.disabled = false; }
+    if (xhr.status === 200) {
+      try {
+        var resp = JSON.parse(xhr.responseText);
+        var text = resp.content[0].text;
+        var json = JSON.parse(text.match(/\{[\s\S]*\}/)[0]);
+        var targetInput = document.getElementById('qa-target');
+        if (targetInput) targetInput.value = json.target;
+        var hint = document.getElementById('qa-target-hint');
+        if (hint) hint.textContent = json.reasoning;
+      } catch (err) {
+        showToast('Could not parse AI response');
+      }
+    } else {
+      showToast('API error: ' + xhr.status);
+    }
+  };
+  xhr.onerror = function() {
+    if (btn) { btn.textContent = 'AI'; btn.disabled = false; }
+    showToast('Network error');
+  };
+
+  xhr.send(JSON.stringify({
+    model: 'claude-haiku-4-5-20251001',
+    max_tokens: 150,
+    messages: [{ role: 'user', content: prompt }]
+  }));
 }
 
 function qaSubmit() {
