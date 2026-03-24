@@ -208,7 +208,7 @@ function renderExperiment(e) {
     html += '<div class="var-card' + (isStopped ? ' var-stopped' : '') + '">' +
       '<div class="var-head">' +
       '<div class="var-name">' + vDot + v.name + (isStopped ? ' <span class="var-stopped-label">stopped</span>' : '') + '</div>' +
-      (isStopped ? '' : '<span class="verdict ' + vCls + '" onclick="event.stopPropagation();cycleVarVerdict(' + e.id + ',\'' + v.id + '\')">' + (v.verdict || '—') + '</span>') +
+      (isStopped ? '' : '<button class="var-stop-btn" onclick="event.stopPropagation();stopVariation(' + e.id + ',\'' + v.id + '\')">Stop</button>') +
       '</div>';
 
     if (isStopped) { html += '</div>'; return; }
@@ -216,7 +216,6 @@ function renderExperiment(e) {
     // Pipeline — direct editable inputs with step conversions
     html += '<div class="pipe">';
     v.stages.forEach(function(stg, sIdx) {
-      // Conversion arrow between stages
       if (sIdx > 0) {
         var prev = v.stages[sIdx - 1].val;
         var conv = prev > 0 ? ((stg.val / prev) * 100) : 0;
@@ -234,14 +233,11 @@ function renderExperiment(e) {
     });
     html += '</div>';
 
-    // AI + next step
+    // AI insight
     if (hasData) {
       var sg = suggestVerdict(v, e.ch);
-      if (sg.verdict) html += '<div class="exp-ai"><strong>' + sg.verdict + '</strong> — ' + sg.reason + '</div>';
+      if (sg.verdict) html += '<div class="exp-ai">' + sg.reason + '</div>';
     }
-
-    html += '<div class="detail-next-text" onclick="event.stopPropagation();editVarNext(' + e.id + ',\'' + v.id + '\',this)">' +
-      (v.next || '<span class="ph">Next step...</span>') + '</div>';
 
     html += '</div>';
   });
@@ -275,14 +271,13 @@ function restoreExpanded() {
   });
 }
 
-function cycleVarVerdict(expId, varId) {
+function stopVariation(expId, varId) {
   var exps = load();
   var e = exps.find(function(x) { return x.id === expId; });
   if (!e) return;
   var v = e.variations.find(function(x) { return x.id === varId; });
   if (!v) return;
-  var opts = ['', 'Keep going', 'Stop'];
-  v.verdict = opts[(opts.indexOf(v.verdict) + 1) % opts.length];
+  v.verdict = 'Stop';
   save(exps); flash(); render();
 }
 
@@ -318,24 +313,6 @@ function editVarStage(expId, varId, stgIdx, el) {
   }, { label: stg.label, hint: hint });
 }
 
-function editVarNext(expId, varId, el) {
-  var exps = load();
-  var v = exps.find(function(x) { return x.id === expId; }).variations.find(function(x) { return x.id === varId; });
-  var input = document.createElement('input'); input.type = 'text'; input.value = v.next || '';
-  input.placeholder = 'Next step...';
-  el.innerHTML = ''; el.appendChild(input); input.focus();
-  var saved = false;
-  function c() {
-    if (saved) return;
-    saved = true;
-    var exps2 = load();
-    var v2 = exps2.find(function(x) { return x.id === expId; }).variations.find(function(x) { return x.id === varId; });
-    v2.next = input.value;
-    save(exps2); flash(); render();
-  }
-  input.addEventListener('blur', c);
-  input.addEventListener('keydown', function(ev) { if (ev.key === 'Enter') c(); });
-}
 
 function addVariation(expId) {
   var trigger = document.querySelector('#expand-' + expId + ' .add-var-trigger');

@@ -225,6 +225,12 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 }
 .var-rate-label { font-size: 10px; color: var(--text-4); }
 
+.var-stop-btn {
+  font-family: var(--ff-body); font-size: var(--fs-xs); color: var(--text-4);
+  background: transparent; border: 1px solid var(--rule); padding: var(--s-2) var(--s-8);
+  border-radius: var(--radius-sm); cursor: pointer; transition: all var(--dur-fast) var(--ease-out);
+}
+.var-stop-btn:hover { color: var(--accent); border-color: var(--accent); }
 .var-stopped { opacity: 0.4; }
 .var-stopped-label { font-size: var(--fs-xs); color: var(--text-4); font-weight: 400; font-family: var(--ff-body); }
 

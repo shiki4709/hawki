@@ -22,7 +22,7 @@ var D = [
     variations:[
       {id:'2a', name:'All engagers, Template A',
         stages:[{label:'Posts found',val:12},{label:'Engagers scraped',val:680},{label:'ICP filtered',val:340},{label:'DMs sent',val:340},{label:'Replied',val:48},{label:'Signed up',val:8}],
-        rateIdx:[4,3], started:'Mar 24', verdict:'Keep going', next:'Run on 5 more posts'},
+        rateIdx:[4,3], started:'Mar 24', verdict:'', next:''},
     ]},
 
   {id:3, ch:'li_outreach', name:'Referral Post DMs',
@@ -31,7 +31,7 @@ var D = [
     variations:[
       {id:'3a', name:'Direct DM approach',
         stages:[{label:'Posts found',val:8},{label:'People identified',val:20},{label:'DMs sent',val:20},{label:'Replied',val:7},{label:'Signed up',val:2}],
-        rateIdx:[3,2], started:'Mar 24', verdict:'Keep going', next:''},
+        rateIdx:[3,2], started:'Mar 24', verdict:'', next:''},
     ]},
 
   {id:4, ch:'li_outreach', name:'Influencer Monitor',
@@ -49,7 +49,7 @@ var D = [
     variations:[
       {id:'5a', name:'Standard intro ask',
         stages:[{label:'Target accounts',val:25},{label:'Mutual connections',val:15},{label:'Intro asks',val:10},{label:'Meetings',val:5},{label:'Signed up',val:3}],
-        rateIdx:[3,2], started:'Mar 25', verdict:'Keep going', next:'Draft blurbs for Maruthi'},
+        rateIdx:[3,2], started:'Mar 25', verdict:'', next:''},
     ]},
 
   {id:6, ch:'gifts', name:'Personalized Gifts',
@@ -77,7 +77,7 @@ var D = [
     variations:[
       {id:'17a', name:'Text posts, daily',
         stages:[{label:'Posts',val:12},{label:'Impressions',val:2400},{label:'Engagements',val:86},{label:'Followers',val:12},{label:'Inbound DMs',val:3}],
-        rateIdx:[2,1], started:'Mar 24', verdict:'Keep going', next:'Test carousel format'},
+        rateIdx:[2,1], started:'Mar 24', verdict:'', next:''},
     ]},
 
   {id:13, ch:'content_seo', name:'AI SEO Sprint',
@@ -86,7 +86,7 @@ var D = [
     variations:[
       {id:'13a', name:'Initial',
         stages:[{label:'Pages published',val:0},{label:'Indexed',val:0},{label:'Site visits',val:0},{label:'Signed up',val:0}],
-        rateIdx:[3,2], started:'—', verdict:'Stop', next:'Parked. Focus outbound first.'},
+        rateIdx:[3,2], started:'—', verdict:'', next:''},
     ]},
 
   {id:10, ch:'product', name:'Churn/Retention',
@@ -95,7 +95,7 @@ var D = [
     variations:[
       {id:'10a', name:'Initial',
         stages:[{label:'Churned identified',val:0},{label:'Re-engaged',val:0},{label:'Returned',val:0},{label:'Retained',val:0}],
-        rateIdx:[2,1], started:'—', verdict:'', next:'Need product data access'},
+        rateIdx:[2,1], started:'—', verdict:'', next:''},
     ]},
 
   {id:11, ch:'product', name:'Slack + In-App Messaging',
@@ -104,7 +104,7 @@ var D = [
     variations:[
       {id:'11a', name:'Initial',
         stages:[{label:'Messages sent',val:0},{label:'Opened',val:0},{label:'Engaged',val:0},{label:'Activated',val:0}],
-        rateIdx:[2,1], started:'—', verdict:'', next:'Need analytics access'},
+        rateIdx:[2,1], started:'—', verdict:'', next:''},
     ]},
 ];
 
