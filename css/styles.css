@@ -215,6 +215,7 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
   color: var(--text);
   flex: 1;
 }
+.var-rate-wrap { display: flex; flex-direction: column; align-items: flex-end; }
 .var-rate {
   font-family: var(--ff-display);
   font-size: var(--fs-md);
@@ -222,6 +223,7 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
   color: var(--text);
   font-variant-numeric: tabular-nums;
 }
+.var-rate-label { font-size: 10px; color: var(--text-4); }
 
 .add-var-trigger {
   display: flex;

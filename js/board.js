@@ -203,10 +203,12 @@ function renderExperiment(e) {
     }
     var vCls = verdictCls(v.verdict);
 
+    var rateLabel = info.metric ? info.metric.toLowerCase() : 'rate';
     html += '<div class="var-card">' +
       '<div class="var-head">' +
       '<div class="var-name">' + vDot + v.name + '</div>' +
-      '<div class="var-rate">' + vRate + '</div>' +
+      '<div class="var-rate-wrap"><span class="var-rate">' + vRate + '</span>' +
+      (vRate !== '—' ? '<span class="var-rate-label">' + rateLabel + '</span>' : '') + '</div>' +
       '<span class="verdict ' + vCls + '" onclick="event.stopPropagation();cycleVarVerdict(' + e.id + ',\'' + v.id + '\')">' + (v.verdict || '—') + '</span></div>';
 
     // Pipeline — direct editable inputs
@@ -269,7 +271,12 @@ function saveStage(expId, varId, stgIdx, val) {
   if (!v) return;
   v.stages[stgIdx].val = parseInt(val) || 0;
   save(exps);
-  // Don't re-render — just save silently. Rate updates on next render.
+  // Update rate display live without full re-render
+  var card = document.querySelector('#expand-' + expId);
+  if (card) {
+    var rateEl = card.querySelector('.var-card:nth-child(' + (e.variations.indexOf(v) + 1) + ') .var-rate');
+    if (rateEl) rateEl.textContent = expRateStr(v);
+  }
 }
 
 function editVarStage(expId, varId, stgIdx, el) {
