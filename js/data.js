@@ -156,47 +156,6 @@ var D = [
     ],
     rateIdx:[2,1], hours:1.5, verdict:'', next:''},
 
-  // ── INBOUND: Twitter ──
-  {id:8, ch:'twitter', name:'Thought Leadership Threads',
-    started:'Mar 24', target:'>2% engagement', targetNum:0.02,
-    tools:'Twitter/X',
-    idea:'Post threads on sales AI, reply to sales leaders. Build presence in #SalesTwitter.',
-    stages:[
-      {label:'Threads posted',val:8},
-      {label:'Impressions',val:1200},
-      {label:'Engagements',val:28},
-      {label:'Followers gained',val:4},
-      {label:'Inbound DMs',val:0}
-    ],
-    rateIdx:[2,1], hours:2, verdict:'', next:''},
-
-  {id:19, ch:'twitter', name:'Reply-to-Influencers',
-    started:'Mar 24', target:'>5% engagement', targetNum:0.05,
-    tools:'Twitter/X',
-    idea:'Surface the right people on Twitter. Strategic replies to @jasonlk, sales thought leaders. Get visible in their threads.',
-    stages:[
-      {label:'People surfaced',val:30},
-      {label:'Replies posted',val:45},
-      {label:'Impressions',val:450},
-      {label:'Engagements',val:31},
-      {label:'Followers gained',val:2}
-    ],
-    rateIdx:[3,2], hours:1, verdict:'Keep going', next:'Focus on threads with <10 replies for visibility.'},
-
-  // ── INBOUND: Reddit ──
-  {id:9, ch:'reddit', name:'r/sales Authority',
-    started:'Mar 24', target:'>10% upvote rate', targetNum:0.10,
-    tools:'Reddit',
-    idea:'Surface posts on r/sales, r/salesengineers about sales pain. Reply with value-first, detailed answers. Build credibility.',
-    stages:[
-      {label:'Posts surfaced',val:25},
-      {label:'Replies written',val:15},
-      {label:'Upvotes',val:8},
-      {label:'Profile visits',val:12},
-      {label:'DMs received',val:3}
-    ],
-    rateIdx:[2,1], hours:1.5, verdict:'Keep going', next:'Continue building presence. Post 1 long-form per week.'},
-
   // ── INBOUND: Content/SEO ──
   {id:13, ch:'content_seo', name:'AI SEO Sprint',
     started:'—', target:'>2% visit-to-signup', targetNum:0.02,
@@ -285,7 +244,6 @@ var WE_SEED = [
      {id:1,name:'Autopilot Outbound',ch:'li_outreach',stages:[{label:'ICP filtered',val:500},{label:'Connections sent',val:200},{label:'Accepted',val:85},{label:'In Dripify',val:85},{label:'Replied',val:17},{label:'Signed up',val:3}],rateIdx:[4,1],hours:4,verdict:'',target:'>10% reply rate',targetNum:0.10},
      {id:2,name:'Post Engager Lead Lists',ch:'lead_lists',stages:[{label:'Posts found',val:12},{label:'Scraped',val:680},{label:'Filtered',val:340},{label:'DMs sent',val:340},{label:'Replied',val:48},{label:'Signed up',val:8}],rateIdx:[4,3],hours:3,verdict:'Keep going',target:'>20% reply rate',targetNum:0.20},
      {id:5,name:'Network Mining',ch:'warm_intros',stages:[{label:'Targets',val:25},{label:'Mutuals',val:15},{label:'Asks',val:10},{label:'Meetings',val:5},{label:'Signed up',val:3}],rateIdx:[3,2],hours:1,verdict:'Keep going',target:'>40% meeting rate',targetNum:0.40},
-     {id:17,name:'Daily Insight Posts',ch:'li_content',stages:[{label:'Published',val:12},{label:'Impressions',val:2400},{label:'Engagements',val:86},{label:'Followers',val:12},{label:'DMs',val:3}],rateIdx:[2,1],hours:3,verdict:'Keep going',target:'>3% engagement',targetNum:0.03},
-     {id:9,name:'r/sales Authority',ch:'reddit',stages:[{label:'Surfaced',val:25},{label:'Replies',val:15},{label:'Upvotes',val:8},{label:'Visits',val:12},{label:'DMs',val:3}],rateIdx:[2,1],hours:1.5,verdict:'Keep going',target:'>10% upvote rate',targetNum:0.10}
+     {id:17,name:'Daily Insight Posts',ch:'li_content',stages:[{label:'Published',val:12},{label:'Impressions',val:2400},{label:'Engagements',val:86},{label:'Followers',val:12},{label:'DMs',val:3}],rateIdx:[2,1],hours:3,verdict:'Keep going',target:'>3% engagement',targetNum:0.03}
    ]}
 ];

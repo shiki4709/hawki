@@ -78,24 +78,6 @@ var CH = {
     rateIdx: [2, 1],
     keyIdx: 3
   },
-  twitter: {
-    label: 'Twitter',
-    color: 'oklch(52% 0.10 45)',
-    metric: 'Engagement Rate',
-    mode: 'inbound',
-    defaultStages: ['Posts/Replies', 'Impressions', 'Engagements', 'Followers', 'Inbound DMs'],
-    rateIdx: [2, 1],
-    keyIdx: 3
-  },
-  reddit: {
-    label: 'Reddit',
-    color: 'oklch(52% 0.16 28)',
-    metric: 'Upvote Rate',
-    mode: 'inbound',
-    defaultStages: ['Posts surfaced', 'Replies written', 'Upvotes', 'Profile visits', 'DMs received'],
-    rateIdx: [2, 1],
-    keyIdx: 2
-  },
   content_seo: {
     label: 'Content / SEO',
     color: 'oklch(48% 0.08 30)',

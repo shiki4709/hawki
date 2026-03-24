@@ -60,16 +60,6 @@ var CHANNEL_BENCHMARKS = {
     variables: ['Content format (carousel vs text vs video)', 'Hook / first line', 'Topic relevance to ICP pain', 'Post timing (Tue-Thu 8-10am)', 'CTA in comments', 'Engagement in first 30min'],
     source: 'industry'
   },
-  twitter: {
-    avg: 0.015, good: 0.035, great: 0.07, minSample: 300,
-    variables: ['Reply target selection (whose audience to borrow)', 'Tweet format (thread vs single)', 'Content angle', 'Ratio of original vs reply (60/40 reply-heavy for growth)', 'Posting frequency'],
-    source: 'industry'
-  },
-  reddit: {
-    avg: 0.10, good: 0.20, great: 0.30, minSample: 30,
-    variables: ['Subreddit selection', 'Answer depth / story-based vs tactical', 'Post timing', 'Profile/bio optimization', 'Length and specificity of contributions'],
-    source: 'industry'
-  },
   content_seo: {
     avg: 0.02, good: 0.04, great: 0.07, minSample: 200,
     variables: ['Keyword targeting (competition + intent)', 'Content depth / quality', 'CTA placement', 'Internal linking', 'Page type (comparison/alternative pages convert highest)', 'Backlink strategy'],
