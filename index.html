@@ -521,6 +521,70 @@
       color: var(--text);
     }
 
+    /* Auto vs Manual sections */
+    .detail-section-label {
+      font-size: var(--fs-xs);
+      font-weight: 600;
+      color: var(--text-4);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--s-8);
+    }
+    .detail-auto-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--s-8);
+      margin-bottom: var(--s-4);
+    }
+    .detail-auto {
+      padding: var(--s-12);
+      background: var(--surface);
+      border-radius: var(--s-6);
+      border-left: 2px solid var(--rule);
+    }
+    .detail-auto-val {
+      font-family: var(--ff-display);
+      font-size: var(--fs-lg);
+      font-weight: 600;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+    .detail-auto-label {
+      font-size: var(--fs-xs);
+      color: var(--text-3);
+      margin-top: var(--s-2);
+    }
+    .detail-auto-source {
+      font-size: 10px;
+      color: var(--text-4);
+      margin-top: var(--s-4);
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .detail-manual-grid {
+      display: flex;
+      flex-direction: column;
+      gap: var(--s-8);
+    }
+    .detail-manual {
+    }
+    .detail-idea-toggle {
+      font-size: var(--fs-xs);
+      color: var(--text-4);
+      cursor: pointer;
+      margin-top: var(--s-12);
+    }
+    .detail-idea-toggle:hover { color: var(--accent); }
+    .detail-idea-content {
+      display: none;
+      font-size: var(--fs-sm);
+      color: var(--text-3);
+      margin-top: var(--s-6);
+      line-height: var(--lh-body);
+    }
+    .detail-idea-content.open { display: block; }
+
     /* Comparison ranking */
     .compare-rank {
       margin-bottom: var(--s-24);
@@ -1022,18 +1086,29 @@ function render(){
       <div class="exp-expand-wrap" id="expand-${e.id}">
         <div class="exp-expand-inner">
           <div class="exp-detail">
-            <div class="exp-detail-grid">
-              <div class="detail-field detail-idea"><div class="detail-label">Idea</div><div class="detail-value">${e.idea}</div></div>
-              <div class="detail-field"><div class="detail-label">${info.cols[0]}</div><div class="detail-value editable" onclick="editM(${e.id},0,this)">${e.m?e.m[0]:0}</div></div>
-              <div class="detail-field"><div class="detail-label">${info.cols[1]}</div><div class="detail-value editable" onclick="editM(${e.id},1,this)">${e.m?e.m[1]:0}</div></div>
-              <div class="detail-field"><div class="detail-label">${info.cols[2]}</div><div class="detail-value editable" onclick="editM(${e.id},2,this)">${e.m?e.m[2]:0}</div></div>
-              <div class="detail-field"><div class="detail-label">Hours</div><div class="detail-value editable" onclick="editHours(${e.id},this)">${e.hours||0}h</div></div>
-              <div class="detail-next"><div class="detail-label">Next Step</div><div class="detail-next-text" onclick="event.stopPropagation();editNext(${e.id},this)">${e.next||'<span class="ph">What to do next sprint...</span>'}</div></div>
+            <div class="detail-section-label">Synced from tools</div>
+            <div class="detail-auto-grid">
+              <div class="detail-auto"><div class="detail-auto-val">${e.m?e.m[0]:0}</div><div class="detail-auto-label">${info.cols[0]}</div><div class="detail-auto-source"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> ${info.source||'Auto'}</div></div>
+              <div class="detail-auto"><div class="detail-auto-val">${e.m?e.m[1]:0}</div><div class="detail-auto-label">${info.cols[1]}</div><div class="detail-auto-source"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> ${info.source||'Auto'}</div></div>
+              <div class="detail-auto"><div class="detail-auto-val">${e.m?e.m[2]:0}</div><div class="detail-auto-label">${info.cols[2]}</div><div class="detail-auto-source"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Product analytics</div></div>
+            </div>
+            <div class="detail-section-label" style="margin-top:var(--s-16)">Your input</div>
+            <div class="detail-manual-grid">
+              <div class="detail-manual">
+                <div class="detail-label">Hours spent</div>
+                <div class="detail-value editable" onclick="editHours(${e.id},this)">${e.hours||0}h <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;color:var(--text-4)"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+              </div>
+              <div class="detail-manual detail-next">
+                <div class="detail-label">Next step</div>
+                <div class="detail-next-text" onclick="event.stopPropagation();editNext(${e.id},this)">${e.next||'<span class="ph">What to change next sprint...</span>'} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;color:var(--text-4)"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+              </div>
               <div class="verdict-group">
                 <span class="verdict-group-label">Verdict</span>
                 ${['Keep going','Change variables','Close, iterate','Stop'].map(v=>`<div class="vbtn v-${v==='Keep going'?'keep':v==='Change variables'?'change':v==='Close, iterate'?'close':'stop'} ${e.verdict===v?'active':''}" onclick="event.stopPropagation();setVerdict(${e.id},'${v}')">${v}</div>`).join('')}
               </div>
             </div>
+            <div class="detail-idea-toggle" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle('open')">View idea ▾</div>
+            <div class="detail-idea-content">${e.idea}</div>
           </div>
         </div>
       </div>
