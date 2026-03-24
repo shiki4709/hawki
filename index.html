@@ -73,8 +73,16 @@
     .exp-name-col { font-weight: 500; padding-right: 12px; }
     .metric-col { font-size: 12px; color: var(--text-2); }
     .target-col { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-3); font-variant-numeric: tabular-nums; }
-    .actual-col { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; cursor: pointer; }
+    .date-col { font-size: 12px; color: var(--text-3); white-space: nowrap; }
+    .date-text { margin-right: 4px; }
+    .date-icon { cursor: pointer; color: var(--text-3); opacity: 0; transition: opacity 0.15s; vertical-align: middle; }
+    tr:hover .date-icon { opacity: 0.6; }
+    .date-icon:hover { opacity: 1 !important; color: var(--accent); }
+
+    .actual-col { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; cursor: pointer; position: relative; }
     .actual-col:hover { color: var(--accent); }
+    .actual-col::after { content: ''; }
+    tr:hover .actual-col:not(.pending)::after { content: ' ✎'; font-size: 10px; color: var(--text-3); }
     .actual-col input { width: 60px; border: 1.5px solid var(--accent); border-radius: 3px; padding: 2px 6px; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; text-align: right; background: var(--bg); color: var(--text); }
     .actual-col.hit { color: var(--green); }
     .actual-col.miss { color: var(--accent); }
@@ -289,7 +297,7 @@ function render(){
 
     html+=`<tr class="${actualCls}" onclick="toggleExp(${e.id})" style="cursor:pointer">
       <td class="exp-name-col">${e.name}</td>
-      <td style="font-size:12px;color:var(--text-3);cursor:pointer" onclick="event.stopPropagation();editDate(${e.id},this)">${e.started||'—'}</td>
+      <td class="date-col"><span class="date-text">${e.started||'—'}</span><span class="date-icon" onclick="event.stopPropagation();editDate(${e.id},this.parentElement)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span></td>
       <td class="target-col">${e.target}</td>
       <td class="actual-col ${actualCls}" onclick="event.stopPropagation();editActual(${e.id},this)">${hasData?actual:'—'}</td>
       <td class="verdict-col"><span class="verdict ${verdictCls}" onclick="event.stopPropagation();cycleVerdict(${e.id})">${e.verdict||'—'}</span></td>
