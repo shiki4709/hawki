@@ -250,7 +250,9 @@ function toggleExp(id) { document.getElementById('expand-' + id).classList.toggl
 function cycleVarVerdict(expId, varId) {
   var exps = load();
   var e = exps.find(function(x) { return x.id === expId; });
+  if (!e) return;
   var v = e.variations.find(function(x) { return x.id === varId; });
+  if (!v) return;
   var opts = ['', 'Keep going', 'Change variables', 'Close, iterate', 'Stop'];
   v.verdict = opts[(opts.indexOf(v.verdict) + 1) % opts.length];
   save(exps); flash(); render();

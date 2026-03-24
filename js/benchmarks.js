@@ -277,7 +277,7 @@ function generateAllBenchmarks(callback) {
   var done = 0;
   needsGen.forEach(function(e) {
     var best = e.variations.find(function(v) { return v.verdict !== 'Stop'; }) || e.variations[0];
-    // Build a merged object for the AI with experiment + variation data
+    if (!best || !best.stages) { done++; if (done >= needsGen.length && callback) callback(); return; }
     var forAI = { id: e.id, name: e.name, ch: e.ch, idea: e.idea, stages: best.stages, rateIdx: best.rateIdx };
     generateBenchmarkAI(forAI, function(bm, err) {
       if (bm) setBenchmark(e.id, bm);

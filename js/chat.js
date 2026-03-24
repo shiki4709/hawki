@@ -2,27 +2,6 @@
    Quick Add — Inline + panel experiment creation
    ================================================================ */
 
-/* --- Inline add --- */
-function inlineAdd() {
-  var existing = document.getElementById('inline-add-row');
-  if (existing) { existing.querySelector('input').focus(); return; }
-  var list = document.querySelector('.exp-list');
-  if (!list) return;
-  var row = document.createElement('div');
-  row.id = 'inline-add-row'; row.className = 'inline-add';
-  row.innerHTML = '<input type="text" class="inline-add-input" placeholder="Experiment name..." onkeydown="inlineAddKey(event)" autofocus>' +
-    '<button class="inline-add-cancel" onclick="inlineAddCancel()">Esc</button>';
-  list.appendChild(row);
-  setTimeout(function() { row.querySelector('input').focus(); }, 50);
-}
-
-function inlineAddKey(e) {
-  if (e.key === 'Enter') { var n = e.target.value.trim(); if (n) { createExperiment(n, Object.keys(CH)[0]); } inlineAddCancel(); }
-  if (e.key === 'Escape') inlineAddCancel();
-}
-
-function inlineAddCancel() { var r = document.getElementById('inline-add-row'); if (r) r.remove(); }
-
 /* --- Quick-add panel --- */
 var qaOpen = false;
 var qaChannel = null;

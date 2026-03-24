@@ -118,45 +118,4 @@ function inlineEdit(el, currentVal, onSave, opts) {
   });
 }
 
-/* ================================================================
-   Rewired edit functions (replace prompt-based ones)
-   ================================================================ */
-
-function editStage(id, idx, el) {
-  var exps = load();
-  var e = exps.find(function(x) { return x.id === id; });
-  var stg = e.stages[idx];
-  var hint = getTrackingHint(e, stg.label);
-
-  inlineEdit(el, stg.val, function(val) {
-    var exps2 = load();
-    var e2 = exps2.find(function(x) { return x.id === id; });
-    e2.stages[idx].val = val;
-    save(exps2); flash(); render();
-  }, { label: stg.label, hint: hint });
-}
-
-function editHours(id, el) {
-  var exps = load();
-  var e = exps.find(function(x) { return x.id === id; });
-
-  inlineEdit(el, e.hours || 0, function(val) {
-    var exps2 = load();
-    var e2 = exps2.find(function(x) { return x.id === id; });
-    e2.hours = parseFloat(val) || 0;
-    save(exps2); flash(); render();
-  }, { label: 'Hours spent' });
-}
-
-function quickBump(id, stageIdx, el) {
-  var exps = load();
-  var e = exps.find(function(x) { return x.id === id; });
-  var stg = e.stages[stageIdx];
-
-  inlineEdit(el, stg.val, function(val) {
-    var exps2 = load();
-    var e2 = exps2.find(function(x) { return x.id === id; });
-    e2.stages[stageIdx].val = val;
-    save(exps2); flash(); render();
-  }, { label: stg.label });
-}
+/* editVarStage is in board.js — these old functions are removed */
