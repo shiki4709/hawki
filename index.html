@@ -326,6 +326,14 @@ function renderExp(e){
           ${STATUSES.map(s=>`<div class="status-opt s-${s.c} ${e.status===s.v?'active':''}" onclick="event.stopPropagation();setStatus(${e.id},'${s.v}')" title="${s.h}">${s.l}</div>`).join('')}
         </div>
       </div>
+      <div class="detail-status" style="margin-top:8px">
+        <span class="detail-status-label">Move to</span>
+        <div class="status-options">
+          <div class="status-opt ${e.pri===0?'active':''}" style="background:#e8f8ef;color:#1a7f37" onclick="event.stopPropagation();moveTo(${e.id},0)">This Week</div>
+          <div class="status-opt ${e.pri===1?'active':''}" style="background:#e8eaf6;color:#3949ab" onclick="event.stopPropagation();moveTo(${e.id},1)">Up Next</div>
+          <div class="status-opt ${e.pri===2?'active':''}" style="background:#f0f0f5;color:#999" onclick="event.stopPropagation();moveTo(${e.id},2)">Stopped</div>
+        </div>
+      </div>
       <div class="detail-next">
         <div class="d-label">Next Step</div>
         <div class="detail-next-text" onclick="event.stopPropagation();editNext(${e.id},this)">
@@ -355,6 +363,15 @@ function setStatus(id,v){
   const exps=load();exps.find(e=>e.id===id).status=v;save(exps);flash();render();
 }
 
+function moveTo(id,pri){
+  const exps=load();
+  const e=exps.find(x=>x.id===id);
+  e.pri=pri;
+  if(pri===2 && e.status!=='Stopped') e.status='Stopped';
+  if(pri===0 && e.status==='Stopped') e.status='Testing';
+  save(exps);flash();render();
+}
+
 function editNext(id,el){
   const exps=load();const e=exps.find(x=>x.id===id);
   const input=document.createElement('input');input.type='text';input.value=e.next||'';input.placeholder='What to do next...';
@@ -364,26 +381,66 @@ function editNext(id,el){
 }
 
 // Chat-based experiment creation
-const STEPS = [
-  { key:'idea', q:"What's the idea? Describe it however you want — raw is fine." },
-  { key:'goal', q:"What's the goal? What are you trying to achieve with this?" },
-  { key:'platform', q:"Where does it run? Which platforms or tools?" },
-  { key:'target', q:"How do we know it worked? What number = success?" },
-  { key:'scope', q:"How big is the test? (e.g., 50 DMs, 2 events, 7 days)" },
-  { key:'name', q:"Give it a short name — 2-3 words you'd use to refer to it." },
-];
+// Only asks 2 things: idea + goal. Bot suggests everything else.
 
-let chatStep = 0;
+const SUGGEST_MAP = {
+  'linkedin': { platform:'LinkedIn', flywheel:'Find & Reach', target:'>20% reply rate', scope:'50 outreach · 7 days', name:'LinkedIn Outbound' },
+  'sales nav': { platform:'LinkedIn, Sales Nav', flywheel:'Find & Reach', target:'>25% accept, >10% reply', scope:'200 requests · 7 days', name:'Sales Nav Outbound' },
+  'dripify': { platform:'LinkedIn, Sales Nav, Dripify', flywheel:'Find & Reach', target:'>25% accept, >10% reply', scope:'200 requests · 7 days', name:'Drip Sequence' },
+  'reddit': { platform:'Reddit', flywheel:'Find & Reach', target:'>20% reply-back rate', scope:'20 replies · 7 days', name:'Reddit Listening' },
+  'twitter': { platform:'Twitter/X', flywheel:'Build Awareness', target:'>15% engagement rate', scope:'20 replies/day · 7 days', name:'Twitter Outreach' },
+  'event': { platform:'In-person events', flywheel:'Find & Reach', target:'>3 demos per event', scope:'2 events · 7 days', name:'Event Marketing' },
+  'coffee': { platform:'In-person events', flywheel:'Find & Reach', target:'>50% conv-to-demo', scope:'2 events · 40 convos', name:'Coffee Events' },
+  'meetup': { platform:'In-person events', flywheel:'Find & Reach', target:'>3 demos per event', scope:'2 events · 7 days', name:'Meetup Outreach' },
+  'email': { platform:'Email', flywheel:'Find & Reach', target:'>40% open, >5% click', scope:'100 sends · 7 days', name:'Email Campaign' },
+  'churn': { platform:'Email, In-App', flywheel:'Attract & Retain', target:'>5% reactivation', scope:'All churned 90d · 30 days', name:'Win-Back' },
+  're-engage': { platform:'Email, In-App', flywheel:'Attract & Retain', target:'>5% reactivation', scope:'All churned 90d · 30 days', name:'Win-Back' },
+  'seo': { platform:'Website, Google', flywheel:'Build Awareness', target:'>500 impressions, >2% CTR', scope:'3 posts · 60 days', name:'SEO Sprint' },
+  'content': { platform:'LinkedIn, Twitter/X, Reddit', flywheel:'Build Awareness', target:'>50 imp/post', scope:'3 posts · 7 days', name:'Content Push' },
+  'slack': { platform:'Slack, In-App', flywheel:'Attract & Retain', target:'>15% engagement', scope:'3 messages · 7 days', name:'Slack Broadcast' },
+  'in-app': { platform:'In-App', flywheel:'Attract & Retain', target:'>15% feature usage increase', scope:'3 prompts · 7 days', name:'In-App Nudges' },
+  'docs': { platform:'Website, Help Center', flywheel:'Attract & Retain', target:'>30% reduction in support tickets', scope:'3 docs · 7 days', name:'Docs Rewrite' },
+  'gift': { platform:'LinkedIn, Email', flywheel:'Find & Reach', target:'>35% response rate', scope:'15 targets · $75 · 7 days', name:'Gift Outreach' },
+  'influencer': { platform:'LinkedIn', flywheel:'Find & Reach', target:'>20% DM response', scope:'5 influencers · 30 DMs · 7 days', name:'Influencer Monitor' },
+  'warm intro': { platform:'LinkedIn', flywheel:'Find & Reach', target:'>40% meeting rate', scope:'10 intros · 7 days', name:'Warm Intros' },
+  'referral': { platform:'LinkedIn', flywheel:'Find & Reach', target:'>30% DM response', scope:'20 DMs · 7 days', name:'Referral Posts' },
+  'scrape': { platform:'LinkedIn, PhantomBuster', flywheel:'Find & Reach', target:'>3x response vs cold', scope:'1 post · 50 leads · 7 days', name:'Post Engagers' },
+  'phantom': { platform:'LinkedIn, PhantomBuster', flywheel:'Find & Reach', target:'>3x response vs cold', scope:'1 post · 50 leads · 7 days', name:'Post Engagers' },
+  'webinar': { platform:'Zoom, LinkedIn', flywheel:'Build Awareness', target:'>50 attendees, >10% to demo', scope:'1 webinar · 14 days prep', name:'Webinar' },
+  'podcast': { platform:'Podcast platforms', flywheel:'Build Awareness', target:'>100 listens, >5 inbound leads', scope:'1 episode · 30 days', name:'Podcast Appearance' },
+  'cold call': { platform:'Phone', flywheel:'Find & Reach', target:'>5% meeting rate', scope:'50 calls · 7 days', name:'Cold Calling' },
+  'ads': { platform:'LinkedIn Ads, Google Ads', flywheel:'Build Awareness', target:'>2% CTR, <$50 CAC', scope:'$500 budget · 14 days', name:'Paid Ads Test' },
+  'partner': { platform:'Partner channels', flywheel:'Find & Reach', target:'>5 qualified intros', scope:'3 partners · 14 days', name:'Partner Outreach' },
+};
+
+function suggestFromIdea(idea) {
+  const lower = idea.toLowerCase();
+  let best = null;
+  let bestScore = 0;
+  for (const [keyword, suggestion] of Object.entries(SUGGEST_MAP)) {
+    if (lower.includes(keyword) && keyword.length > bestScore) {
+      best = suggestion;
+      bestScore = keyword.length;
+    }
+  }
+  // Default if no match
+  if (!best) {
+    best = { platform:'TBD', flywheel:'Find & Reach', target:'Define after scoping', scope:'7 days', name: idea.split(' ').slice(0, 3).join(' ') };
+  }
+  return { ...best };
+}
+
+let chatPhase = 0; // 0=ask idea, 1=ask goal, 2=show suggestion, 3=done
 let chatData = {};
 
 function openModal() {
-  chatStep = 0;
+  chatPhase = 0;
   chatData = {};
   document.getElementById('modal').classList.add('open');
   document.getElementById('chat-msgs').innerHTML = '';
-  document.getElementById('chat-in').value = '';
+  resetChatInput();
   setTimeout(() => {
-    addBotMsg(STEPS[0].q);
+    addBotMsg("What's the idea? Just describe it however you want.");
     document.getElementById('chat-in').focus();
   }, 200);
 }
@@ -392,11 +449,18 @@ function closeModal() {
   document.getElementById('modal').classList.remove('open');
 }
 
+function resetChatInput() {
+  document.getElementById('chat-input').innerHTML = `
+    <input type="text" id="chat-in" placeholder="Type here..." onkeydown="if(event.key==='Enter')sendMsg()">
+    <button onclick="sendMsg()">Send</button>
+  `;
+}
+
 function addBotMsg(text) {
   const msgs = document.getElementById('chat-msgs');
   const div = document.createElement('div');
   div.className = 'msg bot';
-  div.textContent = text;
+  div.innerHTML = text;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
@@ -410,18 +474,20 @@ function addUserMsg(text) {
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-function addSummary(data) {
+function addSummaryCard() {
   const msgs = document.getElementById('chat-msgs');
+  const d = chatData;
   const div = document.createElement('div');
   div.className = 'msg summary';
   div.innerHTML = `
-    <div class="s-value" style="font-size:14px;margin-bottom:8px">Here's your experiment:</div>
-    <div class="s-label">Name</div><div class="s-value">${data.name}</div>
-    <div class="s-label">Idea</div><div class="s-value">${data.idea}</div>
-    <div class="s-label">Goal</div><div class="s-value">${data.goal}</div>
-    <div class="s-label">Platform</div><div class="s-value">${data.platform}</div>
-    <div class="s-label">Target</div><div class="s-value">${data.target}</div>
-    <div class="s-label">Test Size</div><div class="s-value">${data.scope}</div>
+    <div style="font-weight:700;font-size:14px;margin-bottom:10px">Here's what I'd suggest:</div>
+    <div class="s-label">Name</div><div class="s-value">${d.name}</div>
+    <div class="s-label">Idea</div><div class="s-value">${d.idea}</div>
+    <div class="s-label">Goal</div><div class="s-value">${d.goal}</div>
+    <div class="s-label">Platform</div><div class="s-value">${d.platform}</div>
+    <div class="s-label">Target</div><div class="s-value">${d.target}</div>
+    <div class="s-label">Test Size</div><div class="s-value">${d.scope}</div>
+    <div class="s-label">Stage</div><div class="s-value">${d.flywheel}</div>
   `;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
@@ -431,43 +497,51 @@ function sendMsg() {
   const input = document.getElementById('chat-in');
   const val = input.value.trim();
   if (!val) return;
-
   addUserMsg(val);
-  chatData[STEPS[chatStep].key] = val;
   input.value = '';
-  chatStep++;
 
-  if (chatStep < STEPS.length) {
+  if (chatPhase === 0) {
+    // Got the idea
+    chatData.idea = val;
+    chatPhase = 1;
     setTimeout(() => {
-      addBotMsg(STEPS[chatStep].q);
+      addBotMsg("Got it. What are you hoping to get out of this? (e.g., more demos, more users, brand awareness — or just say 'not sure')");
       input.focus();
     }, 300);
-  } else {
-    finishChat();
-  }
-}
 
-function skipStep() {
-  chatData[STEPS[chatStep].key] = '';
-  chatStep++;
-  if (chatStep < STEPS.length) {
-    addBotMsg(STEPS[chatStep].q);
-    document.getElementById('chat-in').focus();
-  } else {
-    finishChat();
-  }
-}
+  } else if (chatPhase === 1) {
+    // Got the goal
+    chatData.goal = val === 'not sure' || val === 'idk' ? '' : val;
+    chatPhase = 2;
 
-function finishChat() {
-  const input = document.getElementById('chat-input');
-  addSummary(chatData);
-  setTimeout(() => {
-    addBotMsg("Add this to your tracker?");
-    input.innerHTML = `
-      <button class="skip-btn" onclick="closeModal()" style="flex:1">Cancel</button>
-      <button onclick="confirmAdd()" style="flex:2;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#34c759;color:#fff">Add Experiment</button>
-    `;
-  }, 400);
+    // Auto-suggest everything else
+    const suggestion = suggestFromIdea(chatData.idea);
+    chatData.name = suggestion.name;
+    chatData.platform = suggestion.platform;
+    chatData.target = suggestion.target;
+    chatData.scope = suggestion.scope;
+    chatData.flywheel = suggestion.flywheel;
+    if (!chatData.goal) chatData.goal = 'To be defined with operator';
+
+    setTimeout(() => {
+      addBotMsg("Based on your idea, here's how I'd structure the experiment:");
+      setTimeout(() => {
+        addSummaryCard();
+        setTimeout(() => {
+          addBotMsg("Look good? You can edit any of these after adding.");
+          // Switch to confirm buttons
+          document.getElementById('chat-input').innerHTML = `
+            <button onclick="closeModal()" style="flex:1;padding:10px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:#f0f0f5;color:#86868b">Cancel</button>
+            <button onclick="confirmAdd()" style="flex:2;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#34c759;color:#fff">Add to Tracker</button>
+          `;
+        }, 400);
+      }, 300);
+    }, 300);
+
+  } else if (chatPhase === 3) {
+    // Editing phase — user is refining
+    input.focus();
+  }
 }
 
 function confirmAdd() {
@@ -475,13 +549,13 @@ function confirmAdd() {
   const id = exps.reduce((m, e) => Math.max(m, e.id), 0) + 1;
   exps.push({
     id, pri: 1,
-    name: chatData.name || chatData.idea?.split(' ').slice(0, 3).join(' ') || 'New',
-    idea: chatData.idea || '',
-    goal: chatData.goal || '',
-    platform: chatData.platform || '',
-    flywheel: '',
-    target: chatData.target || '',
-    scope: chatData.scope || '',
+    name: chatData.name,
+    idea: chatData.idea,
+    goal: chatData.goal,
+    platform: chatData.platform,
+    flywheel: chatData.flywheel,
+    target: chatData.target,
+    scope: chatData.scope,
     status: 'Testing',
     next: ''
   });
