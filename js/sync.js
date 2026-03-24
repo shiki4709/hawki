@@ -111,8 +111,12 @@ function syncExperiment(expId, callback) {
       var e = exps.find(function(x) { return x.id === expId; });
       if (!e) { callback('Experiment not found'); return; }
 
+      // Sync into the first (or best) active variation
+      var v = e.variations && e.variations.length > 0 ? e.variations[0] : null;
+      if (!v) { callback('No variations found'); return; }
+
       var matched = 0;
-      e.stages.forEach(function(stg) {
+      v.stages.forEach(function(stg) {
         var colIdx = -1;
         data.headers.forEach(function(h, i) {
           if (h.toLowerCase().trim() === stg.label.toLowerCase().trim()) colIdx = i;
@@ -127,11 +131,11 @@ function syncExperiment(expId, callback) {
       src.lastSync = new Date().toISOString();
       src.lastRow = data.rowCount;
       src.matched = matched;
-      src.total = e.stages.length;
+      src.total = v.stages.length;
       setSource(expId, src);
 
       save(exps);
-      callback(null, matched + '/' + e.stages.length + ' stages synced');
+      callback(null, matched + '/' + v.stages.length + ' stages synced');
     });
 
   } else if (src.type === 'api') {
@@ -146,8 +150,11 @@ function syncExperiment(expId, callback) {
           var e = exps.find(function(x) { return x.id === expId; });
           if (!e) { callback('Experiment not found'); return; }
 
+          var v = e.variations && e.variations.length > 0 ? e.variations[0] : null;
+          if (!v) { callback('No variations found'); return; }
+
           var matched = 0;
-          e.stages.forEach(function(stg) {
+          v.stages.forEach(function(stg) {
             var key = stg.label.toLowerCase().replace(/\s+/g, '_');
             if (data[key] !== undefined) { stg.val = parseInt(data[key]) || 0; matched++; }
             if (data[stg.label] !== undefined) { stg.val = parseInt(data[stg.label]) || 0; matched++; }
@@ -202,6 +209,7 @@ function openConnect(expId) {
     sinceText = ago < 60 ? ago + ' min ago' : Math.round(ago / 60) + 'h ago';
   }
 
+  qaOpen = true;
   document.getElementById('modal').classList.add('open');
   document.querySelector('.chat').innerHTML =
     '<div class="qa-panel"><div class="qa-header"><h2 class="qa-title">Connect Data — ' + e.name + '</h2>' +
@@ -237,7 +245,8 @@ function connectType(expId, type) {
 
 function connectConfigHTML(expId, src) {
   var e = load().find(function(x) { return x.id === expId; });
-  var stageNames = e ? e.stages.map(function(s) { return s.label; }) : [];
+  var v = e && e.variations && e.variations.length > 0 ? e.variations[0] : null;
+  var stageNames = v ? v.stages.map(function(s) { return s.label; }) : [];
   var headerRow = 'Date, ' + stageNames.join(', ');
   var exampleRow = 'YYYY-MM-DD, ' + stageNames.map(function() { return '0'; }).join(', ');
 

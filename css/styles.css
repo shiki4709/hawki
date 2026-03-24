@@ -233,6 +233,11 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 }
 .add-var-trigger:hover { color: var(--text-2); border-color: var(--text-4); }
 
+.add-var-inline { display: flex; flex-direction: column; gap: var(--s-8); width: 100%; }
+.add-var-input { width: 100%; border: 1.5px solid var(--accent); border-radius: var(--radius-sm); padding: var(--s-8) var(--s-12); font-size: var(--fs-sm); font-family: var(--ff-body); outline: none; background: var(--bg); color: var(--text); }
+.add-var-input::placeholder { color: var(--text-4); }
+.add-var-actions { display: flex; gap: var(--s-6); justify-content: flex-end; }
+
 .exp-bottom {
   display: flex;
   gap: var(--s-12);
@@ -315,6 +320,12 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .ie-save:hover { opacity: 0.85; }
 .ie-cancel { padding: var(--s-4) var(--s-12); border-radius: var(--radius-sm); border: 1px solid var(--rule); background: transparent; color: var(--text-3); font-size: var(--fs-xs); font-weight: 600; font-family: var(--ff-body); cursor: pointer; }
 .ie-cancel:hover { border-color: var(--text-4); }
+
+/* Settings action buttons */
+.td-action-btn { font-family: var(--ff-body); font-size: var(--fs-xs); font-weight: 600; color: var(--inbound); background: var(--inbound-bg); border: 1.5px solid oklch(50% 0.10 250 / 0.2); padding: var(--s-6) var(--s-12); border-radius: var(--radius-sm); cursor: pointer; transition: all var(--dur-fast) var(--ease-out); }
+.td-action-btn:hover { border-color: var(--inbound); }
+.td-edit-btn { font-family: var(--ff-body); font-size: var(--fs-xs); font-weight: 600; color: var(--text-3); background: transparent; border: 1.5px solid var(--rule); padding: var(--s-6) var(--s-12); border-radius: var(--radius-sm); cursor: pointer; transition: all var(--dur-fast) var(--ease-out); }
+.td-edit-btn:hover { border-color: var(--text-4); }
 
 /* ================================================================
    MODAL

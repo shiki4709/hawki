@@ -197,7 +197,7 @@ function getTrackingHint(exp, stageLabel) {
 
 /* --- Rate calc helpers (used by board + weeks) --- */
 function expRate(e) {
-  var ri = e.rateIdx || CH[e.ch].rateIdx;
+  var ri = e.rateIdx || (e.ch && CH[e.ch] ? CH[e.ch].rateIdx : [1, 0]);
   var s = e.stages;
   if (!s || !ri) return 0;
   var num = s[ri[0]] ? s[ri[0]].val : 0;
@@ -217,7 +217,7 @@ function expHasData(e) {
 }
 
 function expKeyVal(e) {
-  var info = CH[e.ch];
+  var info = e.ch ? CH[e.ch] : null;
   if (!info || !e.stages) return 0;
   var idx = info.keyIdx === -1 ? e.stages.length - 1 : info.keyIdx;
   return e.stages[idx] ? e.stages[idx].val : 0;

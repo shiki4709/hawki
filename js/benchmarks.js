@@ -107,7 +107,7 @@ function suggestVerdict(exp, ch) {
   }
 
   // Get sample size (denominator of rate)
-  var ri = exp.rateIdx || (CH[exp.ch] ? CH[exp.ch].rateIdx : [1, 0]);
+  var ri = exp.rateIdx || (ch && CH[ch] ? CH[ch].rateIdx : [1, 0]);
   var sample = exp.stages[ri[1]] ? exp.stages[ri[1]].val : 0;
 
   if (sample < bm.minSample) {
@@ -263,7 +263,10 @@ function generateAllBenchmarks(callback) {
   var exps = load();
   var custom = loadBenchmarks();
   var needsGen = exps.filter(function(e) {
-    return !custom[e.id] && e.verdict !== 'Stop' && expHasData(e);
+    if (custom[e.id]) return false;
+    if (!e.variations || e.variations.length === 0) return false;
+    var best = e.variations.find(function(v) { return v.verdict !== 'Stop'; }) || e.variations[0];
+    return expHasData(best);
   });
 
   if (needsGen.length === 0) {
@@ -273,7 +276,10 @@ function generateAllBenchmarks(callback) {
 
   var done = 0;
   needsGen.forEach(function(e) {
-    generateBenchmarkAI(e, function(bm, err) {
+    var best = e.variations.find(function(v) { return v.verdict !== 'Stop'; }) || e.variations[0];
+    // Build a merged object for the AI with experiment + variation data
+    var forAI = { id: e.id, name: e.name, ch: e.ch, idea: e.idea, stages: best.stages, rateIdx: best.rateIdx };
+    generateBenchmarkAI(forAI, function(bm, err) {
       if (bm) setBenchmark(e.id, bm);
       done++;
       if (done >= needsGen.length && callback) callback();

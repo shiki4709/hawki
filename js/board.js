@@ -225,7 +225,7 @@ function cycleVarVerdict(expId, varId) {
   var exps = load();
   var e = exps.find(function(x) { return x.id === expId; });
   var v = e.variations.find(function(x) { return x.id === varId; });
-  var opts = ['', 'Keep going', 'Change variables', 'Stop'];
+  var opts = ['', 'Keep going', 'Change variables', 'Close, iterate', 'Stop'];
   v.verdict = opts[(opts.indexOf(v.verdict) + 1) % opts.length];
   save(exps); flash(); render();
 }
@@ -252,32 +252,64 @@ function editVarNext(expId, varId, el) {
   var input = document.createElement('input'); input.type = 'text'; input.value = v.next || '';
   input.placeholder = 'Next step...';
   el.innerHTML = ''; el.appendChild(input); input.focus();
-  function c() { v.next = input.value; save(exps); flash(); render(); }
+  var saved = false;
+  function c() {
+    if (saved) return;
+    saved = true;
+    var exps2 = load();
+    var v2 = exps2.find(function(x) { return x.id === expId; }).variations.find(function(x) { return x.id === varId; });
+    v2.next = input.value;
+    save(exps2); flash(); render();
+  }
   input.addEventListener('blur', c);
   input.addEventListener('keydown', function(ev) { if (ev.key === 'Enter') c(); });
 }
 
 function addVariation(expId) {
-  var exps = load();
-  var e = exps.find(function(x) { return x.id === expId; });
-  var info = CH[e.ch];
-  var count = e.variations.length + 1;
-  var stages = (info ? info.defaultStages : ['Input', 'Output']).map(function(l) { return { label: l, val: 0 }; });
+  var trigger = document.querySelector('#expand-' + expId + ' .add-var-trigger');
+  if (!trigger || trigger.querySelector('.add-var-inline')) return;
 
-  var name = prompt('Variation name (what are you changing?)');
-  if (!name) return;
+  var wrap = document.createElement('div');
+  wrap.className = 'add-var-inline';
+  wrap.onclick = function(e) { e.stopPropagation(); };
+  wrap.innerHTML = '<input type="text" class="add-var-input" placeholder="What are you changing?" autofocus>' +
+    '<div class="add-var-actions"><button class="ie-cancel add-var-cancel-btn">Cancel</button><button class="ie-save add-var-save-btn">Add</button></div>';
+  trigger.innerHTML = '';
+  trigger.style.border = 'none';
+  trigger.style.padding = '0';
+  trigger.appendChild(wrap);
 
-  e.variations.push({
-    id: expId + '_v' + count,
-    name: name,
-    stages: stages,
-    rateIdx: info ? info.rateIdx : [1, 0],
-    started: MONTHS[new Date().getMonth()] + ' ' + new Date().getDate(),
-    verdict: '',
-    next: ''
+  var input = wrap.querySelector('input');
+  setTimeout(function() { input.focus(); }, 30);
+
+  function doAdd() {
+    var name = input.value.trim();
+    if (!name) { doCancel(); return; }
+    var exps = load();
+    var e = exps.find(function(x) { return x.id === expId; });
+    var info = CH[e.ch];
+    var count = e.variations.length + 1;
+    var stages = (info ? info.defaultStages : ['Input', 'Output']).map(function(l) { return { label: l, val: 0 }; });
+    e.variations.push({
+      id: expId + '_v' + count,
+      name: name,
+      stages: stages,
+      rateIdx: info ? info.rateIdx : [1, 0],
+      started: MONTHS[new Date().getMonth()] + ' ' + new Date().getDate(),
+      verdict: '',
+      next: ''
+    });
+    save(exps); flash(); render();
+  }
+
+  function doCancel() { render(); }
+
+  wrap.querySelector('.add-var-save-btn').onclick = function(e) { e.stopPropagation(); doAdd(); };
+  wrap.querySelector('.add-var-cancel-btn').onclick = function(e) { e.stopPropagation(); doCancel(); };
+  input.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Enter') doAdd();
+    if (ev.key === 'Escape') doCancel();
   });
-
-  save(exps); flash(); render();
 }
 
 function deleteExp(id) {

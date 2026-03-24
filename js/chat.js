@@ -17,7 +17,7 @@ function inlineAdd() {
 }
 
 function inlineAddKey(e) {
-  if (e.key === 'Enter') { var n = e.target.value.trim(); if (n) { createExperiment(n, activeFlow); } inlineAddCancel(); }
+  if (e.key === 'Enter') { var n = e.target.value.trim(); if (n) { createExperiment(n, Object.keys(CH)[0]); } inlineAddCancel(); }
   if (e.key === 'Escape') inlineAddCancel();
 }
 
@@ -28,12 +28,13 @@ var qaOpen = false;
 var qaChannel = null;
 
 function openModal() {
-  qaOpen = !qaOpen;
-  if (!qaOpen) { closeModal(); return; }
+  if (qaOpen) { closeModal(); return; }
+  qaOpen = true;
 
   var outChannels = Object.entries(CH).filter(function(p) { return p[1].mode === 'outbound'; });
   var inChannels = Object.entries(CH).filter(function(p) { return p[1].mode === 'inbound'; });
-  qaChannel = activeFlow;
+  // Default to first channel of current mode
+  qaChannel = qaChannel || (activeMode === 'outbound' ? outChannels[0][0] : inChannels[0][0]);
 
   document.getElementById('modal').classList.add('open');
   document.querySelector('.chat').innerHTML =
@@ -58,13 +59,12 @@ function openModal() {
     '</div><div class="qa-footer"><button class="qa-cancel" onclick="closeModal()">Cancel</button>' +
     '<button class="qa-submit" onclick="qaSubmit()">Add to Sprint</button></div></div>';
 
-  // Auto-fill target for initially selected channel
-  qaPickChannel(qaChannel);
   setTimeout(function() { var n = document.getElementById('qa-name'); if (n) n.focus(); }, 100);
 }
 
 function closeModal() {
   qaOpen = false;
+  qaChannel = null;
   document.getElementById('modal').classList.remove('open');
 }
 
@@ -73,28 +73,12 @@ function qaPickChannel(ch) {
   document.querySelectorAll('.qa-chip').forEach(function(c) { c.classList.remove('active'); });
   var t = document.querySelector('.qa-chip[onclick*="' + ch + '"]');
   if (t) t.classList.add('active');
-
-  // Auto-fill target from benchmark
-  var bm = CHANNEL_BENCHMARKS[ch];
-  if (bm) {
-    var info = CH[ch];
-    var targetInput = document.getElementById('qa-target');
-    if (targetInput && !targetInput.value.trim()) {
-      targetInput.value = '>' + (bm.good * 100).toFixed(0) + '% ' + (info ? info.metric.toLowerCase() : 'rate');
-      targetInput.style.color = 'var(--text)';
-    }
-    // Show benchmark context
-    var hint = document.getElementById('qa-target-hint');
-    if (hint) {
-      hint.textContent = 'Avg: ' + (bm.avg * 100).toFixed(0) + '% · Good: ' + (bm.good * 100).toFixed(0) + '% · Great: ' + (bm.great * 100).toFixed(0) + '%';
-    }
-  }
 }
 
 function qaSuggestTarget() {
   var name = document.getElementById('qa-name').value.trim();
   var idea = document.getElementById('qa-idea').value.trim();
-  var ch = qaChannel || activeFlow;
+  var ch = qaChannel || Object.keys(CH)[0];
   var info = CH[ch];
   var key = getAIKey();
 
@@ -153,7 +137,8 @@ function qaSubmit() {
   var name = document.getElementById('qa-name').value.trim();
   if (!name) { document.getElementById('qa-name').focus(); return; }
   var idea = document.getElementById('qa-idea').value.trim();
-  createExperiment(name, qaChannel || activeFlow, null, null, idea, '');
+  var ch = qaChannel || Object.keys(CH)[0];
+  createExperiment(name, ch, null, null, idea, '');
   closeModal();
 }
 
@@ -183,6 +168,7 @@ function openSettings() {
   var key = getAIKey();
   var masked = key ? key.slice(0, 8) + '...' + key.slice(-4) : '';
 
+  qaOpen = true;
   document.getElementById('modal').classList.add('open');
   document.querySelector('.chat').innerHTML =
     '<div class="qa-panel"><div class="qa-header"><h2 class="qa-title">Settings</h2>' +
@@ -258,18 +244,22 @@ function createExperiment(name, ch, target, targetNum, idea, tools) {
     return { label: label, val: 0 };
   });
 
+  var varId = id + 'a';
   exps.push({
     id: id, ch: ch, name: name,
-    started: MONTHS[now.getMonth()] + ' ' + now.getDate(),
-    target: target || 'TBD', targetNum: targetNum || 0,
     idea: idea || '', tools: tools || '',
-    stages: stages,
-    rateIdx: info ? info.rateIdx : [1, 0],
-    hours: 0, verdict: '', next: ''
+    variations: [{
+      id: varId,
+      name: 'Initial',
+      stages: stages,
+      rateIdx: info ? info.rateIdx : [1, 0],
+      started: MONTHS[now.getMonth()] + ' ' + now.getDate(),
+      verdict: '',
+      next: ''
+    }]
   });
 
   save(exps); flash();
   if (info) activeMode = info.mode;
-  activeFlow = ch;
   render();
 }

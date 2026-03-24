@@ -20,34 +20,41 @@ function weToggleCompare() {
 
 function snapshotWeek() {
   var exps = load(), ws = loadWE();
-  var allActive = exps.filter(function(e) { return e.verdict !== 'Stop'; });
+  var allActive = exps.filter(function(e) { return !allStopped(e); });
 
   var outExps = allActive.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === 'outbound'; });
   var inExps = allActive.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === 'inbound'; });
 
   var now = new Date(), wNum = ws.length + 1;
 
+  // Helper: aggregate best variation stats for snapshot
+  function snapBest(e) {
+    var best = bestVariation(e);
+    return best || { stages: [], rateIdx: CH[e.ch].rateIdx };
+  }
+
   var snap = {
     week: 'W' + wNum,
     date: MONTHS[now.getMonth()] + ' ' + now.getDate(),
     outbound: {
-      sourced: outExps.reduce(function(s, e) { return s + expTopVal(e); }, 0),
-      reached: outExps.reduce(function(s, e) { var ri = e.rateIdx; return s + (e.stages[ri[1]] ? e.stages[ri[1]].val : 0); }, 0),
-      converted: outExps.reduce(function(s, e) { return s + expBottomVal(e); }, 0),
-      hours: outExps.reduce(function(s, e) { return s + (e.hours || 0); }, 0)
+      sourced: outExps.reduce(function(s, e) { var b = snapBest(e); return s + (b.stages[0] ? b.stages[0].val : 0); }, 0),
+      reached: outExps.reduce(function(s, e) { var b = snapBest(e); var ri = b.rateIdx || CH[e.ch].rateIdx; return s + (b.stages[ri[1]] ? b.stages[ri[1]].val : 0); }, 0),
+      converted: outExps.reduce(function(s, e) { return s + expTotalBottom(e); }, 0),
+      hours: 0
     },
     inbound: {
-      reach: inExps.reduce(function(s, e) { return s + expTopVal(e); }, 0),
-      engaged: inExps.reduce(function(s, e) { var ri = e.rateIdx; return s + (e.stages[ri[0]] ? e.stages[ri[0]].val : 0); }, 0),
-      gained: inExps.reduce(function(s, e) { return s + expBottomVal(e); }, 0),
-      hours: inExps.reduce(function(s, e) { return s + (e.hours || 0); }, 0)
+      reach: inExps.reduce(function(s, e) { var b = snapBest(e); return s + (b.stages[0] ? b.stages[0].val : 0); }, 0),
+      engaged: inExps.reduce(function(s, e) { var b = snapBest(e); var ri = b.rateIdx || CH[e.ch].rateIdx; return s + (b.stages[ri[0]] ? b.stages[ri[0]].val : 0); }, 0),
+      gained: inExps.reduce(function(s, e) { return s + expTotalBottom(e); }, 0),
+      hours: 0
     },
     experiments: allActive.map(function(e) {
+      var best = bestVariation(e);
       return {
         id: e.id, name: e.name, ch: e.ch,
-        stages: e.stages.map(function(s) { return { label: s.label, val: s.val }; }),
-        rateIdx: e.rateIdx, hours: e.hours || 0, verdict: e.verdict || '',
-        target: e.target, targetNum: e.targetNum
+        stages: best.stages.map(function(s) { return { label: s.label, val: s.val }; }),
+        rateIdx: best.rateIdx || CH[e.ch].rateIdx,
+        verdict: best.verdict || ''
       };
     })
   };
@@ -73,7 +80,6 @@ function buildExpTable(weekData, prevWeekData, mode) {
     var prev = prevMap[e.id];
     var rate = expRateStr(e);
     var rateNum = expRate(e);
-    var hit = expHasData(e) && rateNum >= e.targetNum;
     var topV = expTopVal(e), botV = expBottomVal(e);
     var prevTop = prev ? expTopVal(prev) : null;
     var prevBot = prev ? expBottomVal(prev) : null;
