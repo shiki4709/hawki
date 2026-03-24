@@ -298,21 +298,47 @@ body {
   margin-bottom: var(--s-8);
 }
 
-/* Quick numbers */
+/* Quick numbers with +/- and Add */
 .td-nums { display: flex; gap: var(--s-6); flex-wrap: wrap; margin-bottom: var(--s-8); }
 .td-num {
-  padding: var(--s-6) var(--s-12); background: var(--bg); border: 1.5px solid var(--rule);
-  border-radius: var(--s-4); cursor: pointer; text-align: center; min-width: 4rem;
-  transition: all var(--dur-fast) var(--ease-out);
+  padding: var(--s-8); background: var(--bg); border: 1.5px solid var(--rule);
+  border-radius: var(--s-6); text-align: center; min-width: 5.5rem;
 }
-.td-num:hover { border-color: var(--accent); }
-.td-num:hover .td-num-v { color: var(--accent); }
+.td-num-rate { border: none; background: transparent; min-width: 3rem; }
+.td-num-top { display: flex; align-items: center; justify-content: center; gap: var(--s-4); }
 .td-num-v {
   font-family: var(--ff-display); font-size: var(--fs-md); font-weight: 600;
-  color: var(--text); font-variant-numeric: tabular-nums;
-  transition: color var(--dur-fast) var(--ease-out);
+  color: var(--text); font-variant-numeric: tabular-nums; min-width: 2rem;
 }
 .td-num-l { font-size: 10px; color: var(--text-4); margin-top: var(--s-2); white-space: nowrap; }
+.td-inc {
+  width: 1.5rem; height: 1.5rem; border-radius: var(--s-4);
+  border: 1px solid var(--rule); background: var(--surface);
+  color: var(--text-3); font-size: var(--fs-sm); font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-family: var(--ff-body); transition: all var(--dur-fast) var(--ease-out);
+}
+.td-inc:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
+.td-inc:active { transform: scale(0.9); }
+.td-add-row {
+  display: flex; gap: var(--s-2); margin-top: var(--s-4);
+}
+.td-add-inp {
+  width: 3rem; padding: var(--s-2) var(--s-4); border: 1px solid var(--rule);
+  border-radius: var(--s-4); font-size: var(--fs-xs); font-family: var(--ff-body);
+  text-align: center; outline: none; background: var(--bg); color: var(--text);
+  -moz-appearance: textfield;
+}
+.td-add-inp::-webkit-inner-spin-button,
+.td-add-inp::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.td-add-inp:focus { border-color: var(--accent); }
+.td-add-btn {
+  padding: var(--s-2) var(--s-6); border: 1px solid var(--rule);
+  border-radius: var(--s-4); font-size: var(--fs-xs); font-weight: 600;
+  font-family: var(--ff-body); background: transparent; color: var(--text-3);
+  cursor: pointer; transition: all var(--dur-fast) var(--ease-out);
+}
+.td-add-btn:hover { border-color: var(--hit); color: var(--hit); background: var(--hit-bg); }
 
 /* Text input */
 .td-text-inp {

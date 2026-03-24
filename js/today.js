@@ -1,6 +1,6 @@
 /* ================================================================
    Today — Dead simple. One list. Items update in place.
-   Click something → it saves → list re-renders. That's it.
+   Numbers use +/- increments, not absolute re-entry.
    ================================================================ */
 
 function getExpStatus(e) {
@@ -16,6 +16,35 @@ function getExpStatus(e) {
   return null;
 }
 
+/* ── Build number boxes with +/- buttons ── */
+function buildNums(e) {
+  var info = CH[e.ch];
+  var ri = e.rateIdx || info.rateIdx;
+  var html = '<div class="td-nums">';
+  e.stages.forEach(function(stg, idx) {
+    if (stg.val > 0 || idx === ri[0] || idx === ri[1] || idx === e.stages.length - 1) {
+      html += '<div class="td-num">' +
+        '<div class="td-num-top">' +
+        '<button class="td-inc" onclick="tdInc(' + e.id + ',' + idx + ',-1)">-</button>' +
+        '<div class="td-num-v">' + formatNum(stg.val) + '</div>' +
+        '<button class="td-inc" onclick="tdInc(' + e.id + ',' + idx + ',1)">+</button>' +
+        '</div>' +
+        '<div class="td-num-l">' + stg.label + '</div>' +
+        '<div class="td-add-row">' +
+        '<input type="number" class="td-add-inp" id="td-add-' + e.id + '-' + idx + '" placeholder="+" min="0" ' +
+        'onkeydown="if(event.key===\'Enter\')tdAdd(' + e.id + ',' + idx + ')">' +
+        '<button class="td-add-btn" onclick="tdAdd(' + e.id + ',' + idx + ')">Add</button>' +
+        '</div></div>';
+    }
+  });
+  var rate = expRateStr(e);
+  if (rate !== '—') {
+    html += '<div class="td-num td-num-rate"><div class="td-num-v">' + rate + '</div><div class="td-num-l">Rate</div></div>';
+  }
+  html += '</div>';
+  return html;
+}
+
 function renderToday() {
   var el = document.getElementById('view-today');
   if (!el) return;
@@ -28,12 +57,9 @@ function renderToday() {
     return;
   }
 
-  // Sort: needs_data first, then needs_verdict, then in_progress, then has_next, then all_good
   var order = { needs_data: 0, needs_verdict: 1, in_progress: 2, has_next: 3, all_good: 4 };
   active.sort(function(a, b) {
-    var sa = order[getExpStatus(a)] || 5;
-    var sb = order[getExpStatus(b)] || 5;
-    return sa - sb;
+    return (order[getExpStatus(a)] || 5) - (order[getExpStatus(b)] || 5);
   });
 
   var html = '';
@@ -45,26 +71,19 @@ function renderToday() {
 
     html += '<div class="td-item" id="td-' + e.id + '">';
 
-    // Header: name + channel + rate
-    html += '<div class="td-head">' +
-      '<div><div class="td-name">' + e.name + '</div>' +
+    // Header
+    html += '<div class="td-head"><div>' +
+      '<div class="td-name">' + e.name + '</div>' +
       '<div class="td-meta">' + info.label + (rate !== '—' ? ' · ' + rate : '') + '</div></div>';
 
-    // Status label
-    if (status === 'needs_data') {
-      html += '<span class="td-tag td-tag-red">Needs data</span>';
-    } else if (status === 'needs_verdict') {
-      html += '<span class="td-tag td-tag-amber">Needs verdict</span>';
-    } else if (status === 'in_progress') {
-      html += '<span class="td-tag td-tag-blue">' + e.verdict + '</span>';
-    } else if (status === 'has_next') {
-      html += '<span class="td-tag td-tag-green">Next step</span>';
-    } else {
-      html += '<span class="td-tag td-tag-grey">Running</span>';
-    }
+    if (status === 'needs_data')    html += '<span class="td-tag td-tag-red">Needs data</span>';
+    else if (status === 'needs_verdict') html += '<span class="td-tag td-tag-amber">Needs verdict</span>';
+    else if (status === 'in_progress')   html += '<span class="td-tag td-tag-blue">' + e.verdict + '</span>';
+    else if (status === 'has_next')      html += '<span class="td-tag td-tag-green">Next step</span>';
+    else html += '<span class="td-tag td-tag-grey">Running</span>';
     html += '</div>';
 
-    // ── NEEDS DATA: show inline pipeline inputs ──
+    // ── NEEDS DATA ──
     if (status === 'needs_data') {
       html += '<div class="td-body"><div class="td-pipe-grid">';
       e.stages.forEach(function(stg, idx) {
@@ -76,7 +95,7 @@ function renderToday() {
       html += '</div><button class="td-btn td-btn-primary" onclick="tdSaveData(' + e.id + ')">Save numbers</button></div>';
     }
 
-    // ── NEEDS VERDICT: show AI suggestion + buttons ──
+    // ── NEEDS VERDICT ──
     else if (status === 'needs_verdict') {
       var sg = suggestVerdict(e);
       html += '<div class="td-body">';
@@ -91,8 +110,6 @@ function renderToday() {
           var star = sg.verdict === v ? ' *' : '';
           return '<button class="td-btn td-btn-' + cls + '" onclick="tdVerdict(' + e.id + ',\'' + v + '\')">' + v + star + '</button>';
         }).join('') + '</div>';
-
-      // If verdict was just set but no "next" written yet, show input
       html += '<div id="td-next-prompt-' + e.id + '" style="display:none">' +
         '<input type="text" class="td-text-inp" id="td-next-inp-' + e.id + '" placeholder="What are you changing / doing next?" ' +
         'onkeydown="if(event.key===\'Enter\')tdSaveNext(' + e.id + ')">' +
@@ -100,23 +117,11 @@ function renderToday() {
       html += '</div>';
     }
 
-    // ── IN PROGRESS: show what's being changed + numbers + re-evaluate ──
+    // ── IN PROGRESS ──
     else if (status === 'in_progress') {
       html += '<div class="td-body">';
-      if (e.next) {
-        html += '<div class="td-what">' + e.next + '</div>';
-      }
-      // Quick counters
-      var ri = e.rateIdx || info.rateIdx;
-      html += '<div class="td-nums">';
-      e.stages.forEach(function(stg, idx) {
-        if (stg.val > 0 || idx === ri[0] || idx === ri[1]) {
-          html += '<div class="td-num" onclick="quickBump(' + e.id + ',' + idx + ',this)">' +
-            '<div class="td-num-v">' + formatNum(stg.val) + '</div>' +
-            '<div class="td-num-l">' + stg.label + '</div></div>';
-        }
-      });
-      html += '</div>';
+      if (e.next) html += '<div class="td-what">' + e.next + '</div>';
+      html += buildNums(e);
       html += '<button class="td-btn td-btn-outline" onclick="tdReeval(' + e.id + ')">Re-evaluate with new numbers</button>';
       html += '</div>';
     }
@@ -134,18 +139,9 @@ function renderToday() {
         '<div class="td-hint">Enter to save. Blank = done.</div></div></div>';
     }
 
-    // ── ALL GOOD: just show numbers, clickable ──
+    // ── ALL GOOD ──
     else {
-      html += '<div class="td-body"><div class="td-nums">';
-      var ri = e.rateIdx || info.rateIdx;
-      e.stages.forEach(function(stg, idx) {
-        if (stg.val > 0 || idx === ri[0] || idx === ri[1]) {
-          html += '<div class="td-num" onclick="quickBump(' + e.id + ',' + idx + ',this)">' +
-            '<div class="td-num-v">' + formatNum(stg.val) + '</div>' +
-            '<div class="td-num-l">' + stg.label + '</div></div>';
-        }
-      });
-      html += '</div></div>';
+      html += '<div class="td-body">' + buildNums(e) + '</div>';
     }
 
     html += '</div>';
@@ -154,7 +150,34 @@ function renderToday() {
   el.innerHTML = html;
 }
 
-/* ── Actions — each one saves and re-renders ── */
+/* ================================================================
+   Number actions — increment based
+   ================================================================ */
+
+/* +1 / -1 buttons */
+function tdInc(id, idx, delta) {
+  var exps = load();
+  var e = exps.find(function(x) { return x.id === id; });
+  var newVal = Math.max(0, e.stages[idx].val + delta);
+  e.stages[idx].val = newVal;
+  save(exps);
+  // Update just the number display without full re-render
+  var numEl = document.querySelector('#td-' + id + ' .td-nums');
+  if (numEl) { render(); } else { render(); }
+}
+
+/* "Add X" — type a batch increment */
+function tdAdd(id, idx) {
+  var inp = document.getElementById('td-add-' + id + '-' + idx);
+  var amount = parseInt(inp.value) || 0;
+  if (amount <= 0) return;
+  var exps = load();
+  var e = exps.find(function(x) { return x.id === id; });
+  e.stages[idx].val += amount;
+  save(exps);
+  showToast('+' + amount + ' ' + e.stages[idx].label);
+  render();
+}
 
 function tdStage(id, idx, val) {
   var exps = load();
@@ -164,31 +187,27 @@ function tdStage(id, idx, val) {
 
 function tdSaveData(id) {
   var exps = load();
-  var e = exps.find(function(x) { return x.id === id; });
-  if (!expHasData(e)) return;
+  if (!expHasData(exps.find(function(x) { return x.id === id; }))) return;
   save(exps);
   showToast('Numbers saved');
   render();
 }
+
+/* ================================================================
+   Verdict + next step actions
+   ================================================================ */
 
 function tdVerdict(id, v) {
   var exps = load();
   exps.find(function(x) { return x.id === id; }).verdict = v;
   save(exps);
 
-  if (v === 'Stop') {
-    showToast('Stopped');
+  if (v === 'Stop' || v === 'Keep going') {
+    showToast(v === 'Stop' ? 'Stopped' : 'Keep going');
     render();
     return;
   }
 
-  if (v === 'Keep going') {
-    showToast('Keep going');
-    render();
-    return;
-  }
-
-  // Change variables / Close iterate → show "what are you changing?" input
   showToast(v);
   var prompt = document.getElementById('td-next-prompt-' + id);
   if (prompt) {
@@ -222,7 +241,6 @@ function tdReeval(id) {
 }
 
 function tdDone(id) {
-  // Show the "what's next?" input
   var prompt = document.getElementById('td-next-prompt-' + id);
   if (prompt) {
     prompt.style.display = 'block';
