@@ -7,6 +7,7 @@
 
 var activeMode = 'outbound';
 var activeView = 'experiments';
+var expandedIds = {};
 
 function setMode(m) { activeMode = m; render(); }
 function setView(v) { activeView = v; render(); }
@@ -122,6 +123,7 @@ function renderGoalView(exps) {
   }
 
   el.innerHTML = html;
+  restoreExpanded();
 }
 
 /* ================================================================
@@ -255,7 +257,20 @@ function renderExperiment(e) {
    Actions
    ================================================================ */
 
-function toggleExp(id) { document.getElementById('expand-' + id).classList.toggle('open'); }
+function toggleExp(id) {
+  var el = document.getElementById('expand-' + id);
+  if (el) el.classList.toggle('open');
+  expandedIds[id] = el ? el.classList.contains('open') : false;
+}
+
+function restoreExpanded() {
+  Object.keys(expandedIds).forEach(function(id) {
+    if (expandedIds[id]) {
+      var el = document.getElementById('expand-' + id);
+      if (el) el.classList.add('open');
+    }
+  });
+}
 
 function cycleVarVerdict(expId, varId) {
   var exps = load();
