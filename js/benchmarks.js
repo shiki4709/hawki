@@ -82,10 +82,11 @@ function saveBenchmarks(bm) {
   localStorage.setItem(BM_KEY, JSON.stringify(bm));
 }
 
-function getBenchmark(exp) {
+function getBenchmark(exp, ch) {
   var custom = loadBenchmarks();
   if (custom[exp.id]) return custom[exp.id];
-  if (CHANNEL_BENCHMARKS[exp.ch]) return CHANNEL_BENCHMARKS[exp.ch];
+  var channel = ch || exp.ch;
+  if (channel && CHANNEL_BENCHMARKS[channel]) return CHANNEL_BENCHMARKS[channel];
   return { avg: 0.10, good: 0.20, great: 0.30, minSample: 30, variables: [], source: 'fallback' };
 }
 
@@ -96,8 +97,8 @@ function setBenchmark(expId, bm) {
 }
 
 /* ── Verdict suggestion engine ── */
-function suggestVerdict(exp) {
-  var bm = getBenchmark(exp);
+function suggestVerdict(exp, ch) {
+  var bm = getBenchmark(exp, ch);
   var rate = expRate(exp);
   var hasData = expHasData(exp);
 
