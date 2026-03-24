@@ -160,6 +160,17 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 
 .exp-page-footer { margin-top: var(--s-24); padding-top: var(--s-12); border-top: 1px solid var(--rule-faint); }
 
+/* Current setup summary */
+.var-current {
+  padding: var(--s-12); background: var(--surface); border-radius: var(--radius);
+  margin-bottom: var(--s-16);
+}
+.var-current-title { font-size: var(--fs-sm); font-weight: 600; color: var(--text); margin-bottom: var(--s-6); }
+.var-current-pipe { font-size: var(--fs-xs); color: var(--text-2); line-height: 1.8; }
+.var-conv { color: var(--text-4); }
+.var-current-stage {}
+.var-current-ai { font-size: var(--fs-xs); color: var(--text-3); margin-top: var(--s-6); padding-top: var(--s-6); border-top: 1px solid var(--rule-faint); }
+
 /* Variation step picker */
 .var-step-list { display: flex; flex-direction: column; gap: var(--s-4); }
 .var-step-btn {
@@ -170,8 +181,9 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 }
 .var-step-btn:hover { border-color: var(--rule); }
 .var-step-btn.active { border-color: var(--accent); background: var(--accent-bg); color: var(--text); }
-.var-step-name { font-weight: 500; }
-.var-step-val { font-family: var(--ff-display); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-4); }
+.var-step-name { font-weight: 500; flex: 1; }
+.var-step-conv { font-size: var(--fs-xs); color: var(--text-4); min-width: 2.5rem; text-align: right; }
+.var-step-val { font-family: var(--ff-display); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-4); min-width: 2.5rem; text-align: right; }
 
 /* ================================================================
    GOAL — Hero card

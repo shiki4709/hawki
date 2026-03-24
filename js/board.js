@@ -352,19 +352,49 @@ function addVariation(expId) {
   var best = bestVariation(e);
   var stages = best ? best.stages : [];
 
+  // Build current setup summary
+  var currentPipe = stages.map(function(stg, i) {
+    var conv = '';
+    if (i > 0) {
+      var prev = stages[i - 1].val;
+      conv = prev > 0 ? ((stg.val / prev) * 100).toFixed(0) + '%' : '—';
+    }
+    return (conv ? '<span class="var-conv">' + conv + ' →</span> ' : '') +
+      '<span class="var-current-stage">' + stg.label + ': <strong>' + formatNum(stg.val) + '</strong></span>';
+  }).join(' ');
+
+  var currentRate = expRateStr(best);
+  var sg = expHasData(best) ? suggestVerdict(best, e.ch) : null;
+
   qaOpen = true;
   document.getElementById('modal').classList.add('open');
   document.querySelector('.chat').innerHTML =
     '<div class="qa-panel"><div class="qa-header"><h2 class="qa-title">Change a variable</h2>' +
     '<button class="chat-close" onclick="closeModal()">&times;</button></div>' +
     '<div class="qa-body">' +
+
+    // Current setup
+    '<div class="var-current">' +
+    '<div class="var-current-title">Current: ' + best.name + ' · ' + currentRate + '</div>' +
+    '<div class="var-current-pipe">' + currentPipe + '</div>' +
+    (sg && sg.reason ? '<div class="var-current-ai">' + sg.reason + '</div>' : '') +
+    '</div>' +
+
+    // Step picker
     '<div class="qa-field"><label class="qa-label">Which step are you changing?</label>' +
     '<div class="var-step-list">' +
     stages.map(function(stg, i) {
+      var conv = '';
+      if (i > 0) {
+        var prev = stages[i - 1].val;
+        if (prev > 0) conv = ((stg.val / prev) * 100).toFixed(0) + '%';
+      }
       return '<button class="var-step-btn" onclick="pickVarStep(this,' + i + ')" data-idx="' + i + '">' +
         '<span class="var-step-name">' + stg.label + '</span>' +
+        '<span class="var-step-conv">' + (conv || '') + '</span>' +
         '<span class="var-step-val">' + formatNum(stg.val) + '</span></button>';
     }).join('') + '</div></div>' +
+
     '<div class="qa-field" id="var-change-field" style="display:none">' +
     '<label class="qa-label">What are you changing about it?</label>' +
     '<input type="text" class="qa-input qa-input-sm" id="var-change-desc" placeholder="e.g. Comment on their post first, then DM" ' +
