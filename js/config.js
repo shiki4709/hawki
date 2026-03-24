@@ -53,10 +53,10 @@ var CH = {
   gifts: {
     label: 'Gift Outreach',
     color: 'oklch(55% 0.08 320)',
-    metric: 'Response Rate',
+    metric: 'Meeting Rate',
     mode: 'outbound',
-    defaultStages: ['AEs researched', 'Gifts sent', 'Responses', 'Meetings', 'Signed up'],
-    rateIdx: [2, 1],
+    defaultStages: ['AEs contacted', 'Replied', 'Gifts sent', 'Meetings', 'Signed up'],
+    rateIdx: [3, 2],
     keyIdx: -1
   },
   email: {

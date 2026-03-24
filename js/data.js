@@ -53,12 +53,12 @@ var D = [
     ]},
 
   {id:6, ch:'gifts', name:'Personalized Gifts',
-    idea:'Research AE profile → find interesting angle → send personalized gift',
+    idea:'Contact AE → get reply → send personalized gift based on conversation → convert',
     tools:'LinkedIn → Sendoso',
     variations:[
       {id:'6a', name:'Book + handwritten note',
-        stages:[{label:'AEs researched',val:25},{label:'Gifts sent',val:15},{label:'Responses',val:4},{label:'Meetings',val:2},{label:'Signed up',val:1}],
-        rateIdx:[2,1], started:'Mar 25', verdict:'', next:''},
+        stages:[{label:'AEs contacted',val:25},{label:'Replied',val:8},{label:'Gifts sent',val:6},{label:'Meetings',val:2},{label:'Signed up',val:1}],
+        rateIdx:[3,2], started:'Mar 25', verdict:'', next:''},
     ]},
 
   {id:7, ch:'events', name:'Coffee Events',
