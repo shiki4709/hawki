@@ -170,7 +170,8 @@ function renderExperimentPage(exps) {
 
     // Variation header
     html += '<div class="var-section-head">' +
-      '<span class="var-section-name">' + v.name + (isStopped ? ' <span class="var-stopped-label">stopped</span>' : '') + '</span>' +
+      '<div class="var-section-info"><span class="var-section-name">' + v.name + (isStopped ? ' <span class="var-stopped-label">stopped</span>' : '') + '</span>' +
+      '<span class="var-section-date">Started ' + (v.started || '—') + '</span></div>' +
       (vRate !== '—' ? '<span class="var-section-rate">' + vRate + '</span>' : '') +
       (!isStopped ? '<button class="var-stop-btn" onclick="stopVariation(' + e.id + ',\'' + v.id + '\')">Stop</button>' : '') +
       '</div>';
@@ -346,18 +347,71 @@ function addVariation(expId) {
   var e = exps.find(function(x) { return x.id === expId; });
   if (!e) return;
   var info = CH[e.ch];
-  var name = prompt('What variable are you changing?');
-  if (!name) return;
+  var best = bestVariation(e);
+  var stages = best ? best.stages : [];
 
-  var stages = (info ? info.defaultStages : ['Input', 'Output']).map(function(l) { return { label: l, val: 0 }; });
+  qaOpen = true;
+  document.getElementById('modal').classList.add('open');
+  document.querySelector('.chat').innerHTML =
+    '<div class="qa-panel"><div class="qa-header"><h2 class="qa-title">Change a variable</h2>' +
+    '<button class="chat-close" onclick="closeModal()">&times;</button></div>' +
+    '<div class="qa-body">' +
+    '<div class="qa-field"><label class="qa-label">Which step are you changing?</label>' +
+    '<div class="var-step-list">' +
+    stages.map(function(stg, i) {
+      return '<button class="var-step-btn" onclick="pickVarStep(this,' + i + ')" data-idx="' + i + '">' +
+        '<span class="var-step-name">' + stg.label + '</span>' +
+        '<span class="var-step-val">' + formatNum(stg.val) + '</span></button>';
+    }).join('') + '</div></div>' +
+    '<div class="qa-field" id="var-change-field" style="display:none">' +
+    '<label class="qa-label">What are you changing about it?</label>' +
+    '<input type="text" class="qa-input qa-input-sm" id="var-change-desc" placeholder="e.g. Comment on their post first, then DM" ' +
+    'onkeydown="if(event.key===\'Enter\')confirmVariation(' + expId + ')">' +
+    '</div></div>' +
+    '<div class="qa-footer"><button class="qa-cancel" onclick="closeModal()">Cancel</button>' +
+    '<button class="qa-submit" id="var-create-btn" style="opacity:0.4;pointer-events:none" onclick="confirmVariation(' + expId + ')">Create variation</button></div></div>';
+}
+
+var selectedVarStep = -1;
+
+function pickVarStep(btn, idx) {
+  selectedVarStep = idx;
+  document.querySelectorAll('.var-step-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('var-change-field').style.display = 'block';
+  document.getElementById('var-create-btn').style.opacity = '1';
+  document.getElementById('var-create-btn').style.pointerEvents = 'auto';
+  var input = document.getElementById('var-change-desc');
+  if (input) input.focus();
+}
+
+function confirmVariation(expId) {
+  var desc = document.getElementById('var-change-desc').value.trim();
+  if (!desc || selectedVarStep < 0) return;
+
+  var exps = load();
+  var e = exps.find(function(x) { return x.id === expId; });
+  if (!e) return;
+  var info = CH[e.ch];
+  var best = bestVariation(e);
+  var stepLabel = best.stages[selectedVarStep].label;
+
+  // Copy stages from best variation (start from same structure)
+  var stages = best.stages.map(function(s) { return { label: s.label, val: 0 }; });
+
   e.variations.push({
     id: expId + '_v' + (e.variations.length + 1),
-    name: name, stages: stages,
-    rateIdx: info ? info.rateIdx : [1, 0],
+    name: stepLabel + ': ' + desc,
+    stages: stages,
+    rateIdx: best.rateIdx || (info ? info.rateIdx : [1, 0]),
     started: MONTHS[new Date().getMonth()] + ' ' + new Date().getDate(),
     verdict: '', next: ''
   });
-  save(exps); flash(); render();
+
+  save(exps); flash();
+  selectedVarStep = -1;
+  closeModal();
+  render();
 }
 
 function deleteExp(id) {

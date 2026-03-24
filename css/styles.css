@@ -151,10 +151,25 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .var-section { padding: var(--s-16); background: var(--surface); border-radius: var(--radius); margin-bottom: var(--s-8); }
 .var-section-stopped { opacity: 0.4; }
 .var-section-head { display: flex; align-items: center; gap: var(--s-12); margin-bottom: var(--s-12); }
-.var-section-name { font-family: var(--ff-display); font-size: var(--fs-sm); font-weight: 500; color: var(--text); flex: 1; }
+.var-section-info { flex: 1; }
+.var-section-name { font-family: var(--ff-display); font-size: var(--fs-sm); font-weight: 500; color: var(--text); }
+.var-section-date { font-size: var(--fs-xs); color: var(--text-4); display: block; margin-top: var(--s-2); }
 .var-section-rate { font-family: var(--ff-display); font-size: var(--fs-md); font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
 
 .exp-page-footer { margin-top: var(--s-24); padding-top: var(--s-12); border-top: 1px solid var(--rule-faint); }
+
+/* Variation step picker */
+.var-step-list { display: flex; flex-direction: column; gap: var(--s-4); }
+.var-step-btn {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--s-8) var(--s-12); background: var(--bg-sub); border: 1.5px solid var(--rule-faint);
+  border-radius: var(--radius-sm); cursor: pointer; font-family: var(--ff-body);
+  font-size: var(--fs-sm); color: var(--text-2); transition: all var(--dur-fast) var(--ease-out);
+}
+.var-step-btn:hover { border-color: var(--rule); }
+.var-step-btn.active { border-color: var(--accent); background: var(--accent-bg); color: var(--text); }
+.var-step-name { font-weight: 500; }
+.var-step-val { font-family: var(--ff-display); font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-4); }
 
 /* ================================================================
    GOAL — Hero card
