@@ -259,7 +259,17 @@ body {
   color: var(--text); letter-spacing: -0.005em;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+.exp-sub { display: flex; align-items: center; gap: var(--s-6); margin-top: var(--s-2); }
 .exp-ch-label { font-size: var(--fs-xs); color: var(--text-4); white-space: nowrap; }
+.exp-tools-label {
+  font-size: var(--fs-xs); color: var(--text-4); white-space: nowrap;
+}
+.exp-tools-label::before { content: '·'; margin-right: var(--s-6); }
+.exp-desc {
+  font-size: var(--fs-xs); color: var(--text-3); margin-top: var(--s-2);
+  line-height: var(--lh-body);
+  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+}
 
 .exp-nums { display: flex; align-items: baseline; gap: var(--s-8); white-space: nowrap; }
 .exp-rate-g {
@@ -358,7 +368,13 @@ body {
 }
 .exp-expand-wrap.open { grid-template-rows: 1fr; }
 .exp-expand-inner { overflow: hidden; }
-.exp-detail { padding: var(--s-4) 0 var(--s-24); }
+.exp-detail { padding: var(--s-16) 0 var(--s-24); }
+.exp-actions {
+  margin-top: var(--s-16);
+  padding-top: var(--s-12);
+  border-top: 1px solid var(--rule-faint);
+  display: flex; flex-direction: column; gap: var(--s-8);
+}
 .exp-detail-grid {
   display: grid; grid-template-columns: repeat(3, 1fr);
   gap: var(--s-8); margin-bottom: var(--s-16);

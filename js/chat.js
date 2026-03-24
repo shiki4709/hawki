@@ -53,14 +53,8 @@ function openModal() {
       return '<button class="qa-chip ' + (p[0] === qaChannel ? 'active' : '') + '" onclick="qaPickChannel(\'' + p[0] + '\')" style="--chip-color:' + p[1].color + '">' +
         '<span class="qa-chip-dot" style="background:' + p[1].color + '"></span>' + p[1].label + '</button>';
     }).join('') + '</div></div>' +
-    '<div class="qa-field"><label class="qa-label">Target</label>' +
-    '<div class="qa-target-row"><input type="text" class="qa-input qa-input-sm" id="qa-target" placeholder="e.g. >20% reply rate">' +
-    (getAIKey() ? '<button class="qa-ai-btn" onclick="qaSuggestTarget()" id="qa-ai-btn" title="AI suggest target">AI</button>' : '') + '</div>' +
-    '<div class="qa-target-hint" id="qa-target-hint">Pick a channel to see benchmarks</div></div>' +
-    '<div class="qa-field"><label class="qa-label">Idea / Context</label>' +
-    '<input type="text" class="qa-input qa-input-sm" id="qa-idea" placeholder="Brief description (optional)"></div>' +
-    '<div class="qa-field"><label class="qa-label">Tools</label>' +
-    '<input type="text" class="qa-input qa-input-sm" id="qa-tools" placeholder="e.g. Sales Nav → Dripify (optional)"></div>' +
+    '<div class="qa-field"><label class="qa-label">What is it?</label>' +
+    '<input type="text" class="qa-input qa-input-sm" id="qa-idea" placeholder="One line description"></div>' +
     '</div><div class="qa-footer"><button class="qa-cancel" onclick="closeModal()">Cancel</button>' +
     '<button class="qa-submit" onclick="qaSubmit()">Add to Sprint</button></div></div>';
 
@@ -158,10 +152,8 @@ function qaSuggestTarget() {
 function qaSubmit() {
   var name = document.getElementById('qa-name').value.trim();
   if (!name) { document.getElementById('qa-name').focus(); return; }
-  var target = document.getElementById('qa-target').value.trim();
   var idea = document.getElementById('qa-idea').value.trim();
-  var tools = document.getElementById('qa-tools').value.trim();
-  createExperiment(name, qaChannel || activeFlow, target, null, idea, tools);
+  createExperiment(name, qaChannel || activeFlow, null, null, idea, '');
   closeModal();
 }
 

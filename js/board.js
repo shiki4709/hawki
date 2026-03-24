@@ -162,8 +162,12 @@ function renderExpRow(e) {
 
   var html = '<div class="exp-card" id="exp-card-' + e.id + '">' +
     '<div class="exp-row-g" onclick="toggleExp(' + e.id + ')">' +
-    '<div class="exp-main">' + dot + '<span class="exp-name-g">' + e.name + '</span>' +
-    '<span class="exp-ch-label">' + info.label + '</span></div>' +
+    '<div class="exp-main"><div>' + dot + '<span class="exp-name-g">' + e.name + '</span>' +
+    '<div class="exp-sub">' +
+    '<span class="exp-ch-label">' + info.label + '</span>' +
+    (e.tools ? '<span class="exp-tools-label">' + e.tools + '</span>' : '') +
+    '</div>' +
+    (e.idea ? '<div class="exp-desc">' + e.idea + '</div>' : '') + '</div></div>' +
     '<div class="exp-nums">' +
     '<span class="exp-rate-g">' + rate + '</span>' +
     (contrib > 0 ? '<span class="exp-contrib">→ ' + contrib + ' ' + (CH[e.ch].mode === 'outbound' ? 'signup' + (contrib !== 1 ? 's' : '') : 'gained') + '</span>' : '') +
@@ -172,26 +176,12 @@ function renderExpRow(e) {
     '<div class="exp-verdict-g"><span class="verdict ' + vCls + '" onclick="event.stopPropagation();cycleVerdict(' + e.id + ')">' + (e.verdict || '—') + '</span></div>' +
     '</div>';
 
-  // Expandable detail
+  // Expandable detail — 3 zones: pipeline → AI → actions
   html += '<div class="exp-expand-wrap" id="expand-' + e.id + '"><div class="exp-expand-inner"><div class="exp-detail">';
 
-  // AI suggestion
-  if (hasData) {
-    var sg = suggestVerdict(e);
-    if (sg.verdict) {
-      html += '<div class="exp-ai">AI: <strong>' + sg.verdict + '</strong> — ' + sg.reason + '</div>';
-    } else if (sg.reason) {
-      html += '<div class="exp-ai exp-ai-wait">' + sg.reason + '</div>';
-    }
-  }
-
-  // Pipeline
+  // 1. PIPELINE — the main thing you came to update
   html += '<div class="pipe">';
   e.stages.forEach(function(stg, idx) {
-    if (idx > 0) {
-      var prev = e.stages[idx - 1].val;
-      html += '<div class="pipe-conv">' + (prev > 0 ? ((stg.val / prev) * 100).toFixed(0) + '%' : '—') + '</div>';
-    }
     var isKey = e.rateIdx && (idx === e.rateIdx[0] || idx === e.rateIdx[1]);
     html += '<div class="pipe-stage' + (isKey ? ' pipe-stage-key' : '') + '" onclick="event.stopPropagation();editStage(' + e.id + ',' + idx + ',this)">' +
       '<div class="pipe-stage-val">' + formatNum(stg.val) + '</div>' +
@@ -199,30 +189,31 @@ function renderExpRow(e) {
   });
   html += '</div>';
 
-  // Fields
-  html += '<div class="exp-detail-row">' +
-    '<div class="detail-field"><div class="detail-label">Target</div><div class="detail-value editable" onclick="editTarget(' + e.id + ',this)">' + e.target + '</div></div>' +
-    '<div class="detail-field"><div class="detail-label">Hours</div><div class="detail-value editable" onclick="editHours(' + e.id + ',this)">' + (e.hours || 0) + 'h</div></div></div>';
+  // 2. AI — one line of context
+  if (hasData) {
+    var sg = suggestVerdict(e);
+    if (sg.verdict) {
+      html += '<div class="exp-ai"><strong>' + sg.verdict + '</strong> — ' + sg.reason + '</div>';
+    } else if (sg.reason) {
+      html += '<div class="exp-ai exp-ai-wait">' + sg.reason + '</div>';
+    }
+  }
 
-  html += '<div class="detail-next"><div class="detail-label">Next step</div>' +
-    '<div class="detail-next-text" onclick="event.stopPropagation();editNext(' + e.id + ',this)">' +
-    (e.next || '<span class="ph">What to do next...</span>') + '</div></div>';
+  // 3. ACTIONS — verdict + next step + delete
+  html += '<div class="exp-actions">';
 
-  // Verdict buttons
-  html += '<div class="verdict-group"><span class="verdict-group-label">Verdict</span>' +
+  html += '<div class="verdict-group">' +
     ['Keep going', 'Change variables', 'Close, iterate', 'Stop'].map(function(v) {
       var bc = v === 'Keep going' ? 'keep' : v === 'Change variables' ? 'change' : v === 'Close, iterate' ? 'close' : 'stop';
       return '<div class="vbtn v-' + bc + ' ' + (e.verdict === v ? 'active' : '') + '" onclick="event.stopPropagation();setVerdict(' + e.id + ',\'' + v + '\')">' + v + '</div>';
     }).join('') + '</div>';
 
-  // More + Delete
-  html += '<div class="detail-more-toggle" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle(\'open\')">More details</div>' +
-    '<div class="detail-more">' +
-    '<div class="detail-field"><div class="detail-label">Tools</div><div class="detail-value editable" onclick="editTools(' + e.id + ',this)">' + (e.tools || '<span class="ph">Add tools...</span>') + '</div></div>' +
-    '<div class="detail-field"><div class="detail-label">Idea</div><div class="detail-value editable" onclick="editIdea(' + e.id + ',this)">' + (e.idea || '<span class="ph">Add idea...</span>') + '</div></div>' +
-    '</div>' +
-    '<div class="detail-danger"><button class="delete-btn" onclick="event.stopPropagation();deleteExp(' + e.id + ')">Delete experiment</button></div>';
+  html += '<div class="detail-next-text" onclick="event.stopPropagation();editNext(' + e.id + ',this)">' +
+    (e.next || '<span class="ph">Next step...</span>') + '</div>';
 
+  html += '<button class="delete-btn" onclick="event.stopPropagation();deleteExp(' + e.id + ')">Delete</button>';
+
+  html += '</div>';
   html += '</div></div></div></div>';
   return html;
 }
@@ -248,31 +239,6 @@ function editName(id, el) {
     var exps = load(); exps.find(function(x) { return x.id === id; }).name = val.trim();
     save(exps); flash(); render();
   }, { type: 'text', label: 'Experiment name' });
-}
-
-function editTarget(id, el) {
-  var e = load().find(function(x) { return x.id === id; });
-  inlineEdit(el, e.target, function(val) {
-    var exps = load(), e2 = exps.find(function(x) { return x.id === id; });
-    e2.target = val || 'TBD';
-    var match = val.match(/>?\s*(\d+(?:\.\d+)?)\s*%/);
-    if (match) e2.targetNum = parseFloat(match[1]) / 100;
-    save(exps); flash(); render();
-  }, { type: 'text', label: 'Target' });
-}
-
-function editTools(id, el) {
-  inlineEdit(el, load().find(function(x) { return x.id === id; }).tools || '', function(val) {
-    var exps = load(); exps.find(function(x) { return x.id === id; }).tools = val;
-    save(exps); flash(); render();
-  }, { type: 'text', label: 'Tools' });
-}
-
-function editIdea(id, el) {
-  inlineEdit(el, load().find(function(x) { return x.id === id; }).idea || '', function(val) {
-    var exps = load(); exps.find(function(x) { return x.id === id; }).idea = val;
-    save(exps); flash(); render();
-  }, { type: 'text', label: 'Idea' });
 }
 
 function deleteExp(id) {
