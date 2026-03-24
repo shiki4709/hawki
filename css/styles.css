@@ -102,6 +102,59 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .vtab.active { color: var(--text); border-bottom-color: var(--text); }
 .vtab-badge { font-size: 10px; font-weight: 700; color: oklch(97% 0.008 55); background: var(--accent); padding: 1px 5px; border-radius: 10px; }
 .view { display: none; }
+.vtab-title { font-family: var(--ff-display); font-size: var(--fs-sm); font-weight: 500; color: var(--text); padding: var(--s-8) var(--s-12); }
+
+/* ================================================================
+   HOME — Experiment list
+   ================================================================ */
+
+.home-empty { padding: var(--s-48) 0; text-align: center; color: var(--text-4); font-size: var(--fs-sm); line-height: var(--lh-body); }
+
+.home-card {
+  padding: var(--s-16); background: var(--bg); border: 1px solid var(--rule-faint);
+  border-radius: var(--radius); margin-bottom: var(--s-8); cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.home-card:hover { border-color: var(--rule); }
+.home-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s-16); }
+.home-card-name { font-family: var(--ff-display); font-size: var(--fs-md); font-weight: 500; color: var(--text); }
+.home-card-sub { font-size: var(--fs-xs); color: var(--text-4); margin-top: var(--s-2); }
+.home-card-idea { font-size: var(--fs-xs); color: var(--text-3); margin-top: var(--s-4); line-height: var(--lh-body); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+.home-card-right { text-align: right; flex-shrink: 0; }
+.home-card-rate { font-family: var(--ff-display); font-size: var(--fs-lg); font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; }
+.home-card-contrib { font-size: var(--fs-xs); color: var(--text-3); }
+
+.home-card-bottom { display: flex; align-items: center; gap: var(--s-12); margin-top: var(--s-12); }
+.home-health { font-size: var(--fs-xs); font-weight: 600; padding: var(--s-2) var(--s-8); border-radius: 10px; }
+.health-good { color: var(--hit); background: var(--hit-bg); }
+.health-ok { color: var(--change); background: var(--change-bg); }
+.health-low { color: var(--accent); background: var(--accent-bg); }
+.health-none { color: var(--text-4); background: var(--muted-bg); }
+
+.home-progress { display: flex; align-items: center; gap: var(--s-6); flex: 1; }
+.home-progress-bar { flex: 1; height: 3px; background: var(--rule); border-radius: 2px; overflow: hidden; max-width: 8rem; }
+.home-progress-fill { height: 100%; background: var(--accent); border-radius: 2px; }
+.home-progress-label { font-size: 10px; color: var(--text-4); font-variant-numeric: tabular-nums; }
+.home-vars { font-size: var(--fs-xs); color: var(--text-4); }
+
+.home-add { padding: var(--s-16); text-align: center; font-size: var(--fs-sm); color: var(--text-4); cursor: pointer; border: 1px dashed var(--rule); border-radius: var(--radius); margin-top: var(--s-8); transition: all var(--dur-fast) var(--ease-out); }
+.home-add:hover { color: var(--text-2); border-color: var(--text-4); background: var(--bg-sub); }
+
+/* ================================================================
+   EXPERIMENT PAGE
+   ================================================================ */
+
+.exp-page-header { margin-bottom: var(--s-24); }
+.exp-page-idea { font-size: var(--fs-sm); color: var(--text-2); line-height: var(--lh-body); }
+.exp-page-meta { font-size: var(--fs-xs); color: var(--text-4); margin-top: var(--s-4); }
+
+.var-section { padding: var(--s-16); background: var(--surface); border-radius: var(--radius); margin-bottom: var(--s-8); }
+.var-section-stopped { opacity: 0.4; }
+.var-section-head { display: flex; align-items: center; gap: var(--s-12); margin-bottom: var(--s-12); }
+.var-section-name { font-family: var(--ff-display); font-size: var(--fs-sm); font-weight: 500; color: var(--text); flex: 1; }
+.var-section-rate { font-family: var(--ff-display); font-size: var(--fs-md); font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+
+.exp-page-footer { margin-top: var(--s-24); padding-top: var(--s-12); border-top: 1px solid var(--rule-faint); }
 
 /* ================================================================
    GOAL — Hero card

@@ -1,16 +1,19 @@
 /* ================================================================
-   Board — Goal-down view with experiment → variation hierarchy
+   Board — Experiment-centric flow
 
-   Experiment = the approach (Post Engager Lead Lists)
-   Variation  = a specific variable test (Commenters only, Template A)
+   Home: list of experiments, sorted by health
+   Experiment: full detail page for one experiment
+   Compare: sprint snapshots
    ================================================================ */
 
 var activeMode = 'outbound';
-var activeView = 'experiments';
-var expandedIds = {};
+var activeView = 'home';
+var openExpId = null;
 
-function setMode(m) { activeMode = m; render(); }
+function setMode(m) { activeMode = m; activeView = 'home'; openExpId = null; render(); }
 function setView(v) { activeView = v; render(); }
+function openExp(id) { openExpId = id; activeView = 'experiment'; render(); }
+function goHome() { activeView = 'home'; openExpId = null; render(); }
 
 function render() {
   var exps = load();
@@ -24,81 +27,33 @@ function render() {
     '<button class="mode-pill ' + (activeMode === 'outbound' ? 'active' : '') + '" onclick="setMode(\'outbound\')">Out <span class="mode-pill-n">' + outCount + '</span></button>' +
     '<button class="mode-pill ' + (activeMode === 'inbound' ? 'active' : '') + '" onclick="setMode(\'inbound\')">In <span class="mode-pill-n">' + inCount + '</span></button>';
 
-  document.getElementById('view-tabs').innerHTML =
-    '<button class="vtab ' + (activeView === 'experiments' ? 'active' : '') + '" onclick="setView(\'experiments\')">Experiments</button>' +
-    '<button class="vtab ' + (activeView === 'integrations' ? 'active' : '') + '" onclick="setView(\'integrations\')">Integrations</button>' +
-    '<button class="vtab ' + (activeView === 'weekly' ? 'active' : '') + '" onclick="setView(\'weekly\')">Compare</button>';
-
-  document.getElementById('view-experiments').style.display = activeView === 'experiments' ? 'block' : 'none';
+  // Hide/show views
+  document.getElementById('view-home').style.display = activeView === 'home' ? 'block' : 'none';
+  document.getElementById('view-experiment').style.display = activeView === 'experiment' ? 'block' : 'none';
   document.getElementById('view-integrations').style.display = activeView === 'integrations' ? 'block' : 'none';
   document.getElementById('view-weekly').style.display = activeView === 'weekly' ? 'block' : 'none';
 
-  if (activeView === 'experiments') renderGoalView(exps);
+  // Nav
+  if (activeView === 'experiment') {
+    var exp = exps.find(function(e) { return e.id === openExpId; });
+    document.getElementById('view-tabs').innerHTML =
+      '<button class="vtab" onclick="goHome()">← Back</button>' +
+      '<span class="vtab-title">' + (exp ? exp.name : '') + '</span>';
+  } else {
+    document.getElementById('view-tabs').innerHTML =
+      '<button class="vtab ' + (activeView === 'home' ? 'active' : '') + '" onclick="setView(\'home\')">Experiments</button>' +
+      '<button class="vtab ' + (activeView === 'integrations' ? 'active' : '') + '" onclick="setView(\'integrations\')">Integrations</button>' +
+      '<button class="vtab ' + (activeView === 'weekly' ? 'active' : '') + '" onclick="setView(\'weekly\')">Compare</button>';
+  }
+
+  if (activeView === 'home') renderHome(exps);
+  else if (activeView === 'experiment') renderExperimentPage(exps);
   else if (activeView === 'integrations') renderIntegrations(exps);
   else if (typeof renderTimeSeries === 'function') renderTimeSeries();
 }
 
-/* ================================================================
-   Integrations View — all data sources in one place
-   ================================================================ */
-
-function renderIntegrations(exps) {
-  var el = document.getElementById('view-integrations');
-  var modeExps = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === activeMode; });
-
-  var manualStages = [], autoStages = [];
-
-  modeExps.forEach(function(e) {
-    var info = CH[e.ch];
-    e.variations.forEach(function(v) {
-      if (v.verdict === 'Stop') return;
-      v.stages.forEach(function(stg, sIdx) {
-        var item = { exp: e, v: v, stg: stg, sIdx: sIdx, info: info };
-        if (stg.connType && stg.connType !== 'manual') autoStages.push(item);
-        else manualStages.push(item);
-      });
-    });
-  });
-
-  var total = manualStages.length + autoStages.length;
-  var html = '<div class="integ-summary">' + autoStages.length + ' / ' + total + ' stages connected · ' + manualStages.length + ' need manual update</div>';
-
-  function renderStageRow(item) {
-    var stg = item.stg, e = item.exp, v = item.v, sIdx = item.sIdx;
-    var connLabel = stg.connType === 'sheet' ? 'Sheet' : stg.connType === 'api' ? 'API' : stg.connType === 'webhook' ? 'Webhook' : 'Manual';
-    var connCls = stg.connType && stg.connType !== 'manual' ? 'integ-conn-auto' : 'integ-conn-manual';
-
-    return '<div class="integ-row">' +
-      '<div class="integ-stage">' + stg.label + '</div>' +
-      '<div class="integ-exp-label">' + e.name + '</div>' +
-      '<div class="integ-val">' + formatNum(stg.val) + '</div>' +
-      '<span class="integ-conn ' + connCls + '">' + connLabel + '</span>' +
-      (stg.owner ? '<span class="integ-owner">' + stg.owner + '</span>' : '<span class="integ-no-owner">No owner</span>') +
-      (stg.source ? '<a class="integ-link" href="' + stg.source + '" target="_blank">Source</a>' : '') +
-      '<button class="integ-btn" onclick="openStagePanel(' + e.id + ',\'' + v.id + '\',' + sIdx + ')">Edit</button>' +
-      '</div>';
-  }
-
-  if (manualStages.length > 0) {
-    html += '<div class="integ-group"><div class="integ-group-title">Needs manual update</div>';
-    manualStages.forEach(function(item) { html += renderStageRow(item); });
-    html += '</div>';
-  }
-
-  if (autoStages.length > 0) {
-    html += '<div class="integ-group"><div class="integ-group-title">Connected</div>';
-    autoStages.forEach(function(item) { html += renderStageRow(item); });
-    html += '</div>';
-  }
-
-  el.innerHTML = html;
-}
-
 /* ── Helpers ── */
-function allStopped(e) {
-  return e.variations.every(function(v) { return v.verdict === 'Stop'; });
-}
-
+function allStopped(e) { return e.variations.every(function(v) { return v.verdict === 'Stop'; }); }
 function bestVariation(e) {
   var active = e.variations.filter(function(v) { return v.verdict !== 'Stop'; });
   if (active.length === 0) return e.variations[0];
@@ -106,7 +61,6 @@ function bestVariation(e) {
   active.forEach(function(v) { if (expRate(v) > expRate(best)) best = v; });
   return best;
 }
-
 function expTotalBottom(e) {
   return e.variations.reduce(function(s, v) {
     if (v.verdict === 'Stop') return s;
@@ -115,164 +69,115 @@ function expTotalBottom(e) {
 }
 
 /* ================================================================
-   Goal-down view
+   HOME — List of experiments sorted by health
    ================================================================ */
 
-function renderGoalView(exps) {
-  var el = document.getElementById('view-experiments');
-  var isOut = activeMode === 'outbound';
+function renderHome(exps) {
+  var el = document.getElementById('view-home');
   var modeExps = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === activeMode && !allStopped(e); });
-  var stoppedExps = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === activeMode && allStopped(e); });
 
-  // Goal
-  var total = modeExps.reduce(function(s, e) { return s + expTotalBottom(e); }, 0);
-  var nsTarget = isOut ? 15 : 30;
-  var pct = Math.min(100, Math.round((total / nsTarget) * 100));
-  var color = pct >= 100 ? 'var(--hit)' : pct >= 60 ? 'var(--change)' : 'var(--accent)';
+  if (modeExps.length === 0) {
+    el.innerHTML = '<div class="home-empty">No experiments yet.<br>Click <strong>+ New</strong> to start.</div>';
+    return;
+  }
 
-  var html = '<div class="goal">' +
-    '<div class="goal-label">' + (isOut ? 'Signups' : 'Audience gained') + ' this sprint</div>' +
-    '<div class="goal-row"><span class="goal-num">' + total + '</span><span class="goal-of"> / ' + nsTarget + '</span></div>' +
-    '<div class="goal-bar"><div class="goal-fill" style="width:' + pct + '%;background:' + color + '"></div></div></div>';
-
-  // Categorize experiments by best variation health
-  var working = [], needsData = [], belowBm = [];
-  modeExps.forEach(function(e) {
-    var best = bestVariation(e);
-    var hasData = expHasData(best);
-    var rate = expRate(best);
-    var bm = getBenchmark(best, e.ch);
-    if (!hasData) needsData.push(e);
-    else if (rate >= bm.avg) working.push(e);
-    else belowBm.push(e);
+  // Sort: below benchmark first (needs attention), then needs data, then working
+  modeExps.sort(function(a, b) {
+    var sa = homeScore(a), sb = homeScore(b);
+    if (sa !== sb) return sa - sb;
+    return expTotalBottom(b) - expTotalBottom(a);
   });
 
-  function byContrib(a, b) { return expTotalBottom(b) - expTotalBottom(a); }
-  working.sort(byContrib);
-  belowBm.sort(byContrib);
+  var html = '';
+  modeExps.forEach(function(e) {
+    var info = CH[e.ch];
+    var best = bestVariation(e);
+    var rate = expRateStr(best);
+    var hasData = expHasData(best);
+    var bm = getBenchmark(best, e.ch);
+    var rateNum = expRate(best);
+    var contrib = expTotalBottom(e);
 
-  if (working.length > 0) {
-    html += '<div class="group"><div class="group-head"><span class="group-title">Working</span><span class="group-count">' + working.length + '</span></div>' +
-      '<div class="group-desc">At or above industry average — keep going</div>';
-    working.forEach(function(e) { html += renderExperiment(e); });
-    html += '</div>';
-  }
-  if (needsData.length > 0) {
-    html += '<div class="group"><div class="group-head"><span class="group-title">Needs more data</span><span class="group-count group-count-muted">' + needsData.length + '</span></div>' +
-      '<div class="group-desc">Keep running until enough volume to judge</div>';
-    needsData.forEach(function(e) { html += renderExperiment(e); });
-    html += '</div>';
-  }
-  if (belowBm.length > 0) {
-    html += '<div class="group"><div class="group-head"><span class="group-title">Below benchmark</span><span class="group-count group-count-warn">' + belowBm.length + '</span></div>' +
-      '<div class="group-desc">Add a new variation to test different variables</div>';
-    belowBm.forEach(function(e) { html += renderExperiment(e); });
-    html += '</div>';
-  }
+    // Health
+    var healthLabel = '', healthCls = '';
+    if (!hasData) { healthLabel = 'No data'; healthCls = 'health-none'; }
+    else if (rateNum >= bm.good) { healthLabel = 'Working'; healthCls = 'health-good'; }
+    else if (rateNum >= bm.avg) { healthLabel = 'Average'; healthCls = 'health-ok'; }
+    else { healthLabel = 'Below benchmark'; healthCls = 'health-low'; }
 
-  html += '<div class="inline-add-trigger" onclick="openModal()"><span class="inline-add-icon">+</span> New experiment</div>';
+    // Progress
+    var ri = best.rateIdx || info.rateIdx;
+    var sample = best.stages[ri[1]] ? best.stages[ri[1]].val : 0;
+    var minSample = bm ? bm.minSample : 50;
+    var pct = Math.min(100, Math.round((sample / minSample) * 100));
 
-  if (stoppedExps.length > 0) {
-    html += '<div class="stopped-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Stopped · ' + stoppedExps.length + '</div>' +
-      '<div style="display:none" class="stopped-list">';
-    stoppedExps.forEach(function(e) {
-      html += '<div class="exp-stopped"><span class="exp-stopped-name">' + e.name + '</span><button class="delete-btn-sm" onclick="deleteExp(' + e.id + ')">x</button></div>';
-    });
-    html += '</div>';
-  }
+    html += '<div class="home-card" onclick="openExp(' + e.id + ')">' +
+      '<div class="home-card-top">' +
+      '<div><div class="home-card-name">' + e.name + '</div>' +
+      '<div class="home-card-sub">' + info.label + (e.tools ? ' · ' + e.tools : '') + '</div>' +
+      (e.idea ? '<div class="home-card-idea">' + e.idea + '</div>' : '') + '</div>' +
+      '<div class="home-card-right">' +
+      '<div class="home-card-rate">' + rate + '</div>' +
+      (contrib > 0 ? '<div class="home-card-contrib">' + contrib + ' signup' + (contrib !== 1 ? 's' : '') + '</div>' : '') +
+      '</div></div>' +
+      '<div class="home-card-bottom">' +
+      '<span class="home-health ' + healthCls + '">' + healthLabel + '</span>' +
+      '<div class="home-progress"><div class="home-progress-bar"><div class="home-progress-fill" style="width:' + pct + '%"></div></div>' +
+      '<span class="home-progress-label">' + sample + '/' + minSample + '</span></div>' +
+      '<span class="home-vars">' + e.variations.filter(function(v) { return v.verdict !== 'Stop'; }).length + ' var</span>' +
+      '</div></div>';
+  });
 
+  html += '<div class="home-add" onclick="openModal()">+ New experiment</div>';
   el.innerHTML = html;
-  restoreExpanded();
+}
+
+function homeScore(e) {
+  var best = bestVariation(e);
+  if (!expHasData(best)) return 1; // needs data
+  var bm = getBenchmark(best, e.ch);
+  var rate = expRate(best);
+  if (rate < bm.avg) return 0; // below benchmark — needs attention first
+  return 2; // working
 }
 
 /* ================================================================
-   Single experiment with variations
+   EXPERIMENT PAGE — Full detail for one experiment
    ================================================================ */
 
-function renderExperiment(e) {
+function renderExperimentPage(exps) {
+  var el = document.getElementById('view-experiment');
+  var e = exps.find(function(x) { return x.id === openExpId; });
+  if (!e) { goHome(); return; }
   var info = CH[e.ch];
-  var best = bestVariation(e);
-  var bestRate = expRateStr(best);
-  var contrib = expTotalBottom(e);
-  var bm = getBenchmark(best, e.ch);
-  var rateNum = expRate(best);
-  var dot = '';
-  if (expHasData(best) && bm) {
-    if (rateNum >= bm.good) dot = '<span class="dot-good">●</span>';
-    else if (rateNum >= bm.avg) dot = '<span class="dot-ok">●</span>';
-    else dot = '<span class="dot-low">●</span>';
-  }
+  var bm = getBenchmark(bestVariation(e), e.ch);
 
-  // Data progress — how close to enough data for a verdict
-  var ri = best.rateIdx || info.rateIdx;
-  var sample = best.stages[ri[1]] ? best.stages[ri[1]].val : 0;
-  var minSample = bm ? bm.minSample : 50;
-  var samplePct = Math.min(100, Math.round((sample / minSample) * 100));
-  var hasEnough = sample >= minSample;
+  var html = '';
 
-  // Time estimate
-  var started = best.started || '—';
-  var timeLabel = '';
-  if (started !== '—' && !hasEnough && sample > 0) {
-    // Estimate weeks remaining based on current accumulation rate
-    var startDate = new Date(started + ', 2026');
-    var weeksRunning = Math.max(1, Math.round((Date.now() - startDate.getTime()) / (7 * 24 * 60 * 60 * 1000)));
-    var ratePerWeek = sample / weeksRunning;
-    if (ratePerWeek > 0) {
-      var weeksLeft = Math.ceil((minSample - sample) / ratePerWeek);
-      timeLabel = '~' + weeksLeft + ' more week' + (weeksLeft !== 1 ? 's' : '');
-    }
-  } else if (hasEnough) {
-    timeLabel = 'ready for verdict';
-  } else if (sample === 0) {
-    timeLabel = 'not started';
-  }
+  // Header
+  html += '<div class="exp-page-header">' +
+    '<div class="exp-page-idea">' + (e.idea || '') + '</div>' +
+    '<div class="exp-page-meta">' + info.label + (e.tools ? ' · ' + e.tools : '') + '</div>' +
+    '</div>';
 
-  var progressColor = hasEnough ? 'var(--hit)' : samplePct > 50 ? 'var(--change)' : 'var(--accent)';
-
-  var html = '<div class="exp-card">' +
-    '<div class="exp-row-g" onclick="toggleExp(' + e.id + ')">' +
-    '<div class="exp-main"><div>' + dot + '<span class="exp-name-g">' + e.name + '</span>' +
-    '<div class="exp-sub"><span class="exp-ch-label">' + info.label + '</span>' +
-    (e.tools ? '<span class="exp-tools-label">' + e.tools + '</span>' : '') + '</div>' +
-    (e.idea ? '<div class="exp-desc">' + e.idea + '</div>' : '') +
-    // Data progress bar
-    '<div class="exp-progress">' +
-    '<div class="exp-progress-bar"><div class="exp-progress-fill" style="width:' + samplePct + '%;background:' + progressColor + '"></div></div>' +
-    '<span class="exp-progress-label">' + formatNum(sample) + ' / ' + formatNum(minSample) + ' ' +
-    (best.stages[ri[1]] ? best.stages[ri[1]].label.toLowerCase() : '') +
-    (timeLabel ? ' · ' + timeLabel : '') + '</span></div>' +
-    '</div></div>' +
-    '<div class="exp-nums"><span class="exp-rate-g">' + bestRate + '</span>' +
-    (contrib > 0 ? '<span class="exp-contrib">' + contrib + ' ' + (info.mode === 'outbound' ? 'signup' + (contrib !== 1 ? 's' : '') : 'gained') + '</span>' : '') +
-    '</div></div>';
-
-  // Expandable: variations list
-  html += '<div class="exp-expand-wrap" id="expand-' + e.id + '"><div class="exp-expand-inner"><div class="exp-detail">';
-
-  // Variations — show ALL including stopped (dimmed)
-  e.variations.forEach(function(v, idx) {
+  // Variations
+  e.variations.forEach(function(v) {
     var isStopped = v.verdict === 'Stop';
     var vRate = expRateStr(v);
-    var vRateNum = expRate(v);
     var hasData = expHasData(v);
-    var vDot = '';
-    if (hasData && bm) {
-      if (vRateNum >= bm.good) vDot = '<span class="dot-good">●</span>';
-      else if (vRateNum >= bm.avg) vDot = '<span class="dot-ok">●</span>';
-      else vDot = '<span class="dot-low">●</span>';
-    }
-    var vCls = verdictCls(v.verdict);
 
-    html += '<div class="var-card' + (isStopped ? ' var-stopped' : '') + '">' +
-      '<div class="var-head">' +
-      '<div class="var-name">' + vDot + v.name + (isStopped ? ' <span class="var-stopped-label">stopped</span>' : '') + '</div>' +
-      (isStopped ? '' : '<button class="var-stop-btn" onclick="event.stopPropagation();stopVariation(' + e.id + ',\'' + v.id + '\')">Stop</button>') +
+    html += '<div class="var-section' + (isStopped ? ' var-section-stopped' : '') + '">';
+
+    // Variation header
+    html += '<div class="var-section-head">' +
+      '<span class="var-section-name">' + v.name + (isStopped ? ' <span class="var-stopped-label">stopped</span>' : '') + '</span>' +
+      (vRate !== '—' ? '<span class="var-section-rate">' + vRate + '</span>' : '') +
+      (!isStopped ? '<button class="var-stop-btn" onclick="stopVariation(' + e.id + ',\'' + v.id + '\')">Stop</button>' : '') +
       '</div>';
 
     if (isStopped) { html += '</div>'; return; }
 
-    // Pipeline — direct editable inputs with step conversions
+    // Pipeline with conversions
     html += '<div class="pipe">';
     v.stages.forEach(function(stg, sIdx) {
       if (sIdx > 0) {
@@ -283,53 +188,147 @@ function renderExperiment(e) {
         html += '<div class="pipe-arrow ' + convCls + '">' + convText + '</div>';
       }
       var isKey = v.rateIdx && (sIdx === v.rateIdx[0] || sIdx === v.rateIdx[1]);
-      var hasNote = stg.note || stg.source;
-      html += '<div class="pipe-stage' + (isKey ? ' pipe-stage-key' : '') + (hasNote ? ' pipe-stage-noted' : '') + '">' +
+      var hasConn = stg.source || stg.note || stg.owner;
+      html += '<div class="pipe-stage' + (isKey ? ' pipe-stage-key' : '') + (hasConn ? ' pipe-stage-noted' : '') + '">' +
         '<input type="number" class="pipe-input" value="' + stg.val + '" min="0" ' +
-        'onfocus="this.select()" ' +
-        'onchange="saveStage(' + e.id + ',\'' + v.id + '\',' + sIdx + ',this.value)" ' +
-        'onclick="event.stopPropagation()">' +
-        '<div class="pipe-stage-label" onclick="event.stopPropagation();openStagePanel(' + e.id + ',\'' + v.id + '\',' + sIdx + ')">' + stg.label +
-        (hasNote ? ' *' : '') + '</div></div>';
+        'onfocus="this.select()" onchange="saveStage(' + e.id + ',\'' + v.id + '\',' + sIdx + ',this.value)">' +
+        '<div class="pipe-stage-label" onclick="openStagePanel(' + e.id + ',\'' + v.id + '\',' + sIdx + ')">' +
+        stg.label + (hasConn ? ' *' : '') + '</div></div>';
     });
     html += '</div>';
 
     // AI insight
     if (hasData) {
       var sg = suggestVerdict(v, e.ch);
-      if (sg.verdict) html += '<div class="exp-ai">' + sg.reason + '</div>';
+      if (sg.reason) html += '<div class="exp-ai">' + sg.reason + '</div>';
     }
 
     html += '</div>';
   });
 
-  // Add variation button
-  html += '<div class="add-var-trigger" onclick="event.stopPropagation();addVariation(' + e.id + ')"><span class="inline-add-icon">+</span> New variation</div>';
+  // Add variation
+  html += '<div class="add-var-trigger" onclick="addVariation(' + e.id + ')"><span class="inline-add-icon">+</span> Try a different variable</div>';
 
-  html += '<div class="exp-bottom">' +
-    '<button class="delete-btn" onclick="event.stopPropagation();deleteExp(' + e.id + ')">Delete</button></div>';
+  // Delete
+  html += '<div class="exp-page-footer"><button class="delete-btn" onclick="deleteExp(' + e.id + ')">Delete experiment</button></div>';
 
-  html += '</div></div></div></div>';
-  return html;
+  el.innerHTML = html;
+}
+
+/* ================================================================
+   INTEGRATIONS — all stages grouped by manual vs connected
+   ================================================================ */
+
+function renderIntegrations(exps) {
+  var el = document.getElementById('view-integrations');
+  var modeExps = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === activeMode; });
+  var manualStages = [], autoStages = [];
+
+  modeExps.forEach(function(e) {
+    e.variations.forEach(function(v) {
+      if (v.verdict === 'Stop') return;
+      v.stages.forEach(function(stg, sIdx) {
+        var item = { exp: e, v: v, stg: stg, sIdx: sIdx };
+        if (stg.connType && stg.connType !== 'manual') autoStages.push(item);
+        else manualStages.push(item);
+      });
+    });
+  });
+
+  var total = manualStages.length + autoStages.length;
+  var html = '<div class="integ-summary">' + autoStages.length + ' / ' + total + ' connected · ' + manualStages.length + ' manual</div>';
+
+  function renderRow(item) {
+    var stg = item.stg, e = item.exp, v = item.v, sIdx = item.sIdx;
+    var connLabel = stg.connType === 'sheet' ? 'Sheet' : stg.connType === 'api' ? 'API' : stg.connType === 'webhook' ? 'Webhook' : 'Manual';
+    var connCls = stg.connType && stg.connType !== 'manual' ? 'integ-conn-auto' : 'integ-conn-manual';
+    return '<div class="integ-row">' +
+      '<div class="integ-stage">' + stg.label + '</div>' +
+      '<div class="integ-exp-label">' + e.name + '</div>' +
+      '<div class="integ-val">' + formatNum(stg.val) + '</div>' +
+      '<span class="integ-conn ' + connCls + '">' + connLabel + '</span>' +
+      (stg.owner ? '<span class="integ-owner">' + stg.owner + '</span>' : '') +
+      '<button class="integ-btn" onclick="openStagePanel(' + e.id + ',\'' + v.id + '\',' + sIdx + ')">Edit</button></div>';
+  }
+
+  if (manualStages.length > 0) {
+    html += '<div class="integ-group"><div class="integ-group-title">Needs manual update</div>';
+    manualStages.forEach(function(i) { html += renderRow(i); });
+    html += '</div>';
+  }
+  if (autoStages.length > 0) {
+    html += '<div class="integ-group"><div class="integ-group-title">Connected</div>';
+    autoStages.forEach(function(i) { html += renderRow(i); });
+    html += '</div>';
+  }
+
+  el.innerHTML = html;
+}
+
+/* ================================================================
+   Stage panel (modal)
+   ================================================================ */
+
+function openStagePanel(expId, varId, stgIdx) {
+  var exps = load();
+  var e = exps.find(function(x) { return x.id === expId; });
+  if (!e) return;
+  var v = e.variations.find(function(x) { return x.id === varId; });
+  if (!v) return;
+  var stg = v.stages[stgIdx];
+  var hint = getTrackingHint(e, stg.label);
+  var connType = stg.connType || 'manual';
+
+  qaOpen = true;
+  document.getElementById('modal').classList.add('open');
+  document.querySelector('.chat').innerHTML =
+    '<div class="qa-panel"><div class="qa-header"><h2 class="qa-title">' + stg.label + '</h2>' +
+    '<button class="chat-close" onclick="closeModal()">&times;</button></div>' +
+    '<div class="qa-body">' +
+    '<div class="qa-field"><label class="qa-label">Connection</label>' +
+    '<div class="qa-chips" id="stg-conn">' +
+    ['manual','sheet','api','webhook'].map(function(t) {
+      var label = t === 'manual' ? 'Manual' : t === 'sheet' ? 'Google Sheet' : t === 'api' ? 'API' : 'Webhook';
+      return '<button class="qa-chip ' + (connType === t ? 'active' : '') + '" onclick="pickConn(this,\'' + t + '\')" data-type="' + t + '">' + label + '</button>';
+    }).join('') + '</div></div>' +
+    '<div class="qa-field"><div style="font-size:var(--fs-xs);color:var(--text-3);padding:var(--s-6);background:var(--bg-sub);border-radius:var(--radius-sm);border-left:2px solid var(--inbound)">' + hint + '</div></div>' +
+    '<div class="qa-field"><label class="qa-label">Source URL</label><input type="text" class="qa-input qa-input-sm" id="stg-source" value="' + (stg.source || '').replace(/"/g, '&quot;') + '" placeholder="https://..."></div>' +
+    '<div class="qa-field"><label class="qa-label">Owner</label><input type="text" class="qa-input qa-input-sm" id="stg-owner" value="' + (stg.owner || '').replace(/"/g, '&quot;') + '" placeholder="Who updates this?"></div>' +
+    '<div class="qa-field"><label class="qa-label">Note</label><input type="text" class="qa-input qa-input-sm" id="stg-note" value="' + (stg.note || '').replace(/"/g, '&quot;') + '" placeholder="Optional note"></div>' +
+    '</div><div class="qa-footer"><button class="qa-cancel" onclick="closeModal()">Cancel</button>' +
+    '<button class="qa-submit" onclick="saveStagePanel(' + expId + ',\'' + varId + '\',' + stgIdx + ')">Save</button></div></div>';
+}
+
+function pickConn(btn, type) {
+  document.querySelectorAll('#stg-conn .qa-chip').forEach(function(c) { c.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+function saveStagePanel(expId, varId, stgIdx) {
+  var exps = load();
+  var v = exps.find(function(x) { return x.id === expId; }).variations.find(function(x) { return x.id === varId; });
+  var stg = v.stages[stgIdx];
+  stg.note = document.getElementById('stg-note').value.trim();
+  stg.source = document.getElementById('stg-source').value.trim();
+  stg.owner = document.getElementById('stg-owner').value.trim();
+  var activeChip = document.querySelector('#stg-conn .qa-chip.active');
+  stg.connType = activeChip ? activeChip.dataset.type : 'manual';
+  stg.lastUpdated = new Date().toLocaleDateString();
+  save(exps); closeModal(); render();
 }
 
 /* ================================================================
    Actions
    ================================================================ */
 
-function toggleExp(id) {
-  var el = document.getElementById('expand-' + id);
-  if (el) el.classList.toggle('open');
-  expandedIds[id] = el ? el.classList.contains('open') : false;
-}
-
-function restoreExpanded() {
-  Object.keys(expandedIds).forEach(function(id) {
-    if (expandedIds[id]) {
-      var el = document.getElementById('expand-' + id);
-      if (el) el.classList.add('open');
-    }
-  });
+function saveStage(expId, varId, stgIdx, val) {
+  var exps = load();
+  var e = exps.find(function(x) { return x.id === expId; });
+  if (!e) return;
+  var v = e.variations.find(function(x) { return x.id === varId; });
+  if (!v) return;
+  v.stages[stgIdx].val = parseInt(val) || 0;
+  save(exps);
 }
 
 function stopVariation(expId, varId) {
@@ -342,175 +341,27 @@ function stopVariation(expId, varId) {
   save(exps); flash(); render();
 }
 
-function saveStage(expId, varId, stgIdx, val) {
-  var exps = load();
-  var e = exps.find(function(x) { return x.id === expId; });
-  if (!e) return;
-  var v = e.variations.find(function(x) { return x.id === varId; });
-  if (!v) return;
-  v.stages[stgIdx].val = parseInt(val) || 0;
-  save(exps);
-  // Update rate display live without full re-render
-  var card = document.querySelector('#expand-' + expId);
-  if (card) {
-    var rateEl = card.querySelector('.var-card:nth-child(' + (e.variations.indexOf(v) + 1) + ') .var-rate');
-    if (rateEl) rateEl.textContent = expRateStr(v);
-  }
-}
-
-function openStagePanel(expId, varId, stgIdx) {
-  var exps = load();
-  var e = exps.find(function(x) { return x.id === expId; });
-  if (!e) return;
-  var v = e.variations.find(function(x) { return x.id === varId; });
-  if (!v) return;
-  var stg = v.stages[stgIdx];
-  var hint = getTrackingHint(e, stg.label);
-
-  var connType = stg.connType || 'manual';
-  var lastUpdated = stg.lastUpdated || '';
-
-  qaOpen = true;
-  document.getElementById('modal').classList.add('open');
-  document.querySelector('.chat').innerHTML =
-    '<div class="qa-panel"><div class="qa-header"><h2 class="qa-title">' + stg.label + '</h2>' +
-    '<button class="chat-close" onclick="closeModal()">&times;</button></div>' +
-    '<div class="qa-body">' +
-
-    '<div class="qa-field"><label class="qa-label">Connection type</label>' +
-    '<div class="qa-chips">' +
-    '<button class="qa-chip ' + (connType === 'manual' ? 'active' : '') + '" onclick="document.querySelectorAll(\'#stg-conn-type .qa-chip\').forEach(function(c){c.classList.remove(\'active\')});this.classList.add(\'active\')" id="conn-manual">Manual</button>' +
-    '<button class="qa-chip ' + (connType === 'sheet' ? 'active' : '') + '" onclick="document.querySelectorAll(\'#stg-conn-type .qa-chip\').forEach(function(c){c.classList.remove(\'active\')});this.classList.add(\'active\')" id="conn-sheet">Google Sheet</button>' +
-    '<button class="qa-chip ' + (connType === 'api' ? 'active' : '') + '" onclick="document.querySelectorAll(\'#stg-conn-type .qa-chip\').forEach(function(c){c.classList.remove(\'active\')});this.classList.add(\'active\')" id="conn-api">API</button>' +
-    '<button class="qa-chip ' + (connType === 'webhook' ? 'active' : '') + '" onclick="document.querySelectorAll(\'#stg-conn-type .qa-chip\').forEach(function(c){c.classList.remove(\'active\')});this.classList.add(\'active\')" id="conn-webhook">Webhook</button>' +
-    '</div><div id="stg-conn-type"></div></div>' +
-
-    '<div class="qa-field"><label class="qa-label">How to track</label>' +
-    '<div style="font-size:var(--fs-sm);color:var(--text-3);line-height:var(--lh-body);padding:var(--s-8);background:var(--bg-sub);border-radius:var(--radius-sm);border-left:2px solid var(--inbound)">' + hint + '</div></div>' +
-
-    '<div class="qa-field"><label class="qa-label">Source URL or endpoint</label>' +
-    '<input type="text" class="qa-input qa-input-sm" id="stg-source" value="' + (stg.source || '').replace(/"/g, '&quot;') + '" placeholder="https://..."></div>' +
-
-    '<div class="qa-field"><label class="qa-label">Owner</label>' +
-    '<input type="text" class="qa-input qa-input-sm" id="stg-owner" value="' + (stg.owner || '').replace(/"/g, '&quot;') + '" placeholder="Who updates this? e.g. Maruthi"></div>' +
-
-    '<div class="qa-field"><label class="qa-label">Note</label>' +
-    '<input type="text" class="qa-input qa-input-sm" id="stg-note" value="' + (stg.note || '').replace(/"/g, '&quot;') + '" placeholder="e.g. Exported weekly from Phantom"></div>' +
-
-    (lastUpdated ? '<div style="font-size:var(--fs-xs);color:var(--text-4)">Last updated: ' + lastUpdated + '</div>' : '') +
-
-    '</div><div class="qa-footer">' +
-    '<button class="qa-cancel" onclick="closeModal()">Cancel</button>' +
-    '<button class="qa-submit" onclick="saveStagePanel(' + expId + ',\'' + varId + '\',' + stgIdx + ')">Save</button></div></div>';
-}
-
-function saveStagePanel(expId, varId, stgIdx) {
-  var exps = load();
-  var e = exps.find(function(x) { return x.id === expId; });
-  var v = e.variations.find(function(x) { return x.id === varId; });
-  var stg = v.stages[stgIdx];
-  stg.note = document.getElementById('stg-note').value.trim();
-  stg.source = document.getElementById('stg-source').value.trim();
-  stg.owner = document.getElementById('stg-owner').value.trim();
-
-  // Connection type
-  if (document.getElementById('conn-sheet').classList.contains('active')) stg.connType = 'sheet';
-  else if (document.getElementById('conn-api').classList.contains('active')) stg.connType = 'api';
-  else if (document.getElementById('conn-webhook').classList.contains('active')) stg.connType = 'webhook';
-  else stg.connType = 'manual';
-
-  stg.lastUpdated = new Date().toLocaleDateString();
-  save(exps);
-  closeModal();
-  render();
-}
-
-function saveStageNote(expId, varId, stgIdx, val) {
-  var exps = load();
-  var e = exps.find(function(x) { return x.id === expId; });
-  if (!e) return;
-  var v = e.variations.find(function(x) { return x.id === varId; });
-  if (!v) return;
-  v.stages[stgIdx].note = val;
-  save(exps);
-}
-
-function saveStageSource(expId, varId, stgIdx, val) {
-  var exps = load();
-  var e = exps.find(function(x) { return x.id === expId; });
-  if (!e) return;
-  var v = e.variations.find(function(x) { return x.id === varId; });
-  if (!v) return;
-  v.stages[stgIdx].source = val;
-  save(exps);
-}
-
-function editVarStage(expId, varId, stgIdx, el) {
-  var exps = load();
-  var e = exps.find(function(x) { return x.id === expId; });
-  var v = e.variations.find(function(x) { return x.id === varId; });
-  var stg = v.stages[stgIdx];
-  var hint = getTrackingHint(e, stg.label);
-
-  inlineEdit(el, stg.val, function(val) {
-    var exps2 = load();
-    var e2 = exps2.find(function(x) { return x.id === expId; });
-    var v2 = e2.variations.find(function(x) { return x.id === varId; });
-    v2.stages[stgIdx].val = val;
-    save(exps2); flash(); render();
-  }, { label: stg.label, hint: hint });
-}
-
-
 function addVariation(expId) {
-  var trigger = document.querySelector('#expand-' + expId + ' .add-var-trigger');
-  if (!trigger || trigger.querySelector('.add-var-inline')) return;
+  var exps = load();
+  var e = exps.find(function(x) { return x.id === expId; });
+  if (!e) return;
+  var info = CH[e.ch];
+  var name = prompt('What variable are you changing?');
+  if (!name) return;
 
-  var wrap = document.createElement('div');
-  wrap.className = 'add-var-inline';
-  wrap.onclick = function(e) { e.stopPropagation(); };
-  wrap.innerHTML = '<input type="text" class="add-var-input" placeholder="What are you changing?" autofocus>' +
-    '<div class="add-var-actions"><button class="ie-cancel add-var-cancel-btn">Cancel</button><button class="ie-save add-var-save-btn">Add</button></div>';
-  trigger.innerHTML = '';
-  trigger.style.border = 'none';
-  trigger.style.padding = '0';
-  trigger.appendChild(wrap);
-
-  var input = wrap.querySelector('input');
-  setTimeout(function() { input.focus(); }, 30);
-
-  function doAdd() {
-    var name = input.value.trim();
-    if (!name) { doCancel(); return; }
-    var exps = load();
-    var e = exps.find(function(x) { return x.id === expId; });
-    var info = CH[e.ch];
-    var count = e.variations.length + 1;
-    var stages = (info ? info.defaultStages : ['Input', 'Output']).map(function(l) { return { label: l, val: 0 }; });
-    e.variations.push({
-      id: expId + '_v' + count,
-      name: name,
-      stages: stages,
-      rateIdx: info ? info.rateIdx : [1, 0],
-      started: MONTHS[new Date().getMonth()] + ' ' + new Date().getDate(),
-      verdict: '',
-      next: ''
-    });
-    save(exps); flash(); render();
-  }
-
-  function doCancel() { render(); }
-
-  wrap.querySelector('.add-var-save-btn').onclick = function(e) { e.stopPropagation(); doAdd(); };
-  wrap.querySelector('.add-var-cancel-btn').onclick = function(e) { e.stopPropagation(); doCancel(); };
-  input.addEventListener('keydown', function(ev) {
-    if (ev.key === 'Enter') doAdd();
-    if (ev.key === 'Escape') doCancel();
+  var stages = (info ? info.defaultStages : ['Input', 'Output']).map(function(l) { return { label: l, val: 0 }; });
+  e.variations.push({
+    id: expId + '_v' + (e.variations.length + 1),
+    name: name, stages: stages,
+    rateIdx: info ? info.rateIdx : [1, 0],
+    started: MONTHS[new Date().getMonth()] + ' ' + new Date().getDate(),
+    verdict: '', next: ''
   });
+  save(exps); flash(); render();
 }
 
 function deleteExp(id) {
   var exps = load(), e = exps.find(function(x) { return x.id === id; });
-  if (!e || !confirm('Delete "' + e.name + '" and all its variations?')) return;
-  save(exps.filter(function(x) { return x.id !== id; })); flash(); render();
+  if (!e || !confirm('Delete "' + e.name + '"?')) return;
+  save(exps.filter(function(x) { return x.id !== id; })); flash(); goHome();
 }
