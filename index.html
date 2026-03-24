@@ -38,9 +38,7 @@
     .ch-color { width: 14px; height: 14px; border-radius: 4px; }
     .ch-title { font-size: 16px; font-weight: 800; letter-spacing: -0.2px; }
     .ch-meta { font-size: 11px; color: #999; margin-left: auto; }
-    .ch-metrics { display: flex; gap: 8px; margin-bottom: 10px; padding: 0 4px; }
-    .ch-metric { font-size: 12px; color: #555; }
-    .ch-metric .cm-num { font-weight: 700; }
+    /* ch-metrics removed — data shown in comparison table */
 
     /* Comparison table */
     .compare { margin-bottom: 12px; }
@@ -181,11 +179,11 @@
 <script>
 const K='gtm_v15';
 const CH={
-  outbound: { label:'Outbound', color:'#0a66c2', metrics:['Sent','Replies','Signups'], rateLabel:'Reply Rate', rateCalc:(m)=>m[0]>0?((m[1]/m[0])*100).toFixed(1)+'%':'—', icon:'📤', source:'Dripify / manual count' },
-  social: { label:'Social', color:'#ff4500', metrics:['Posts/Replies','Engagements','Visits'], rateLabel:'Engagement Rate', rateCalc:(m)=>m[0]>0?((m[1]/m[0])*100).toFixed(1)+'%':'—', icon:'💬', source:'Manual count' },
-  events: { label:'Events', color:'#ff9f0a', metrics:['Conversations','Contacts','Signups'], rateLabel:'Conv Rate', rateCalc:(m)=>m[0]>0?((m[2]/m[0])*100).toFixed(1)+'%':'—', icon:'☕', source:'Manual count at event' },
-  retention: { label:'Retention', color:'#5856d6', metrics:['Targeted','Engaged','Reactivated'], rateLabel:'Reactivation', rateCalc:(m)=>m[0]>0?((m[2]/m[0])*100).toFixed(1)+'%':'—', icon:'🔄', source:'Product analytics' },
-  content: { label:'Content', color:'#ff2d55', metrics:['Published','Impressions','Signups'], rateLabel:'Signup Rate', rateCalc:(m)=>m[1]>0?((m[2]/m[1])*100).toFixed(2)+'%':'—', icon:'📝', source:'Analytics' },
+  outbound: { label:'Outbound', color:'#0a66c2', metrics:['Sent','Replies','Signups'], rateLabel:'Reply Rate', rateCalc:(m)=>m[0]>0?((m[1]/m[0])*100).toFixed(1)+'%':'—', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>', source:'Dripify / manual count' },
+  social: { label:'Social', color:'#ff4500', metrics:['Posts/Replies','Engagements','Visits'], rateLabel:'Engagement Rate', rateCalc:(m)=>m[0]>0?((m[1]/m[0])*100).toFixed(1)+'%':'—', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>', source:'Manual count' },
+  events: { label:'Events', color:'#ff9f0a', metrics:['Conversations','Contacts','Signups'], rateLabel:'Conv Rate', rateCalc:(m)=>m[0]>0?((m[2]/m[0])*100).toFixed(1)+'%':'—', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>', source:'Manual count at event' },
+  retention: { label:'Retention', color:'#5856d6', metrics:['Targeted','Engaged','Reactivated'], rateLabel:'Reactivation', rateCalc:(m)=>m[0]>0?((m[2]/m[0])*100).toFixed(1)+'%':'—', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>', source:'Product analytics' },
+  content: { label:'Content', color:'#ff2d55', metrics:['Published','Impressions','Signups'], rateLabel:'Signup Rate', rateCalc:(m)=>m[1]>0?((m[2]/m[1])*100).toFixed(2)+'%':'—', icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>', source:'Analytics' },
 };
 
 const D=[
@@ -219,7 +217,7 @@ function render(){
   document.getElementById('ns-val').textContent=activated;
   const bar=document.getElementById('ns-bar');
   bar.style.width=pct+'%';
-  bar.style.background=pct>=100?'#34c759':pct>=60?'#ff9f0a':'#0071e3';
+  bar.style.background=pct>=100?'#16a34a':pct>=60?'#f59e0b':'#0071e3';
 
   // Time summary
   const timeByChannel={};
@@ -266,14 +264,14 @@ function render(){
     html+=`<div class="ch-group">
       <div class="ch-header">
         <div class="ch-color" style="background:${info.color}"></div>
-        <span class="ch-title">${info.icon} ${info.label}</span>
+        <span class="ch-title"><span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px;color:${info.color}">${info.icon}</span>${info.label}</span>
         <span class="ch-meta">${gExps.length} experiments · ${totalHrs}h${bestId?' · Best: '+rates[0].name:''}</span>
       </div>`;
 
     // Comparison table
     if(rates.length>0){
       html+=`<div class="compare"><table>
-        <tr><th>Experiment</th>${info.metrics.map(l=>`<th>${l}</th>`).join('')}<th>${info.rateLabel}</th><th>Signups</th><th>Hours</th></tr>
+        <tr><th>Experiment</th>${info.metrics.map(l=>`<th>${l}</th>`).join('')}<th>${info.rateLabel}</th><th>Hours</th></tr>
         ${rates.map(r=>{
           const isBest=r.id===bestId;
           const barPct=rates[0].rateNum>0?Math.round((r.rateNum/rates[0].rateNum)*100):0;
@@ -281,11 +279,10 @@ function render(){
             <td class="exp-name-cell">${r.name}</td>
             ${r.m.map(v=>`<td>${v}</td>`).join('')}
             <td class="rate-cell ${isBest?'best':''}"><div class="rate-bar-wrap"><span>${r.rate}</span><div class="rate-bar"><div class="rate-bar-fill" style="width:${barPct}%"></div></div></div></td>
-            <td>${r.m[2]}</td>
             <td>${r.hours}h</td>
           </tr>`;
         }).join('')}
-        ${withData.length<gExps.length?`<tr><td colspan="${info.metrics.length+4}" class="no-data">${gExps.length-withData.length} experiment${gExps.length-withData.length>1?'s':''} with no data yet</td></tr>`:''}
+        ${withData.length<gExps.length?`<tr><td colspan="${info.metrics.length+3}" class="no-data">${gExps.length-withData.length} experiment${gExps.length-withData.length>1?'s':''} with no data yet</td></tr>`:''}
       </table>
       <div class="source-note">Source: ${info.source}</div>
       </div>`;
