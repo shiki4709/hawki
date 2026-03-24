@@ -99,6 +99,19 @@
     .de-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
     .de-label { font-size: 10px; color: #aaa; }
 
+    /* Comparison table */
+    .compare { margin-bottom: 8px; padding: 0 4px; }
+    .compare table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .compare th { text-align: left; padding: 4px 8px; font-size: 10px; color: #86868b; text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600; border-bottom: 1px solid #e8e8ed; }
+    .compare td { padding: 5px 8px; border-bottom: 1px solid #f5f5f7; }
+    .compare tr:last-child td { border: none; }
+    .compare .exp-name-cell { font-weight: 600; }
+    .compare .rate-cell { font-weight: 700; font-family: 'SF Mono', monospace; }
+    .compare .rate-cell.best { color: #34c759; }
+    .compare .winner-row td { background: #f0fdf4; }
+    .compare .no-data { color: #d2d2d7; }
+    .compare .source-note { font-size: 10px; color: #bbb; margin-top: 4px; }
+
     /* Collapsed group */
     .collapsed-toggle { padding: 10px 16px; background: #fff; border-radius: 10px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); cursor: pointer; font-size: 13px; color: #86868b; display: flex; justify-content: space-between; }
 
@@ -162,11 +175,11 @@
 <script>
 const K='gtm_v15';
 const CH={
-  outbound: { label:'Outbound', color:'#0a66c2', metrics:['Sent','Replies','Signups'], icon:'📤' },
-  social: { label:'Social', color:'#ff4500', metrics:['Posts/Replies','Engagements','Visits'], icon:'💬' },
-  events: { label:'Events', color:'#ff9f0a', metrics:['Conversations','Contacts','Signups'], icon:'☕' },
-  retention: { label:'Retention', color:'#5856d6', metrics:['Targeted','Engaged','Reactivated'], icon:'🔄' },
-  content: { label:'Content', color:'#ff2d55', metrics:['Published','Impressions','Signups'], icon:'📝' },
+  outbound: { label:'Outbound', color:'#0a66c2', metrics:['Sent','Replies','Signups'], rateLabel:'Reply Rate', rateCalc:(m)=>m[0]>0?((m[1]/m[0])*100).toFixed(1)+'%':'—', icon:'📤', source:'Dripify / manual count' },
+  social: { label:'Social', color:'#ff4500', metrics:['Posts/Replies','Engagements','Visits'], rateLabel:'Engagement Rate', rateCalc:(m)=>m[0]>0?((m[1]/m[0])*100).toFixed(1)+'%':'—', icon:'💬', source:'Manual count' },
+  events: { label:'Events', color:'#ff9f0a', metrics:['Conversations','Contacts','Signups'], rateLabel:'Conv Rate', rateCalc:(m)=>m[0]>0?((m[2]/m[0])*100).toFixed(1)+'%':'—', icon:'☕', source:'Manual count at event' },
+  retention: { label:'Retention', color:'#5856d6', metrics:['Targeted','Engaged','Reactivated'], rateLabel:'Reactivation', rateCalc:(m)=>m[0]>0?((m[2]/m[0])*100).toFixed(1)+'%':'—', icon:'🔄', source:'Product analytics' },
+  content: { label:'Content', color:'#ff2d55', metrics:['Published','Impressions','Signups'], rateLabel:'Signup Rate', rateCalc:(m)=>m[1]>0?((m[2]/m[1])*100).toFixed(2)+'%':'—', icon:'📝', source:'Analytics' },
 };
 
 const D=[
@@ -238,16 +251,38 @@ function render(){
     gExps.forEach(e=>{if(e.m){totals[0]+=e.m[0];totals[1]+=e.m[1];totals[2]+=e.m[2];}});
     const totalHrs=gExps.reduce((s,e)=>s+(e.hours||0),0);
 
+    // Find best experiment by rate
+    const withData=gExps.filter(e=>e.m&&e.m[0]>0);
+    const rates=withData.map(e=>({id:e.id, name:e.name, rate:info.rateCalc(e.m), rateNum:e.m[0]>0?(e.m[1]/e.m[0]):0, m:e.m, hours:e.hours||0, status:e.status}));
+    rates.sort((a,b)=>b.rateNum-a.rateNum);
+    const bestId=rates.length>0?rates[0].id:null;
+
     html+=`<div class="ch-group">
       <div class="ch-header">
         <div class="ch-color" style="background:${info.color}"></div>
         <span class="ch-title">${info.icon} ${info.label}</span>
-        <span class="ch-meta">${gExps.length} experiments · ${totalHrs}h</span>
-      </div>
-      <div class="ch-metrics">
-        ${info.metrics.map((label,i)=>`<div class="ch-metric"><span class="cm-num">${totals[i]}</span> ${label.toLowerCase()}</div>`).join(' · ')}
-        ${totals[2]>0?` · <div class="ch-metric"><span class="cm-num" style="color:#34c759">${totals[2]} signups</span></div>`:''}
+        <span class="ch-meta">${gExps.length} experiments · ${totalHrs}h${bestId?' · Best: '+rates[0].name:''}</span>
       </div>`;
+
+    // Comparison table
+    if(rates.length>0){
+      html+=`<div class="compare"><table>
+        <tr><th>Experiment</th>${info.metrics.map(l=>`<th>${l}</th>`).join('')}<th>${info.rateLabel}</th><th>Signups</th><th>Hours</th></tr>
+        ${rates.map(r=>{
+          const isBest=r.id===bestId;
+          return`<tr class="${isBest?'winner-row':''}">
+            <td class="exp-name-cell">${r.name}${isBest?' ★':''}</td>
+            ${r.m.map(v=>`<td>${v}</td>`).join('')}
+            <td class="rate-cell ${isBest?'best':''}">${r.rate}</td>
+            <td>${r.m[2]}</td>
+            <td>${r.hours}h</td>
+          </tr>`;
+        }).join('')}
+        ${withData.length<gExps.length?`<tr><td colspan="${info.metrics.length+4}" class="no-data">${gExps.length-withData.length} experiment${gExps.length-withData.length>1?'s':''} with no data yet</td></tr>`:''}
+      </table>
+      <div class="source-note">Source: ${info.source}</div>
+      </div>`;
+    }
 
     html+=active.map(e=>renderExp(e,info)).join('');
 
