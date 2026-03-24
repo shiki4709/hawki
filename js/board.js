@@ -1,20 +1,19 @@
 /* ================================================================
-   Board — Two views: Experiments (working view) + Compare
-   Health indicators on every experiment row.
+   Board — Goal-down view
+
+   Goal → What's working → Needs data → Below benchmark
+   No channel tabs. Just experiments grouped by health.
    ================================================================ */
 
 var activeMode = 'outbound';
 var activeView = 'experiments';
 var activeFlow = null;
 
-function setMode(m) { activeMode = m; activeFlow = null; render(); }
+function setMode(m) { activeMode = m; render(); }
 function setView(v) { activeView = v; render(); }
-function setFlow(ch) { activeFlow = ch; render(); }
 
 function render() {
   var exps = load();
-  var modeChannels = Object.entries(CH).filter(function(p) { return p[1].mode === activeMode; }).map(function(p) { return p[0]; });
-  if (!activeFlow || !modeChannels.includes(activeFlow)) activeFlow = modeChannels[0];
 
   // Sprint label
   var sp = loadSprint();
@@ -27,7 +26,7 @@ function render() {
     '<button class="mode-pill ' + (activeMode === 'outbound' ? 'active' : '') + '" onclick="setMode(\'outbound\')">Out <span class="mode-pill-n">' + outCount + '</span></button>' +
     '<button class="mode-pill ' + (activeMode === 'inbound' ? 'active' : '') + '" onclick="setMode(\'inbound\')">In <span class="mode-pill-n">' + inCount + '</span></button>';
 
-  // View tabs — just two
+  // View tabs
   document.getElementById('view-tabs').innerHTML =
     '<button class="vtab ' + (activeView === 'experiments' ? 'active' : '') + '" onclick="setView(\'experiments\')">Experiments</button>' +
     '<button class="vtab ' + (activeView === 'weekly' ? 'active' : '') + '" onclick="setView(\'weekly\')">Compare</button>';
@@ -36,166 +35,195 @@ function render() {
   document.getElementById('view-weekly').style.display = activeView === 'weekly' ? 'block' : 'none';
 
   if (activeView === 'experiments') {
-    renderExperimentsView(exps, modeChannels);
+    renderGoalView(exps);
   } else {
     if (typeof renderTimeSeries === 'function') renderTimeSeries();
   }
 }
 
 /* ================================================================
-   Experiments View
+   Goal-down view
    ================================================================ */
 
-function renderExperimentsView(exps, modeChannels) {
+function renderGoalView(exps) {
   var el = document.getElementById('view-experiments');
-  var modeExps = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === activeMode; });
   var isOut = activeMode === 'outbound';
+  var modeExps = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === activeMode && e.verdict !== 'Stop'; });
+  var stoppedExps = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === activeMode && e.verdict === 'Stop'; });
 
-  // North star
+  // Goal
   var total = modeExps.reduce(function(s, e) { return s + expBottomVal(e); }, 0);
   var nsTarget = isOut ? 15 : 30;
   var pct = Math.min(100, Math.round((total / nsTarget) * 100));
-  var color = pct >= 100 ? 'var(--hit)' : pct >= 60 ? 'var(--change)' : (isOut ? 'var(--accent)' : 'var(--inbound)');
+  var goalLabel = isOut ? 'signups' : 'audience gained';
+  var color = pct >= 100 ? 'var(--hit)' : pct >= 60 ? 'var(--change)' : 'var(--accent)';
 
-  var totalRateNum = 0, totalRateDen = 0;
+  var html = '<div class="goal">' +
+    '<div class="goal-label">Goal: ' + nsTarget + ' ' + goalLabel + ' this sprint</div>' +
+    '<div class="goal-row"><span class="goal-num">' + total + '</span><span class="goal-of"> / ' + nsTarget + '</span></div>' +
+    '<div class="goal-bar"><div class="goal-fill" style="width:' + pct + '%;background:' + color + '"></div></div></div>';
+
+  // Categorize
+  var working = [];
+  var needsData = [];
+  var belowBm = [];
+  var noVerdict = [];
+
   modeExps.forEach(function(e) {
-    if (!e.stages || !e.rateIdx) return;
-    totalRateNum += e.stages[e.rateIdx[0]] ? e.stages[e.rateIdx[0]].val : 0;
-    totalRateDen += e.stages[e.rateIdx[1]] ? e.stages[e.rateIdx[1]].val : 0;
+    var hasData = expHasData(e);
+    var rate = expRate(e);
+    var bm = getBenchmark(e);
+
+    if (!hasData) {
+      needsData.push(e);
+    } else if (rate >= bm.good) {
+      working.push(e);
+    } else if (rate >= bm.avg) {
+      working.push(e); // at average = still working, just room to improve
+    } else {
+      belowBm.push(e);
+    }
   });
-  var avgRate = totalRateDen > 0 ? ((totalRateNum / totalRateDen) * 100).toFixed(1) + '%' : '—';
 
-  var html = '<div class="ns-row">' +
-    '<div class="ns-block"><div class="ns-label">' + (isOut ? 'Signups' : 'Audience gained') + '</div>' +
-    '<div class="ns-val-row"><span class="ns-value">' + total + '</span><span class="ns-of">/ ' + nsTarget + '</span></div>' +
-    '<div class="ns-track"><div class="ns-fill" style="width:' + pct + '%;background:' + color + '"></div></div></div>' +
-    '<div class="ns-block ns-rate-block"><div class="ns-label">Avg ' + (isOut ? 'reply rate' : 'engagement') + '</div>' +
-    '<div class="ns-rate-val">' + avgRate + '</div></div></div>';
+  // Sort each group by bottom-of-funnel contribution (signups) desc
+  function byContrib(a, b) { return expBottomVal(b) - expBottomVal(a); }
+  working.sort(byContrib);
+  belowBm.sort(byContrib);
 
-  // Channel tabs
-  var groups = {};
-  exps.forEach(function(e) { if (!groups[e.ch]) groups[e.ch] = []; groups[e.ch].push(e); });
+  // Render groups
+  if (working.length > 0) {
+    html += '<div class="group">' +
+      '<div class="group-head"><span class="group-title">Working</span><span class="group-count">' + working.length + '</span></div>';
+    working.forEach(function(e) { html += renderExpRow(e); });
+    html += '</div>';
+  }
 
-  html += '<div class="flow-nav">';
-  modeChannels.filter(function(k) { return groups[k]; }).forEach(function(k) {
-    var info = CH[k], g = groups[k] || [];
-    var keyNum = g.reduce(function(s, e) { return s + expKeyVal(e); }, 0);
-    html += '<div class="flow-tab ' + (activeFlow === k ? 'active' : '') + '" onclick="setFlow(\'' + k + '\')">' +
-      '<div class="flow-tab-label">' + info.label + '</div>' +
-      '<div class="flow-tab-num ' + (keyNum > 0 ? 'has-data' : '') + '">' + keyNum + '</div>' +
-      '<div class="flow-tab-count">' + g.length + ' exp' + (g.length !== 1 ? 's' : '') + '</div></div>';
-  });
-  html += '</div>';
+  if (needsData.length > 0) {
+    html += '<div class="group">' +
+      '<div class="group-head"><span class="group-title">Needs more data</span><span class="group-count group-count-muted">' + needsData.length + '</span></div>';
+    needsData.forEach(function(e) { html += renderExpRow(e); });
+    html += '</div>';
+  }
 
-  // Board
-  var info = CH[activeFlow];
-  if (info) {
-    var g = groups[activeFlow] || [];
-    var active = g.filter(function(e) { return e.verdict !== 'Stop'; });
-    var stopped = g.filter(function(e) { return e.verdict === 'Stop'; });
-    html += renderBoard(info, active, stopped);
+  if (belowBm.length > 0) {
+    html += '<div class="group">' +
+      '<div class="group-head"><span class="group-title">Below benchmark</span><span class="group-count group-count-warn">' + belowBm.length + '</span></div>';
+    belowBm.forEach(function(e) { html += renderExpRow(e); });
+    html += '</div>';
+  }
+
+  // Add new
+  html += '<div class="inline-add-trigger" onclick="openModal()"><span class="inline-add-icon">+</span> New experiment</div>';
+
+  // Stopped
+  if (stoppedExps.length > 0) {
+    html += '<div class="stopped-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display===\'none\'?\'block\':\'none\'">Stopped · ' + stoppedExps.length + '</div>' +
+      '<div style="display:none" class="stopped-list">';
+    stoppedExps.forEach(function(e) {
+      html += '<div class="exp-stopped"><span class="exp-stopped-name">' + e.name + '</span>' +
+        '<button class="delete-btn-sm" onclick="deleteExp(' + e.id + ')">x</button></div>';
+    });
+    html += '</div>';
   }
 
   el.innerHTML = html;
 }
 
 /* ================================================================
-   Experiment Board — with health indicators
+   Single experiment row
    ================================================================ */
 
-function renderBoard(info, active, stopped) {
-  var html = '<div class="exp-list">';
+function renderExpRow(e) {
+  var info = CH[e.ch];
+  var rate = expRateStr(e);
+  var rateNum = expRate(e);
+  var hasData = expHasData(e);
+  var bm = getBenchmark(e);
+  var contrib = expBottomVal(e);
+  var vCls = verdictCls(e.verdict);
 
-  active.forEach(function(e) {
-    var rate = expRateStr(e);
-    var rateNum = expRate(e);
-    var hasData = expHasData(e);
-    var vCls = verdictCls(e.verdict);
-
-    // Health indicator from benchmarks
-    var bm = getBenchmark(e);
-    var health = '';
-    if (hasData && bm) {
-      if (rateNum >= bm.good)       health = '<span class="health health-good" title="Above benchmark">●</span>';
-      else if (rateNum >= bm.avg)   health = '<span class="health health-ok" title="At average">●</span>';
-      else if (rateNum > 0)         health = '<span class="health health-low" title="Below average">●</span>';
-    }
-
-    html += '<div class="exp-item"><div class="exp-row-v2">' +
-      '<div class="exp-name" onclick="editName(' + e.id + ',this)">' + health + e.name + '</div>' +
-      '<div class="exp-rate">' + rate + '</div>' +
-      '<div><span class="verdict ' + vCls + '" onclick="cycleVerdict(' + e.id + ')">' + (e.verdict || '—') + '</span>' +
-      '<span class="exp-expand-btn" onclick="toggleExp(' + e.id + ')">&#9662;</span></div></div>';
-
-    // Expanded detail
-    html += '<div class="exp-expand-wrap" id="expand-' + e.id + '"><div class="exp-expand-inner"><div class="exp-detail">';
-
-    // AI suggestion inside detail
-    if (hasData) {
-      var sg = suggestVerdict(e);
-      if (sg.verdict) {
-        html += '<div class="exp-ai">AI: <strong>' + sg.verdict + '</strong> — ' + sg.reason + '</div>';
-      } else if (sg.reason) {
-        html += '<div class="exp-ai exp-ai-wait">' + sg.reason + '</div>';
-      }
-    }
-
-    // Pipeline
-    html += '<div class="pipe">';
-    e.stages.forEach(function(stg, idx) {
-      if (idx > 0) {
-        var prev = e.stages[idx - 1].val;
-        html += '<div class="pipe-conv">' + (prev > 0 ? ((stg.val / prev) * 100).toFixed(0) + '%' : '—') + '</div>';
-      }
-      var isKey = e.rateIdx && (idx === e.rateIdx[0] || idx === e.rateIdx[1]);
-      html += '<div class="pipe-stage' + (isKey ? ' pipe-stage-key' : '') + '" onclick="event.stopPropagation();editStage(' + e.id + ',' + idx + ',this)">' +
-        '<div class="pipe-stage-val">' + formatNum(stg.val) + '</div>' +
-        '<div class="pipe-stage-label">' + stg.label + '</div></div>';
-    });
-    html += '</div>';
-
-    // Fields
-    html += '<div class="exp-detail-row">' +
-      '<div class="detail-field"><div class="detail-label">Target</div><div class="detail-value editable" onclick="editTarget(' + e.id + ',this)">' + e.target + '</div></div>' +
-      '<div class="detail-field"><div class="detail-label">Hours</div><div class="detail-value editable" onclick="editHours(' + e.id + ',this)">' + (e.hours || 0) + 'h</div></div></div>';
-
-    html += '<div class="detail-next"><div class="detail-label">Next step</div>' +
-      '<div class="detail-next-text" onclick="event.stopPropagation();editNext(' + e.id + ',this)">' +
-      (e.next || '<span class="ph">What to do next...</span>') + '</div></div>';
-
-    // Verdict
-    html += '<div class="verdict-group"><span class="verdict-group-label">Verdict</span>' +
-      ['Keep going', 'Change variables', 'Close, iterate', 'Stop'].map(function(v) {
-        var bc = v === 'Keep going' ? 'keep' : v === 'Change variables' ? 'change' : v === 'Close, iterate' ? 'close' : 'stop';
-        return '<div class="vbtn v-' + bc + ' ' + (e.verdict === v ? 'active' : '') + '" onclick="event.stopPropagation();setVerdict(' + e.id + ',\'' + v + '\')">' + v + '</div>';
-      }).join('') + '</div>';
-
-    // More + Delete
-    html += '<div class="detail-more-toggle" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle(\'open\')">More details</div>' +
-      '<div class="detail-more">';
-    html += '<div class="detail-field"><div class="detail-label">Tools</div><div class="detail-value editable" onclick="editTools(' + e.id + ',this)">' + (e.tools || '<span class="ph">Add tools...</span>') + '</div></div>';
-    html += '<div class="detail-field"><div class="detail-label">Idea</div><div class="detail-value editable" onclick="editIdea(' + e.id + ',this)">' + (e.idea || '<span class="ph">Add idea...</span>') + '</div></div>';
-    html += '</div>';
-
-    html += '<div class="detail-danger"><button class="delete-btn" onclick="event.stopPropagation();deleteExp(' + e.id + ')">Delete experiment</button></div>';
-    html += '</div></div></div></div>';
-  });
-
-  html += '<div class="inline-add-trigger" onclick="inlineAdd()"><span class="inline-add-icon">+</span> New experiment</div>';
-  html += '</div>';
-
-  if (stopped.length) {
-    html += '<div class="stopped-toggle" onclick="document.getElementById(\'stopped-' + activeFlow + '\').style.display=document.getElementById(\'stopped-' + activeFlow + '\').style.display===\'none\'?\'block\':\'none\'">Stopped &middot; ' + stopped.length + '</div>' +
-      '<div id="stopped-' + activeFlow + '" class="stopped-list"><div class="exp-list">' +
-      stopped.map(function(e) {
-        return '<div class="exp-item"><div class="exp-row-v2"><div class="exp-name">' + e.name + '</div>' +
-          '<div class="exp-rate pending">—</div>' +
-          '<div style="display:flex;gap:var(--s-6);align-items:center;justify-content:flex-end">' +
-          '<button class="delete-btn-sm" onclick="deleteExp(' + e.id + ')">x</button>' +
-          '<span class="verdict stop">Stop</span></div></div></div>';
-      }).join('') + '</div></div>';
+  // Health dot
+  var dot = '';
+  if (hasData && bm) {
+    if (rateNum >= bm.good)     dot = '<span class="dot-good">●</span>';
+    else if (rateNum >= bm.avg) dot = '<span class="dot-ok">●</span>';
+    else                        dot = '<span class="dot-low">●</span>';
   }
 
+  // Sample size check
+  var sampleNote = '';
+  if (hasData && bm) {
+    var ri = e.rateIdx || info.rateIdx;
+    var sample = e.stages[ri[1]] ? e.stages[ri[1]].val : 0;
+    if (sample < bm.minSample) {
+      sampleNote = '<span class="exp-sample">need ' + (bm.minSample - sample) + ' more</span>';
+    }
+  }
+
+  var html = '<div class="exp-card" id="exp-card-' + e.id + '">' +
+    '<div class="exp-row-g" onclick="toggleExp(' + e.id + ')">' +
+    '<div class="exp-main">' + dot + '<span class="exp-name-g">' + e.name + '</span>' +
+    '<span class="exp-ch-label">' + info.label + '</span></div>' +
+    '<div class="exp-nums">' +
+    '<span class="exp-rate-g">' + rate + '</span>' +
+    (contrib > 0 ? '<span class="exp-contrib">→ ' + contrib + ' ' + (CH[e.ch].mode === 'outbound' ? 'signup' + (contrib !== 1 ? 's' : '') : 'gained') + '</span>' : '') +
+    sampleNote +
+    '</div>' +
+    '<div class="exp-verdict-g"><span class="verdict ' + vCls + '" onclick="event.stopPropagation();cycleVerdict(' + e.id + ')">' + (e.verdict || '—') + '</span></div>' +
+    '</div>';
+
+  // Expandable detail
+  html += '<div class="exp-expand-wrap" id="expand-' + e.id + '"><div class="exp-expand-inner"><div class="exp-detail">';
+
+  // AI suggestion
+  if (hasData) {
+    var sg = suggestVerdict(e);
+    if (sg.verdict) {
+      html += '<div class="exp-ai">AI: <strong>' + sg.verdict + '</strong> — ' + sg.reason + '</div>';
+    } else if (sg.reason) {
+      html += '<div class="exp-ai exp-ai-wait">' + sg.reason + '</div>';
+    }
+  }
+
+  // Pipeline
+  html += '<div class="pipe">';
+  e.stages.forEach(function(stg, idx) {
+    if (idx > 0) {
+      var prev = e.stages[idx - 1].val;
+      html += '<div class="pipe-conv">' + (prev > 0 ? ((stg.val / prev) * 100).toFixed(0) + '%' : '—') + '</div>';
+    }
+    var isKey = e.rateIdx && (idx === e.rateIdx[0] || idx === e.rateIdx[1]);
+    html += '<div class="pipe-stage' + (isKey ? ' pipe-stage-key' : '') + '" onclick="event.stopPropagation();editStage(' + e.id + ',' + idx + ',this)">' +
+      '<div class="pipe-stage-val">' + formatNum(stg.val) + '</div>' +
+      '<div class="pipe-stage-label">' + stg.label + '</div></div>';
+  });
+  html += '</div>';
+
+  // Fields
+  html += '<div class="exp-detail-row">' +
+    '<div class="detail-field"><div class="detail-label">Target</div><div class="detail-value editable" onclick="editTarget(' + e.id + ',this)">' + e.target + '</div></div>' +
+    '<div class="detail-field"><div class="detail-label">Hours</div><div class="detail-value editable" onclick="editHours(' + e.id + ',this)">' + (e.hours || 0) + 'h</div></div></div>';
+
+  html += '<div class="detail-next"><div class="detail-label">Next step</div>' +
+    '<div class="detail-next-text" onclick="event.stopPropagation();editNext(' + e.id + ',this)">' +
+    (e.next || '<span class="ph">What to do next...</span>') + '</div></div>';
+
+  // Verdict buttons
+  html += '<div class="verdict-group"><span class="verdict-group-label">Verdict</span>' +
+    ['Keep going', 'Change variables', 'Close, iterate', 'Stop'].map(function(v) {
+      var bc = v === 'Keep going' ? 'keep' : v === 'Change variables' ? 'change' : v === 'Close, iterate' ? 'close' : 'stop';
+      return '<div class="vbtn v-' + bc + ' ' + (e.verdict === v ? 'active' : '') + '" onclick="event.stopPropagation();setVerdict(' + e.id + ',\'' + v + '\')">' + v + '</div>';
+    }).join('') + '</div>';
+
+  // More + Delete
+  html += '<div class="detail-more-toggle" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle(\'open\')">More details</div>' +
+    '<div class="detail-more">' +
+    '<div class="detail-field"><div class="detail-label">Tools</div><div class="detail-value editable" onclick="editTools(' + e.id + ',this)">' + (e.tools || '<span class="ph">Add tools...</span>') + '</div></div>' +
+    '<div class="detail-field"><div class="detail-label">Idea</div><div class="detail-value editable" onclick="editIdea(' + e.id + ',this)">' + (e.idea || '<span class="ph">Add idea...</span>') + '</div></div>' +
+    '</div>' +
+    '<div class="detail-danger"><button class="delete-btn" onclick="event.stopPropagation();deleteExp(' + e.id + ')">Delete experiment</button></div>';
+
+  html += '</div></div></div></div>';
   return html;
 }
 
@@ -223,13 +251,13 @@ function editName(id, el) {
 }
 
 function editTarget(id, el) {
-  var exps = load(), e = exps.find(function(x) { return x.id === id; });
+  var e = load().find(function(x) { return x.id === id; });
   inlineEdit(el, e.target, function(val) {
-    var exps2 = load(), e2 = exps2.find(function(x) { return x.id === id; });
+    var exps = load(), e2 = exps.find(function(x) { return x.id === id; });
     e2.target = val || 'TBD';
     var match = val.match(/>?\s*(\d+(?:\.\d+)?)\s*%/);
     if (match) e2.targetNum = parseFloat(match[1]) / 100;
-    save(exps2); flash(); render();
+    save(exps); flash(); render();
   }, { type: 'text', label: 'Target' });
 }
 

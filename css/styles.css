@@ -183,39 +183,28 @@ body {
 .view { display: none; }
 
 /* ================================================================
-   NORTH STAR (inside experiments view)
+   GOAL
    ================================================================ */
 
-.ns-row {
-  display: flex; align-items: flex-start; gap: var(--s-48);
-  margin-bottom: var(--s-24);
+.goal {
+  margin-bottom: var(--s-32);
 }
-.ns-block {}
-.ns-label {
-  font-size: var(--fs-xs); font-weight: 600; color: var(--text-3);
-  text-transform: uppercase; letter-spacing: 0.08em;
+.goal-label {
+  font-size: var(--fs-sm); color: var(--text-3);
 }
-.ns-val-row {
-  display: flex; align-items: baseline; gap: var(--s-8); margin-top: var(--s-4);
+.goal-row {
+  display: flex; align-items: baseline; gap: var(--s-4); margin-top: var(--s-4);
 }
-.ns-value {
+.goal-num {
   font-family: var(--ff-display); font-size: var(--fs-hero); font-weight: 400;
   line-height: 1; letter-spacing: -0.03em; color: var(--text); font-variant-numeric: tabular-nums;
 }
-.ns-of { font-size: var(--fs-base); color: var(--text-4); }
-.ns-track {
-  height: 3px; background: var(--rule); border-radius: 1.5px;
-  margin-top: var(--s-12); max-width: 16rem; overflow: hidden;
+.goal-of { font-size: var(--fs-base); color: var(--text-4); }
+.goal-bar {
+  height: 4px; background: var(--rule); border-radius: 2px;
+  margin-top: var(--s-12); max-width: 20rem; overflow: hidden;
 }
-.ns-fill {
-  height: 100%; border-radius: 1.5px; transition: width 0.5s var(--ease-out);
-}
-.ns-rate-block { padding-top: var(--s-4); }
-.ns-rate-val {
-  font-family: var(--ff-display); font-size: var(--fs-xl); font-weight: 400;
-  line-height: 1; letter-spacing: -0.02em; color: var(--text); font-variant-numeric: tabular-nums;
-  margin-top: var(--s-4);
-}
+.goal-fill { height: 100%; border-radius: 2px; transition: width 0.5s var(--ease-out); }
 
 /* Settings button */
 .settings-btn {
@@ -227,73 +216,75 @@ body {
 }
 .settings-btn:hover { border-color: var(--text-4); color: var(--text-2); }
 
-@media (max-width: 640px) {
-  .td-pipe-grid { grid-template-columns: repeat(2, 1fr); }
-  .td-nums { gap: var(--s-4); }
-  .td-num { min-width: 3.5rem; padding: var(--s-4) var(--s-8); }
-}
-
 /* ================================================================
-   FLOW NAVIGATION (Channel tabs)
+   EXPERIMENT GROUPS (Working / Needs data / Below benchmark)
    ================================================================ */
 
-.flow-nav {
-  display: flex; gap: var(--s-6); margin-bottom: var(--s-24);
-  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
-  padding-bottom: var(--s-4);
+.group { margin-bottom: var(--s-24); }
+.group-head {
+  display: flex; align-items: center; gap: var(--s-8);
+  margin-bottom: var(--s-8);
+  padding-bottom: var(--s-6);
+  border-bottom: 1px solid var(--rule-faint);
 }
-.flow-nav::-webkit-scrollbar { display: none; }
-
-.flow-tab {
-  display: flex; flex-direction: column; align-items: center; gap: var(--s-2);
-  padding: var(--s-8) var(--s-16); border-radius: var(--s-4); cursor: pointer;
-  transition: background var(--dur-fast) var(--ease-out);
-  user-select: none; white-space: nowrap; min-width: 5rem;
-  border: 1.5px solid transparent;
+.group-title {
+  font-size: var(--fs-xs); font-weight: 600; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.06em;
 }
-.flow-tab:hover { background: var(--surface); }
-.flow-tab.active { background: var(--bg); border-color: var(--rule); }
-.flow-tab-label { font-size: var(--fs-xs); font-weight: 600; color: var(--text-3); letter-spacing: 0.02em; }
-.flow-tab.active .flow-tab-label { color: var(--text); }
-.flow-tab-num {
-  font-family: var(--ff-display); font-size: var(--fs-lg); font-weight: 400;
-  line-height: 1; color: var(--text-4); font-variant-numeric: tabular-nums;
+.group-count {
+  font-size: var(--fs-xs); font-weight: 600; color: var(--hit);
+  background: var(--hit-bg); padding: var(--s-2) var(--s-6); border-radius: var(--s-4);
 }
-.flow-tab.active .flow-tab-num { color: var(--text); }
-.flow-tab-num.has-data { color: var(--hit); }
-.flow-tab.active .flow-tab-num.has-data { color: var(--hit); }
-.flow-tab-count { font-size: var(--fs-xs); color: var(--text-4); font-variant-numeric: tabular-nums; }
+.group-count-muted { color: var(--text-4); background: var(--muted-bg); }
+.group-count-warn  { color: var(--accent); background: var(--accent-bg); }
 
 /* ================================================================
-   EXPERIMENT LIST
+   EXPERIMENT CARD (row in goal-down view)
    ================================================================ */
 
-.platform { margin-bottom: var(--s-24); }
-.platform-head {
-  display: flex; align-items: baseline; gap: var(--s-12); margin-bottom: var(--s-20);
-}
-.platform-name { font-family: var(--ff-display); font-size: var(--fs-md); font-weight: 500; letter-spacing: -0.01em; }
-.platform-meta { font-size: var(--fs-xs); color: var(--text-4); }
-.platform-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; position: relative; top: -1px; }
+.exp-card { border-bottom: 1px solid var(--rule-faint); }
+.exp-card:last-child { border-bottom: none; }
 
-.exp-list { display: flex; flex-direction: column; gap: 0; }
-
-/* V2 columns: Experiment | Pipeline | Rate | Verdict */
-.exp-item { border-bottom: 1px solid var(--rule-faint); }
-.exp-item:last-child { border-bottom: 1px solid var(--rule); }
-
-.exp-row-v2 {
-  display: grid; grid-template-columns: 1fr 5rem auto;
-  gap: var(--s-8); align-items: center; padding: var(--s-12) 0;
+.exp-row-g {
+  display: grid; grid-template-columns: 1fr auto auto;
+  gap: var(--s-12); align-items: center;
+  padding: var(--s-12) 0; cursor: pointer;
   transition: background var(--dur-fast) var(--ease-out);
 }
-.exp-row-v2:hover { background: var(--bg-sub); }
-.exp-expand-btn {
-  font-size: var(--fs-xs); color: var(--text-4); cursor: pointer;
-  padding: var(--s-2) var(--s-6); margin-left: var(--s-4);
-  transition: color var(--dur-fast) var(--ease-out);
+.exp-row-g:hover { background: var(--bg-sub); }
+
+.exp-main { display: flex; align-items: center; gap: var(--s-6); min-width: 0; }
+.exp-name-g {
+  font-family: var(--ff-display); font-size: var(--fs-md); font-weight: 500;
+  color: var(--text); letter-spacing: -0.005em;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.exp-expand-btn:hover { color: var(--text-2); }
+.exp-ch-label { font-size: var(--fs-xs); color: var(--text-4); white-space: nowrap; }
+
+.exp-nums { display: flex; align-items: baseline; gap: var(--s-8); white-space: nowrap; }
+.exp-rate-g {
+  font-size: var(--fs-sm); font-weight: 600; color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.exp-contrib {
+  font-size: var(--fs-xs); color: var(--text-3); font-variant-numeric: tabular-nums;
+}
+.exp-sample {
+  font-size: var(--fs-xs); color: var(--text-4); font-style: italic;
+}
+.exp-verdict-g {}
+
+/* Health dots */
+.dot-good { color: var(--hit); font-size: 8px; margin-right: var(--s-4); }
+.dot-ok   { color: var(--change); font-size: 8px; margin-right: var(--s-4); }
+.dot-low  { color: var(--accent); font-size: 8px; margin-right: var(--s-4); }
+
+/* Stopped */
+.exp-stopped {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: var(--s-6) 0; font-size: var(--fs-sm); color: var(--text-4);
+}
+.exp-stopped-name { font-family: var(--ff-display); }
 
 .exp-name {
   font-family: var(--ff-display); font-size: var(--fs-md); font-weight: 500;
@@ -1131,12 +1122,9 @@ body {
 @media (max-width: 640px) {
   .topbar { flex-direction: column; align-items: flex-start; gap: var(--s-8); }
   .topbar-right { width: 100%; justify-content: flex-end; }
-  .exp-row-v2 { grid-template-columns: 1fr 4rem auto; }
-  .flow-tab { min-width: 4.25rem; padding: var(--s-8) var(--s-12); }
+  .exp-row-g { grid-template-columns: 1fr auto; }
+  .exp-nums { display: none; }
   .pipe-stage { min-width: 4rem; padding: var(--s-8) var(--s-12); }
   .we-compare-grid { grid-template-columns: 1fr; }
-  .ns-row { flex-direction: column; gap: var(--s-16); }
   .exp-detail-row { flex-direction: column; gap: var(--s-8); }
-  .td-counters { gap: var(--s-4); }
-  .td-ctr { min-width: 3.5rem; padding: var(--s-4) var(--s-8); }
 }
