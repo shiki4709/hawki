@@ -31,6 +31,13 @@ function render() {
     '<button class="vtab ' + (activeView === 'experiments' ? 'active' : '') + '" onclick="setView(\'experiments\')">Experiments</button>' +
     '<button class="vtab ' + (activeView === 'weekly' ? 'active' : '') + '" onclick="setView(\'weekly\')">Compare</button>';
 
+  // Sync button — only show if any sources are connected
+  var sources = loadSources();
+  var hasConnected = Object.keys(sources).some(function(k) { return sources[k].type !== 'manual'; });
+  document.getElementById('sync-btn-wrap').innerHTML = hasConnected
+    ? '<button class="sync-all-btn" onclick="syncAll(function(n){showToast(n+\' sources synced\');render();})">Sync</button>'
+    : '';
+
   document.getElementById('view-experiments').style.display = activeView === 'experiments' ? 'block' : 'none';
   document.getElementById('view-weekly').style.display = activeView === 'weekly' ? 'block' : 'none';
 
@@ -93,22 +100,32 @@ function renderGoalView(exps) {
   // Render groups
   if (working.length > 0) {
     html += '<div class="group">' +
-      '<div class="group-head"><span class="group-title">Working</span><span class="group-count">' + working.length + '</span></div>';
+      '<div class="group-head"><span class="group-title">Working</span><span class="group-count">' + working.length + '</span></div>' +
+      '<div class="group-desc">Above industry average — keep going and scale what\'s working</div>';
     working.forEach(function(e) { html += renderExpRow(e); });
     html += '</div>';
   }
 
   if (needsData.length > 0) {
     html += '<div class="group">' +
-      '<div class="group-head"><span class="group-title">Needs more data</span><span class="group-count group-count-muted">' + needsData.length + '</span></div>';
+      '<div class="group-head"><span class="group-title">Needs more data</span><span class="group-count group-count-muted">' + needsData.length + '</span></div>' +
+      '<div class="group-desc">Not enough volume to judge yet — keep running until sample size is met</div>';
     needsData.forEach(function(e) { html += renderExpRow(e); });
     html += '</div>';
   }
 
   if (belowBm.length > 0) {
     html += '<div class="group">' +
-      '<div class="group-head"><span class="group-title">Below benchmark</span><span class="group-count group-count-warn">' + belowBm.length + '</span></div>';
-    belowBm.forEach(function(e) { html += renderExpRow(e); });
+      '<div class="group-head"><span class="group-title">Below benchmark</span><span class="group-count group-count-warn">' + belowBm.length + '</span></div>' +
+      '<div class="group-desc">Below industry average — change a variable and keep testing</div>';
+    belowBm.forEach(function(e) {
+      var extra = '';
+      var bm = getBenchmark(e);
+      if (bm && bm.variables && bm.variables.length > 0) {
+        extra = '<div class="exp-suggest">Try: ' + bm.variables.slice(0, 2).join(', ') + '</div>';
+      }
+      html += renderExpRow(e, extra);
+    });
     html += '</div>';
   }
 
@@ -133,7 +150,7 @@ function renderGoalView(exps) {
    Single experiment row
    ================================================================ */
 
-function renderExpRow(e) {
+function renderExpRow(e, extraHTML) {
   var info = CH[e.ch];
   var rate = expRateStr(e);
   var rateNum = expRate(e);
@@ -175,6 +192,8 @@ function renderExpRow(e) {
     '</div>' +
     '<div class="exp-verdict-g"><span class="verdict ' + vCls + '" onclick="event.stopPropagation();cycleVerdict(' + e.id + ')">' + (e.verdict || '—') + '</span></div>' +
     '</div>';
+
+  if (extraHTML) html += extraHTML;
 
   // Expandable detail — 3 zones: source+pipeline → AI → actions
   html += '<div class="exp-expand-wrap" id="expand-' + e.id + '"><div class="exp-expand-inner"><div class="exp-detail">';

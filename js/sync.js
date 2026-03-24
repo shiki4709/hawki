@@ -232,10 +232,6 @@ function connectType(expId, type) {
   var src = getSource(expId);
   src.type = type;
   setSource(expId, src);
-  document.getElementById('connect-config').innerHTML = connectConfigHTML(expId, src);
-  // Update chip active states
-  document.querySelectorAll('#connect-config').closest('.qa-body').querySelectorAll('.qa-chip').forEach(function(c) { c.classList.remove('active'); });
-  // Simpler: just re-open
   openConnect(expId);
 }
 
