@@ -41,7 +41,7 @@ function render() {
       '<span class="vtab-title">' + (exp ? exp.name : '') + '</span>';
   } else {
     document.getElementById('view-tabs').innerHTML =
-      '<button class="vtab ' + (activeView === 'home' ? 'active' : '') + '" onclick="setView(\'home\')">Experiments</button>' +
+      '<button class="vtab ' + (activeView === 'home' ? 'active' : '') + '" onclick="setView(\'home\')">Workflows</button>' +
       '<button class="vtab ' + (activeView === 'integrations' ? 'active' : '') + '" onclick="setView(\'integrations\')">Integrations</button>' +
       '<button class="vtab ' + (activeView === 'weekly' ? 'active' : '') + '" onclick="setView(\'weekly\')">Compare</button>';
   }
@@ -77,7 +77,7 @@ function renderHome(exps) {
   var modeExps = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === activeMode && !allStopped(e); });
 
   if (modeExps.length === 0) {
-    el.innerHTML = '<div class="home-empty">No experiments yet.<br>Click <strong>+ New</strong> to start.</div>';
+    el.innerHTML = '<div class="home-empty">No workflows yet.<br>Click <strong>+ New</strong> to start.</div>';
     return;
   }
 
@@ -129,7 +129,7 @@ function renderHome(exps) {
       '</div></div>';
   });
 
-  html += '<div class="home-add" onclick="openModal()">+ New experiment</div>';
+  html += '<div class="home-add" onclick="openModal()">+ New workflow</div>';
   el.innerHTML = html;
 }
 
@@ -213,10 +213,10 @@ function renderExperimentPage(exps) {
   });
 
   // Add variation
-  html += '<div class="add-var-trigger" onclick="addVariation(' + e.id + ')"><span class="inline-add-icon">+</span> Try a different variable</div>';
+  html += '<div class="add-var-trigger" onclick="addVariation(' + e.id + ')"><span class="inline-add-icon">+</span> Change a variable</div>';
 
   // Delete
-  html += '<div class="exp-page-footer"><button class="delete-btn" onclick="deleteExp(' + e.id + ')">Delete experiment</button></div>';
+  html += '<div class="exp-page-footer"><button class="delete-btn" onclick="deleteExp(' + e.id + ')">Delete workflow</button></div>';
 
   el.innerHTML = html;
 }

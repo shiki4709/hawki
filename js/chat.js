@@ -22,7 +22,7 @@ function openModal() {
   renderChat();
 
   setTimeout(function() {
-    addBotMessage("What experiment do you want to run? Describe your idea and I'll help you figure out the steps.");
+    addBotMessage("What workflow do you want to test? Describe your idea and I'll help you figure out the steps.");
     var input = document.getElementById('chat-input');
     if (input) input.focus();
   }, 200);
@@ -37,7 +37,7 @@ function closeModal() {
 function renderChat() {
   document.querySelector('.chat').innerHTML =
     '<div class="chat-panel">' +
-    '<div class="chat-top"><span class="chat-title">New Experiment</span>' +
+    '<div class="chat-top"><span class="chat-title">New Workflow</span>' +
     '<button class="chat-close" onclick="closeModal()">&times;</button></div>' +
     '<div class="chat-msgs" id="chat-msgs"></div>' +
     '<div class="chat-bottom" id="chat-bottom">' +
@@ -94,22 +94,22 @@ function callAI(userText, isRevision) {
     return;
   }
 
-  var systemPrompt = 'You are a B2B SaaS GTM experiment designer for Nevara (AI deal execution agent for AEs).\n\n' +
-    'The user wants to run a GTM experiment. Help them design it.\n\n' +
-    'Respond with ONLY a JSON object (no markdown, no explanation):\n' +
+  var systemPrompt = 'You are a B2B SaaS GTM workflow designer for Nevara.\n\n' +
+    'Design a runnable GTM workflow as a measurable pipeline.\n\n' +
+    'Respond with ONLY JSON (no markdown):\n' +
     '{\n' +
-    '  "name": "Short experiment name",\n' +
-    '  "idea": "One line description of the approach",\n' +
+    '  "name": "Short workflow name",\n' +
+    '  "idea": "One line: what this does",\n' +
     '  "mode": "outbound or inbound",\n' +
-    '  "tools": "Tool1 → Tool2 (the workflow tools)",\n' +
-    '  "stages": ["Stage 1 name", "Stage 2 name", ...],\n' +
-    '  "rateIdx": [numerator_index, denominator_index],\n' +
-    '  "explanation": "2-3 sentences explaining the flow and why these stages"\n' +
+    '  "tools": "Tool1 → Tool2",\n' +
+    '  "stages": ["Step 1", "Step 2", ...],\n' +
+    '  "methods": ["How step 1 is done with what tool/prompt", ...],\n' +
+    '  "rateIdx": [numerator_idx, denominator_idx],\n' +
+    '  "explanation": "2-3 sentences on the workflow"\n' +
     '}\n\n' +
-    'Pipeline stages should represent the FULL funnel from sourcing to conversion.\n' +
-    'Each stage is a measurable step. Include 4-7 stages.\n' +
-    'rateIdx: which two stages to divide for the key conversion rate.\n' +
-    'Available modes: outbound (DMs, email, events) or inbound (content, SEO, product).';
+    '4-7 stages from sourcing to conversion. Each measurable.\n' +
+    'Methods: specific tool + prompt/criteria per step.\n' +
+    'Outbound: DMs, email, events. Inbound: content, SEO, product.';
 
   var messages = [{ role: 'user', content: (isRevision ? 'Revise: ' : '') + userText }];
 
@@ -206,7 +206,7 @@ function showProposal(p) {
     '<div class="chat-pipe">' + stagesHTML + '</div>' +
     '<div class="chat-prop-explain">' + p.explanation + '</div>' +
     '<div class="chat-prop-actions">' +
-    '<button class="chat-create-btn" onclick="createFromChat()">Create this experiment</button>' +
+    '<button class="chat-create-btn" onclick="createFromChat()">Create this workflow</button>' +
     '</div></div>';
 
   addBotMessage(html);
@@ -228,7 +228,11 @@ function createFromChat() {
   var id = exps.reduce(function(m, e) { return Math.max(m, e.id); }, 0) + 1;
   var now = new Date();
 
-  var stages = p.stages.map(function(label) { return { label: label, val: 0 }; });
+  var stages = p.stages.map(function(label, i) {
+    var stg = { label: label, val: 0 };
+    if (p.methods && p.methods[i]) stg.method = p.methods[i];
+    return stg;
+  });
 
   exps.push({
     id: id, ch: ch, name: p.name,
@@ -292,7 +296,7 @@ function openSettings() {
     '<div class="qa-body">' +
     '<div class="qa-field"><label class="qa-label">Anthropic API Key</label>' +
     '<input type="password" class="qa-input qa-input-sm" id="settings-key" placeholder="sk-ant-..." value="' + key + '">' +
-    '<div style="font-size:var(--fs-xs);color:var(--text-4);margin-top:var(--s-4)">Powers the AI experiment designer. Stored locally only.' +
+    '<div style="font-size:var(--fs-xs);color:var(--text-4);margin-top:var(--s-4)">Powers the AI workflow designer. Stored locally only.' +
     (masked ? ' Current: ' + masked : '') + '</div></div>' +
     '</div><div class="qa-footer"><button class="qa-submit" onclick="saveSettings()">Save</button></div></div>';
 }
