@@ -6,801 +6,176 @@
   <title>Nevara GTM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;1,9..40,400&family=Plus+Jakarta+Sans:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=Plus+Jakarta+Sans:wght@700&display=swap" rel="stylesheet">
   <style>
-    /* ── Reset & Base ────────────────────────────────────────── */
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --bg: #faf8f5;
-      --bg-subtle: #f3f0eb;
-      --bg-muted: #ece8e2;
       --text: #2c2926;
-      --text-secondary: #6b6560;
-      --text-tertiary: #9a9590;
+      --text-2: #6b6560;
+      --text-3: #a8a29e;
+      --rule: #e7e2dd;
       --accent: #c45d3e;
-      --success: #5a8a6a;
-      --warning: #c48a3e;
-      --stopped: #9a9590;
-      --rule: #ddd8d2;
-      --rule-light: #ece8e2;
-      --focus: #c45d3e;
+      --green: #5a8a6a;
+      --amber: #c48a3e;
+      --stopped: #a8a29e;
     }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      max-width: 880px;
-      margin: 0 auto;
-      padding: 56px 24px 80px;
-      font-size: 14px;
-      line-height: 1.55;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); max-width: 820px; margin: 0 auto; padding: 40px 24px 80px; }
 
-    /* ── Header ──────────────────────────────────────────────── */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 48px;
-    }
-    .header h1 {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: clamp(22px, 3vw, 28px);
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      color: var(--text);
-      line-height: 1.1;
-    }
-    .header .sub {
-      font-size: 13px;
-      color: var(--text-tertiary);
-      margin-top: 4px;
-      font-weight: 400;
-    }
-    .add-btn {
-      padding: 7px 18px;
-      border-radius: 4px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      border: 1.5px solid var(--text);
-      background: transparent;
-      color: var(--text);
-      transition: background 0.15s, color 0.15s;
-      letter-spacing: -0.1px;
-      font-family: 'DM Sans', sans-serif;
-      margin-top: 4px;
-    }
-    .add-btn:hover {
-      background: var(--text);
-      color: var(--bg);
-    }
-    .add-btn:active { transform: scale(0.98); }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; }
+    .header h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 700; }
+    .header .sub { font-size: 13px; color: var(--text-3); margin-top: 2px; }
+    .add-btn { padding: 7px 16px; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--rule); background: transparent; color: var(--text-2); transition: all 0.15s; }
+    .add-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-    /* ── North Star ──────────────────────────────────────────── */
-    .ns {
-      margin-bottom: 40px;
-      text-align: left;
-      padding: 0;
-      background: none;
-      border: none;
-      border-radius: 0;
-    }
-    .ns-label {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 1.6px;
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-    .ns-value {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: clamp(48px, 8vw, 72px);
-      font-weight: 700;
-      letter-spacing: -3px;
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
-      margin-bottom: 2px;
-    }
-    .ns-target {
-      font-size: 14px;
-      color: var(--text-secondary);
-      font-weight: 400;
-      margin-bottom: 12px;
-    }
-    .ns-bar {
-      height: 3px;
-      background: var(--rule-light);
-      border-radius: 1.5px;
-      overflow: hidden;
-      margin-bottom: 8px;
-    }
-    .ns-bar-fill {
-      height: 100%;
-      border-radius: 1.5px;
-      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
-    }
-    .ns-sub {
-      font-size: 12px;
-      color: var(--text-tertiary);
-    }
+    /* Sprint header */
+    .sprint-label { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; letter-spacing: -0.2px; }
+    .sprint-dates { font-size: 12px; color: var(--text-3); margin-bottom: 32px; }
 
-    /* ── Time bar ────────────────────────────────────────────── */
-    .time-bar {
-      padding: 0;
-      margin-bottom: 48px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      flex-wrap: wrap;
-      font-size: 13px;
-      color: var(--text-secondary);
-      background: none;
-      border: none;
-      border-radius: 0;
-    }
-    .time-bar .tb-total {
-      font-weight: 500;
-      color: var(--text);
-      font-size: 14px;
-      margin-right: 4px;
-    }
-    .time-bar .tb-total::after {
-      content: '\2014';
-      margin-left: 8px;
-      color: var(--text-tertiary);
-      font-weight: 400;
-    }
-    .time-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 0;
-      border-radius: 0;
-      font-size: 13px;
-      font-weight: 400;
-      color: var(--text-secondary);
-      background: none;
-      transition: none;
-    }
-    .time-chip:hover { background: none; }
-    .time-chip::after {
-      content: '\00b7';
-      margin-left: 4px;
-      color: var(--text-tertiary);
-    }
-    .time-chip:last-child::after { content: ''; margin: 0; }
-    .time-chip .dot { width: 7px; height: 7px; border-radius: 50%; opacity: 0.75; }
+    /* North Star */
+    .ns { margin-bottom: 40px; }
+    .ns-label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 500; }
+    .ns-row { display: flex; align-items: baseline; gap: 12px; margin-top: 4px; }
+    .ns-value { font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(48px, 8vw, 64px); font-weight: 700; line-height: 1; letter-spacing: -2px; }
+    .ns-of { font-size: 16px; color: var(--text-3); }
+    .ns-bar { height: 3px; background: var(--rule); border-radius: 2px; margin-top: 12px; max-width: 320px; }
+    .ns-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s; }
+    .ns-sub { font-size: 12px; color: var(--text-3); margin-top: 6px; }
 
-    /* ── Platform Flow ──────────────────────────────────────── */
-    .flow {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 48px;
-      flex-wrap: wrap;
-    }
-    .flow-step {
-      flex: 1;
-      min-width: 80px;
-      padding: 12px 8px;
-      text-align: center;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: border-color 0.2s, background 0.15s;
-    }
-    .flow-step:hover {
-      background: rgba(0,0,0,0.02);
-    }
-    .flow-step.active {
-      border-bottom-color: var(--accent);
-    }
-    .flow-step .flow-name {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.2px;
-    }
-    .flow-step .flow-count {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      margin-top: 2px;
-    }
-    .flow-step .flow-signups {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text-secondary);
-      margin-top: 4px;
-      font-variant-numeric: tabular-nums;
-    }
-    .flow-step .flow-signups.has-data {
-      color: var(--success);
-    }
-    .flow-step .flow-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 2px;
-      margin: 0 auto 6px;
-    }
+    /* Flow */
+    .flow { display: flex; gap: 2px; margin-bottom: 40px; border-bottom: 1px solid var(--rule); }
+    .flow-step { padding: 10px 14px 12px; cursor: pointer; text-align: center; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: border-color 0.15s; min-width: 70px; }
+    .flow-step:hover { background: rgba(0,0,0,0.015); }
+    .flow-step.active { border-bottom-color: var(--accent); }
+    .flow-name { font-size: 12px; font-weight: 500; color: var(--text-2); }
+    .flow-step.active .flow-name { color: var(--text); font-weight: 500; }
+    .flow-num { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; font-weight: 700; color: var(--text-3); margin-top: 2px; }
+    .flow-step.active .flow-num { color: var(--text); }
+    .flow-num.has-data { color: var(--green); }
+    .flow-count { font-size: 10px; color: var(--text-3); margin-top: 1px; }
 
-    /* ── Channel group ───────────────────────────────────────── */
-    .ch-group { margin-bottom: 52px; }
-    .ch-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 0 0 10px 0;
-      border-bottom: 1px solid var(--rule);
-      margin-bottom: 16px;
-    }
-    .ch-color {
-      width: 8px;
-      height: 8px;
-      border-radius: 2px;
-      opacity: 0.75;
-    }
-    .ch-title {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.2px;
-      color: var(--text);
-    }
-    .ch-meta {
-      font-size: 12px;
-      color: var(--text-tertiary);
-      margin-left: auto;
-      font-weight: 400;
-    }
+    /* Platform section */
+    .platform { margin-bottom: 48px; }
+    .platform-header { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); }
+    .platform-dot { width: 8px; height: 8px; border-radius: 2px; }
+    .platform-title { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; font-weight: 700; }
+    .platform-meta { font-size: 12px; color: var(--text-3); margin-left: auto; }
 
-    /* ── Comparison table ────────────────────────────────────── */
-    .compare { margin-bottom: 20px; }
-    .compare table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      background: none;
-    }
-    .compare th {
-      text-align: left;
-      padding: 8px 12px;
-      font-size: 10px;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      font-weight: 500;
-      border-bottom: 1px solid var(--rule);
-      background: none;
-    }
-    .compare td {
-      padding: 9px 12px;
-      font-size: 13px;
-      color: var(--text-secondary);
-      border-bottom: 1px solid var(--rule-light);
-      transition: background 0.12s;
-    }
-    .compare tr:nth-child(even) td { background: rgba(0,0,0,0.015); }
-    .compare tr:hover td { background: rgba(0,0,0,0.025); }
-    .compare tr:last-child td { border-bottom: none; }
-    .compare .exp-name-cell {
-      font-weight: 500;
-      font-size: 13px;
-      color: var(--text);
-    }
-    .compare .winner-row td {
-      background: none;
-      border-bottom-color: var(--rule-light);
-    }
-    .compare .winner-row td:first-child {
-      box-shadow: inset 3px 0 0 var(--success);
-    }
-    .compare .winner-row .exp-name-cell {
-      color: var(--text);
-      padding-left: 16px;
-    }
-    .compare .winner-row:hover td { background: rgba(0,0,0,0.025); }
-    .compare .rate-cell {
-      font-weight: 500;
-      font-variant-numeric: tabular-nums;
-      font-size: 13px;
-      color: var(--text-tertiary);
-    }
-    .compare .rate-cell.best { color: var(--success); font-weight: 600; }
-    .compare .no-data {
-      color: var(--text-tertiary);
-      font-style: normal;
-      font-size: 12px;
-    }
-    .compare .source-note {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      margin-top: 6px;
-      padding-left: 2px;
-    }
-    .rate-bar-wrap { display: flex; align-items: center; gap: 8px; }
-    .rate-bar {
-      width: 44px;
-      height: 2px;
-      background: var(--rule-light);
-      border-radius: 1px;
-      overflow: hidden;
-      flex-shrink: 0;
-    }
-    .rate-bar-fill {
-      height: 100%;
-      border-radius: 1px;
-      background: var(--text-tertiary);
-      transition: width 0.4s;
-    }
-    .winner-row .rate-bar-fill { background: var(--success); }
+    /* Sprint table */
+    .sprint-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+    .sprint-table th { text-align: left; padding: 8px 0; font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; border-bottom: 1px solid var(--rule); }
+    .sprint-table td { padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.04); font-size: 13px; vertical-align: middle; }
+    .sprint-table tr:last-child td { border-bottom: 1px solid var(--rule); }
+    .sprint-table tr:hover td { background: rgba(0,0,0,0.01); }
+    .sprint-table tr.hit td { }
+    .sprint-table tr.miss td { }
 
-    /* ── Experiment item ─────────────────────────────────────── */
-    .exp {
-      background: none;
-      border-radius: 0;
-      margin-bottom: 0;
-      overflow: hidden;
-      border: none;
-      border-bottom: 1px solid var(--rule-light);
-      border-left: 2px solid var(--text-tertiary);
-      transition: background 0.12s;
-    }
-    .exp:last-child { border-bottom: 1px solid var(--rule-light); }
-    .exp:hover {
-      background: rgba(0,0,0,0.015);
-    }
-    .exp.highlight {
-      border-left-color: var(--accent);
-      background: rgba(196,93,62,0.04);
-    }
+    .exp-name-col { font-weight: 500; padding-right: 12px; }
+    .metric-col { font-size: 12px; color: var(--text-2); }
+    .target-col { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text-3); font-variant-numeric: tabular-nums; }
+    .actual-col { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; font-variant-numeric: tabular-nums; cursor: pointer; }
+    .actual-col:hover { color: var(--accent); }
+    .actual-col input { width: 60px; border: 1.5px solid var(--accent); border-radius: 3px; padding: 2px 6px; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; text-align: right; background: var(--bg); color: var(--text); }
+    .actual-col.hit { color: var(--green); }
+    .actual-col.miss { color: var(--accent); }
+    .actual-col.pending { color: var(--text-3); }
 
-    .exp-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 12px 10px 14px;
-      cursor: pointer;
-      gap: 10px;
+    .verdict-col { text-align: right; }
+    .verdict {
+      display: inline-block; padding: 3px 10px; border-radius: 3px;
+      font-size: 11px; font-weight: 500; cursor: pointer;
     }
-    .exp-left { flex: 1; min-width: 0; }
-    .exp-name {
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-      letter-spacing: -0.1px;
-    }
-    .exp-nums {
-      font-size: 12px;
-      color: var(--text-tertiary);
-      font-variant-numeric: tabular-nums;
-      margin-top: 1px;
-    }
-    .exp-nums .gn { color: var(--success); }
-    .exp-nums .zr { color: var(--text-tertiary); opacity: 0.5; }
-    .exp-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    .status {
-      padding: 2px 8px;
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: 500;
-      text-transform: none;
-      letter-spacing: 0;
-    }
-    .status.working {
-      background: rgba(90,138,106,0.1);
-      color: var(--success);
-    }
-    .status.mixed {
-      background: rgba(196,138,62,0.1);
-      color: var(--warning);
-    }
-    .status.testing {
-      background: rgba(196,93,62,0.08);
-      color: var(--accent);
-    }
-    .status.stopped {
-      background: rgba(0,0,0,0.04);
-      color: var(--stopped);
-    }
-    .arrow {
-      font-size: 10px;
-      color: var(--text-tertiary);
-      transition: transform 0.25s cubic-bezier(0.4,0,0.2,1), color 0.15s;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 3px;
-    }
-    .exp-row:hover .arrow { color: var(--text-secondary); background: rgba(0,0,0,0.04); }
-    .arrow.open { transform: rotate(180deg); }
+    .verdict.keep { background: rgba(90,138,106,0.1); color: var(--green); }
+    .verdict.change { background: rgba(196,93,62,0.08); color: var(--accent); }
+    .verdict.close { background: rgba(196,138,62,0.1); color: var(--amber); }
+    .verdict.pending { background: rgba(0,0,0,0.03); color: var(--text-3); }
+    .verdict.stop { background: rgba(0,0,0,0.03); color: var(--stopped); }
 
-    /* ── Detail panel ────────────────────────────────────────── */
-    .exp-detail {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease, padding 0.3s ease;
-      padding: 0 14px;
-    }
-    .exp-detail.open { max-height: 600px; padding: 0 14px 16px; }
-    .dm-grid {
-      display: grid;
-      gap: 6px;
-      padding: 12px 0;
-      border-top: 1px solid var(--rule-light);
-    }
-    .dm {
-      background: none;
-      border-radius: 3px;
-      padding: 8px 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: pointer;
-      transition: background 0.12s;
-      position: relative;
-      border: 1px solid var(--rule-light);
-    }
-    .dm:hover {
-      background: rgba(0,0,0,0.02);
-      border-color: var(--rule);
-    }
-    .dm:hover::after {
-      content: '\270E';
-      position: absolute;
-      top: 3px;
-      right: 6px;
-      font-size: 9px;
-      color: var(--text-tertiary);
-    }
-    .dm .dm-label { font-size: 11px; color: var(--text-tertiary); font-weight: 400; }
-    .dm .dm-val {
-      font-size: 18px;
-      font-weight: 500;
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-    }
-    .dm input {
-      width: 60px;
-      border: 1.5px solid var(--accent);
-      border-radius: 3px;
-      padding: 3px 6px;
-      font-size: 16px;
-      font-weight: 500;
-      font-family: 'DM Sans', sans-serif;
-      text-align: right;
-      outline: none;
-      background: var(--bg);
-      color: var(--text);
-    }
-    .d-row {
-      padding: 10px 0;
-      border-top: 1px solid var(--rule-light);
-    }
-    .d-label {
-      font-size: 10px;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 4px;
-      font-weight: 500;
-    }
-    .d-next {
-      font-size: 13px;
-      color: var(--text-secondary);
-      cursor: pointer;
-      padding: 6px 10px;
-      border-radius: 3px;
-      background: rgba(0,0,0,0.02);
-      min-height: 34px;
-      transition: background 0.12s;
-      border: 1px solid transparent;
-    }
-    .d-next:hover {
-      background: rgba(0,0,0,0.04);
-      border-color: var(--rule-light);
-    }
-    .d-next .ph { color: var(--text-tertiary); }
-    .d-next input {
-      width: 100%;
-      border: 1.5px solid var(--accent);
-      border-radius: 3px;
-      padding: 5px 8px;
-      font-size: 13px;
-      font-family: 'DM Sans', sans-serif;
-      outline: none;
-      background: var(--bg);
-      color: var(--text);
-    }
-    .d-actions {
-      display: flex;
-      gap: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--rule-light);
-      flex-wrap: wrap;
-    }
-    .d-actions-group { display: flex; align-items: center; gap: 4px; }
-    .d-actions-label {
-      font-size: 10px;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-right: 4px;
-      font-weight: 500;
-    }
-    .ab {
-      padding: 3px 10px;
-      border-radius: 3px;
-      font-size: 11px;
-      font-weight: 500;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: all 0.12s;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .ab:hover { opacity: 0.8; }
-    .ab.active { border-color: var(--text); }
-    .ab.sw { background: rgba(90,138,106,0.1); color: var(--success); }
-    .ab.sm { background: rgba(196,138,62,0.1); color: var(--warning); }
-    .ab.st { background: rgba(196,93,62,0.08); color: var(--accent); }
-    .ab.ss { background: rgba(0,0,0,0.04); color: var(--stopped); }
-    .ab.m0 { background: rgba(90,138,106,0.1); color: var(--success); }
-    .ab.m1 { background: rgba(196,93,62,0.08); color: var(--accent); }
-    .ab.m2 { background: rgba(0,0,0,0.04); color: var(--stopped); }
-    .d-toggle {
-      font-size: 12px;
-      color: var(--text-tertiary);
-      cursor: pointer;
-      margin-top: 8px;
-      font-weight: 400;
-    }
-    .d-toggle:hover { color: var(--accent); }
-    .d-extra {
-      display: none;
-      padding-top: 8px;
-      font-size: 12px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-    .d-extra.open { display: block; }
-    .de-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-    .de-label {
-      font-size: 10px;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 2px;
-      font-weight: 500;
-    }
+    /* Expand row */
+    .exp-expand { display: none; }
+    .exp-expand.open { display: table-row; }
+    .exp-expand td { padding: 16px 0 20px; border-bottom: 1px solid var(--rule); }
+    .expand-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .expand-field {}
+    .expand-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+    .expand-value { font-size: 13px; color: var(--text-2); }
+    .expand-next { grid-column: 1 / -1; margin-top: 4px; }
+    .expand-next-text { font-size: 13px; color: var(--text-2); cursor: pointer; padding: 6px 8px; border-radius: 3px; background: rgba(0,0,0,0.02); min-height: 32px; }
+    .expand-next-text:hover { background: rgba(0,0,0,0.04); }
+    .expand-next-text .ph { color: var(--text-3); }
+    .expand-next-text input { width: 100%; border: 1.5px solid var(--accent); border-radius: 3px; padding: 5px 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; background: var(--bg); color: var(--text); }
+    .expand-actions { grid-column: 1 / -1; display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+    .expand-actions-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; align-self: center; }
+    .vbtn { padding: 3px 10px; border-radius: 3px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.1s; font-family: 'DM Sans', sans-serif; }
+    .vbtn.active { border-color: var(--text); }
+    .vbtn:hover { opacity: 0.8; }
+    .vbtn.v-keep { background: rgba(90,138,106,0.1); color: var(--green); }
+    .vbtn.v-change { background: rgba(196,93,62,0.08); color: var(--accent); }
+    .vbtn.v-close { background: rgba(196,138,62,0.1); color: var(--amber); }
+    .vbtn.v-stop { background: rgba(0,0,0,0.03); color: var(--stopped); }
 
-    /* ── Collapsed group ─────────────────────────────────────── */
-    .collapsed-toggle {
-      padding: 10px 14px;
-      background: none;
-      border-radius: 0;
-      border: none;
-      border-bottom: 1px dashed var(--rule);
-      border-left: 2px solid var(--stopped);
-      cursor: pointer;
-      font-size: 12px;
-      color: var(--text-tertiary);
-      display: flex;
-      justify-content: space-between;
-      transition: background 0.12s, color 0.12s;
-      margin-top: 0;
-    }
-    .collapsed-toggle:hover {
-      background: rgba(0,0,0,0.02);
-      color: var(--text-secondary);
-    }
+    .stopped-toggle { font-size: 12px; color: var(--text-3); cursor: pointer; margin-top: 8px; }
+    .stopped-toggle:hover { color: var(--text-2); }
 
-    /* ── Save toast ──────────────────────────────────────────── */
-    .save-notice {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(10px);
-      background: var(--text);
-      color: var(--bg);
-      padding: 8px 24px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 500;
-      opacity: 0;
-      transition: opacity 0.3s, transform 0.3s;
-      pointer-events: none;
-      font-family: 'DM Sans', sans-serif;
-    }
+    /* Save toast */
+    .save-notice { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(10px); background: var(--text); color: var(--bg); padding: 8px 20px; border-radius: 20px; font-size: 12px; font-weight: 500; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; }
     .save-notice.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ── Chat modal ──────────────────────────────────────────── */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(44,41,38,0.5);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      z-index: 100;
-      justify-content: center;
-      align-items: flex-end;
-    }
+    /* Chat */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(44,41,38,0.4); backdrop-filter: blur(3px); z-index: 100; justify-content: center; align-items: flex-end; }
     .modal-overlay.open { display: flex; }
-    .chat {
-      background: var(--bg);
-      border-radius: 8px 8px 0 0;
-      width: 480px;
-      max-width: 100vw;
-      box-shadow: 0 -8px 40px rgba(0,0,0,0.12);
-      display: flex;
-      flex-direction: column;
-      max-height: 80vh;
-      border: 1px solid var(--rule);
-      border-bottom: none;
-    }
-    .chat-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--rule);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .chat-header h2 {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .chat-close {
-      background: none;
-      border: none;
-      font-size: 18px;
-      color: var(--text-tertiary);
-      cursor: pointer;
-      transition: color 0.15s;
-    }
-    .chat-close:hover { color: var(--text); }
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .msg {
-      max-width: 85%;
-      padding: 10px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      line-height: 1.5;
-      animation: mi 0.2s ease-out;
-    }
-    @keyframes mi { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
-    .msg.bot {
-      align-self: flex-start;
-      background: var(--bg-subtle);
-      color: var(--text-secondary);
-      border-bottom-left-radius: 2px;
-    }
-    .msg.user {
-      align-self: flex-end;
-      background: var(--accent);
-      color: #faf8f5;
-      border-bottom-right-radius: 2px;
-    }
-    .msg.summary {
-      align-self: flex-start;
-      background: rgba(90,138,106,0.06);
-      border: 1px solid rgba(90,138,106,0.15);
-      border-radius: 6px;
-      max-width: 100%;
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-    .msg.summary .sl {
-      font-size: 10px;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .msg.summary .sv { font-weight: 500; margin-bottom: 4px; color: var(--text); }
-    .chat-input {
-      padding: 12px 16px;
-      border-top: 1px solid var(--rule);
-      display: flex;
-      gap: 8px;
-    }
-    .chat-input input {
-      flex: 1;
-      border: 1.5px solid var(--rule);
-      border-radius: 4px;
-      padding: 8px 12px;
-      font-size: 13px;
-      font-family: 'DM Sans', sans-serif;
-      outline: none;
-      background: var(--bg);
-      color: var(--text);
-      transition: border-color 0.15s;
-    }
+    .chat { background: var(--bg); border-radius: 8px 8px 0 0; width: 440px; max-width: 100vw; box-shadow: 0 -4px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; max-height: 75vh; border: 1px solid var(--rule); border-bottom: none; }
+    .chat-header { padding: 14px 18px; border-bottom: 1px solid var(--rule); display: flex; justify-content: space-between; align-items: center; }
+    .chat-header h2 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; }
+    .chat-close { background: none; border: none; font-size: 16px; color: var(--text-3); cursor: pointer; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; }
+    .msg { max-width: 85%; padding: 8px 12px; border-radius: 6px; font-size: 13px; line-height: 1.5; animation: mi 0.2s ease-out; }
+    @keyframes mi { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; } }
+    .msg.bot { align-self: flex-start; background: rgba(0,0,0,0.04); color: var(--text-2); border-bottom-left-radius: 2px; }
+    .msg.user { align-self: flex-end; background: var(--accent); color: #faf8f5; border-bottom-right-radius: 2px; }
+    .msg.summary { align-self: flex-start; background: rgba(90,138,106,0.06); border: 1px solid rgba(90,138,106,0.12); border-radius: 6px; max-width: 100%; font-size: 12px; }
+    .msg.summary .sl { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; }
+    .msg.summary .sv { font-weight: 500; margin-bottom: 3px; }
+    .chat-input { padding: 10px 14px; border-top: 1px solid var(--rule); display: flex; gap: 6px; }
+    .chat-input input { flex: 1; border: 1px solid var(--rule); border-radius: 4px; padding: 8px 12px; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; background: var(--bg); color: var(--text); }
     .chat-input input:focus { border-color: var(--accent); }
-    .chat-input input::placeholder { color: var(--text-tertiary); }
-    .chat-input button {
-      padding: 8px 16px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      border: none;
-      background: var(--accent);
-      color: #faf8f5;
-      transition: background 0.15s;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .chat-input button:hover { background: #b35236; }
-    .chat-input .skip {
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-size: 11px;
-      cursor: pointer;
-      border: none;
-      background: var(--bg-subtle);
-      color: var(--text-tertiary);
-      transition: background 0.15s;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .chat-input .skip:hover { background: var(--bg-muted); }
+    .chat-input button { padding: 8px 14px; border-radius: 4px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: var(--accent); color: #faf8f5; }
+    .chat-input .skip { padding: 8px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; border: none; background: rgba(0,0,0,0.04); color: var(--text-3); }
 
-    /* ── Scrollbar ────────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
-
-    /* ── Selection ────────────────────────────────────────────── */
-    ::selection { background: rgba(196,93,62,0.2); }
-
-    /* ── Responsive ──────────────────────────────────────────── */
     @media (max-width: 640px) {
       body { padding: 24px 16px 64px; }
-      .de-grid { grid-template-columns: 1fr; }
-      .ch-metrics { flex-wrap: wrap; }
-      .compare table { font-size: 12px; }
-      .compare td, .compare th { padding: 8px 10px; }
-      .rate-bar { display: none; }
-      .ns-value { font-size: clamp(40px, 10vw, 56px); }
+      .flow { overflow-x: auto; flex-wrap: nowrap; }
+      .flow-step { min-width: 60px; padding: 8px 10px 10px; }
+      .expand-inner { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
 <div class="header">
-  <div><h1>Nevara GTM</h1><div class="sub">Week of Mar 24, 2026</div></div>
+  <div>
+    <h1>Nevara GTM</h1>
+    <div class="sub">Hypothesis Sprint Board</div>
+  </div>
   <button class="add-btn" onclick="openModal()">+ New Experiment</button>
 </div>
 
-<div class="ns">
-  <div class="ns-label">Activated Users This Week</div>
-  <div class="ns-value" id="ns-val">0</div>
-  <div class="ns-target">Target: 20 / week</div>
-  <div class="ns-bar"><div class="ns-bar-fill" id="ns-bar"></div></div>
-  <div class="ns-sub">Downloaded + signed up + completed first call</div>
-</div>
+<div class="sprint-label" id="sprint-label">Sprint 1</div>
+<div class="sprint-dates">Mar 24 – 28, 2026</div>
 
-<div class="time-bar" id="time-bar"></div>
+<div class="ns">
+  <div class="ns-label">Activated Users</div>
+  <div class="ns-row">
+    <div class="ns-value" id="ns-val">0</div>
+    <div class="ns-of">/ 20 target</div>
+  </div>
+  <div class="ns-bar"><div class="ns-bar-fill" id="ns-bar"></div></div>
+  <div class="ns-sub">Downloaded + signed up + first call completed</div>
+</div>
 
 <div class="flow" id="flow"></div>
 
-<div id="groups"></div>
+<div id="board"></div>
 <div class="save-notice" id="saved">Saved</div>
 
 <div class="modal-overlay" id="modal">
@@ -816,230 +191,190 @@
 </div>
 
 <script>
-const K='gtm_v16';
+const K='gtm_v17';
+const VERDICTS=['pending','Keep going','Change variables','Close, iterate','Stop'];
+
 const CH={
-  linkedin: { label:'LinkedIn', color:'#2563a8', metrics:['Sent','Replies','Signups'], rateLabel:'Reply Rate', rateCalc:(m)=>m[0]>0?((m[1]/m[0])*100).toFixed(1)+'%':'—', source:'Dripify / manual' },
-  twitter: { label:'Twitter', color:'#b06a52', metrics:['Replies Posted','Engagements','Visits'], rateLabel:'Engagement', rateCalc:(m)=>m[0]>0?((m[1]/m[0])*100).toFixed(1)+'%':'—', source:'Manual count' },
-  reddit: { label:'Reddit', color:'#c45d3e', metrics:['Replies Posted','Reply-backs','Visits'], rateLabel:'Reply-back', rateCalc:(m)=>m[0]>0?((m[1]/m[0])*100).toFixed(1)+'%':'—', source:'Manual count' },
-  events: { label:'Events', color:'#c48a3e', metrics:['Conversations','Contacts','Signups'], rateLabel:'Conv Rate', rateCalc:(m)=>m[0]>0?((m[2]/m[0])*100).toFixed(1)+'%':'—', source:'Manual count' },
-  email: { label:'Email', color:'#5a8a6a', metrics:['Sent','Opened','Signups'], rateLabel:'Open Rate', rateCalc:(m)=>m[0]>0?((m[1]/m[0])*100).toFixed(1)+'%':'—', source:'Email tool' },
-  product: { label:'Product', color:'#7a7568', metrics:['Targeted','Engaged','Activated'], rateLabel:'Activation', rateCalc:(m)=>m[0]>0?((m[2]/m[0])*100).toFixed(1)+'%':'—', source:'Product analytics' },
-  content: { label:'Content', color:'#9a6858', metrics:['Published','Impressions','Signups'], rateLabel:'Signup Rate', rateCalc:(m)=>m[1]>0?((m[2]/m[1])*100).toFixed(2)+'%':'—', source:'Analytics' },
+  linkedin:{label:'LinkedIn',color:'#2563a8',metric:'Reply Rate',calc:(e)=>e.m[0]>0?((e.m[1]/e.m[0])*100).toFixed(1)+'%':'—',calcNum:(e)=>e.m[0]>0?e.m[1]/e.m[0]:0,cols:['Sent','Replies','Signups']},
+  twitter:{label:'Twitter',color:'#b06a52',metric:'Engagement',calc:(e)=>e.m[0]>0?((e.m[1]/e.m[0])*100).toFixed(1)+'%':'—',calcNum:(e)=>e.m[0]>0?e.m[1]/e.m[0]:0,cols:['Replies','Engagements','Visits']},
+  reddit:{label:'Reddit',color:'#c45d3e',metric:'Reply-back',calc:(e)=>e.m[0]>0?((e.m[1]/e.m[0])*100).toFixed(1)+'%':'—',calcNum:(e)=>e.m[0]>0?e.m[1]/e.m[0]:0,cols:['Replies','Reply-backs','Visits']},
+  events:{label:'Events',color:'#c48a3e',metric:'Conv Rate',calc:(e)=>e.m[0]>0?((e.m[2]/e.m[0])*100).toFixed(1)+'%':'—',calcNum:(e)=>e.m[0]>0?e.m[2]/e.m[0]:0,cols:['Convos','Contacts','Signups']},
+  email:{label:'Email',color:'#5a8a6a',metric:'Open Rate',calc:(e)=>e.m[0]>0?((e.m[1]/e.m[0])*100).toFixed(1)+'%':'—',calcNum:(e)=>e.m[0]>0?e.m[1]/e.m[0]:0,cols:['Sent','Opened','Signups']},
+  product:{label:'Product',color:'#7a7568',metric:'Activation',calc:(e)=>e.m[0]>0?((e.m[2]/e.m[0])*100).toFixed(1)+'%':'—',calcNum:(e)=>e.m[0]>0?e.m[2]/e.m[0]:0,cols:['Targeted','Engaged','Activated']},
+  content:{label:'Content',color:'#9a6858',metric:'Signup Rate',calc:(e)=>e.m[1]>0?((e.m[2]/e.m[1])*100).toFixed(2)+'%':'—',calcNum:(e)=>e.m[1]>0?e.m[2]/e.m[1]:0,cols:['Published','Impressions','Signups']},
 };
 
 const D=[
-  {id:1,pri:0,ch:'linkedin',name:"Autopilot Outbound",idea:"Reads ICP filters, sends connection requests on autopilot via Sales Nav → Dripify drip sequences.",platform:"Sales Nav, Dripify",goal:"Drive signups from automated outbound",target:">25% accept, >10% reply",scope:"200 requests · 7 days",status:"Testing",next:"",m:[200,17,3],hours:4},
-  {id:2,pri:0,ch:'linkedin',name:"Post Engagers",idea:"Scrape engagements from posts like rmeadows. Build lead lists from engagers.",platform:"PhantomBuster",goal:"Warm leads from post engagement",target:">3x response vs cold",scope:"1 post · 50 leads · 7 days",status:"Working",next:"Run on 5 more posts. Commenters only.",m:[34,8,5],hours:2},
-  {id:3,pri:0,ch:'linkedin',name:"Referral Posts",idea:"Find 'calling on my network' posts. DM people asking for tool recs.",platform:"LinkedIn Search",goal:"Reach buyers actively evaluating",target:">30% DM response",scope:"20 DMs · 7 days",status:"Testing",next:"",m:[20,7,2],hours:1.5},
-  {id:4,pri:0,ch:'linkedin',name:"Influencer Monitor",idea:"Follow Mark Roberge etc, see which AEs engage, DM them.",platform:"LinkedIn",goal:"Surface in-market AEs",target:">20% DM response",scope:"5 influencers · 30 DMs · 7 days",status:"Testing",next:"",m:[30,4,1],hours:2},
-  {id:5,pri:0,ch:'linkedin',name:"Warm Intros",idea:"Mine LinkedIn network → warm intros to target accounts.",platform:"Sales Nav TeamLink",goal:"Convert network into signups",target:">40% meeting rate",scope:"10 intros · 7 days",status:"Working",next:"Draft blurbs for Maruthi.",m:[10,5,3],hours:1},
-  {id:6,pri:0,ch:'email',name:"Gift Outreach",idea:"Find interesting thing about AE, send personalized gift.",platform:"Email, Starbucks",goal:"Test if gifts lift response rate",target:">35% response",scope:"15 AEs · $75 · 7 days",status:"Testing",next:"",m:[15,4,1],hours:3},
-  {id:7,pri:0,ch:'events',name:"Coffee Events",idea:"Coffee at sales meetups, start conversations with AEs.",platform:"In-person",goal:"Convert conversations into signups",target:">50% conv-to-signup",scope:"2 events · 40 convos",status:"Working",next:"Book 2 more. Test branded cups.",m:[40,18,3],hours:5},
-  {id:8,pri:1,ch:'twitter',name:"Twitter Outreach",idea:"Reply to right people on Twitter. Surface AEs talking about sales pain.",platform:"Twitter/X",goal:"Build presence + find AEs",target:">15% engagement",scope:"20 replies/day · 7 days",status:"Testing",next:"",m:[100,6,0],hours:2},
-  {id:9,pri:1,ch:'reddit',name:"Reddit Listening",idea:"Surface Reddit posts about sales pain. Reply with value.",platform:"Reddit",goal:"Find AEs venting about competitors",target:">20% reply-back",scope:"20 replies · 7 days",status:"Testing",next:"",m:[20,4,0],hours:1.5},
-  {id:10,pri:1,ch:'product',name:"User Segmentation",idea:"Churned / returned / retained users. Segment and re-engage.",platform:"Email, In-App",goal:"Reactivate churned users",target:">5% reactivation",scope:"All churned 90d · 30 days",status:"Testing",next:"Need product data access.",m:[0,0,0],hours:0},
-  {id:11,pri:1,ch:'product',name:"In-App Nudges",idea:"Slack broadcasts + in-platform messaging for underused features.",platform:"Slack, In-App",goal:"Increase feature adoption",target:">15% usage increase",scope:"3 prompts · 7 days",status:"Testing",next:"Need analytics access.",m:[0,0,0],hours:0},
-  {id:12,pri:1,ch:'product',name:"Docs Rewrite",idea:"Product documentation and enablement.",platform:"Website",goal:"Reduce time-to-value",target:">30% ticket reduction",scope:"3 docs · 7 days",status:"Testing",next:"Need support data.",m:[0,0,0],hours:0},
-  {id:13,pri:2,ch:'content',name:"SEO Sprint",idea:"AI SEO — rank for AE pain keywords.",platform:"Website, Google",goal:"Organic traffic from search",target:">500 imp, >2% CTR",scope:"3 posts · 60 days",status:"Stopped",next:"Parked. Focus outbound first.",m:[0,0,0],hours:0},
-  {id:14,pri:2,ch:'content',name:"Content Blitz",idea:"Organic content across LinkedIn, Twitter, Reddit, HN, Quora.",platform:"Multi-channel",goal:"Prospects see Nevara everywhere",target:">50 imp/post",scope:"3 posts × 5 channels",status:"Stopped",next:"Parked. Needs 30+ posts.",m:[0,0,0],hours:0},
+  {id:1,ch:'linkedin',name:"Autopilot Outbound",target:">10% reply",targetNum:0.10,idea:"Reads ICP filters, sends connection requests on autopilot via Sales Nav → Dripify.",m:[200,17,3],hours:4,verdict:"",next:""},
+  {id:2,ch:'linkedin',name:"Post Engagers",target:">3x vs cold",targetNum:0.20,idea:"Scrape engagements from posts like rmeadows. Build lead lists.",m:[34,8,5],hours:2,verdict:"Keep going",next:"Run on 5 more posts. Commenters only."},
+  {id:3,ch:'linkedin',name:"Referral Posts",target:">30% DM reply",targetNum:0.30,idea:"Find 'calling on my network' posts. DM people asking for recs.",m:[20,7,2],hours:1.5,verdict:"Keep going",next:""},
+  {id:4,ch:'linkedin',name:"Influencer Monitor",target:">20% DM reply",targetNum:0.20,idea:"Follow Mark Roberge etc, see which AEs engage, DM them.",m:[30,4,1],hours:2,verdict:"Change variables",next:"Try commenting on their posts first before DMing."},
+  {id:5,ch:'linkedin',name:"Warm Intros",target:">40% meeting",targetNum:0.40,idea:"Mine LinkedIn network → warm intros to target accounts.",m:[10,5,3],hours:1,verdict:"Keep going",next:"Draft blurbs for Maruthi."},
+  {id:6,ch:'email',name:"Gift Outreach",target:">35% response",targetNum:0.35,idea:"Find interesting thing about AE, send personalized gift.",m:[15,4,1],hours:3,verdict:"",next:""},
+  {id:7,ch:'events',name:"Coffee Events",target:">50% conv",targetNum:0.50,idea:"Coffee at sales meetups, start conversations with AEs.",m:[40,18,3],hours:5,verdict:"Close, iterate",next:"Book 2 more. Try branded cups + QR."},
+  {id:8,ch:'twitter',name:"Twitter Outreach",target:">15% engage",targetNum:0.15,idea:"Reply to right people on Twitter. Surface AEs talking about pain.",m:[100,6,0],hours:2,verdict:"",next:""},
+  {id:9,ch:'reddit',name:"Reddit Listening",target:">20% reply-back",targetNum:0.20,idea:"Surface Reddit posts about sales pain. Reply with value.",m:[20,4,0],hours:1.5,verdict:"Keep going",next:"Continue building presence on r/sales."},
+  {id:10,ch:'product',name:"User Segmentation",target:">5% reactivation",targetNum:0.05,idea:"Churned / returned / retained users. Segment and re-engage.",m:[0,0,0],hours:0,verdict:"",next:"Need product data access."},
+  {id:11,ch:'product',name:"In-App Nudges",target:">15% adoption",targetNum:0.15,idea:"Slack broadcasts + in-platform messaging for underused features.",m:[0,0,0],hours:0,verdict:"",next:"Need analytics access."},
+  {id:12,ch:'product',name:"Docs Rewrite",target:">30% fewer tickets",targetNum:0.30,idea:"Product documentation and enablement.",m:[0,0,0],hours:0,verdict:"",next:"Need support data."},
+  {id:13,ch:'content',name:"SEO Sprint",target:">2% CTR",targetNum:0.02,idea:"AI SEO — rank for AE pain keywords.",m:[0,0,0],hours:0,verdict:"Stop",next:"Parked. Focus outbound first."},
+  {id:14,ch:'content',name:"Content Blitz",target:">50 imp/post",targetNum:0.01,idea:"Organic content across LinkedIn, Twitter, Reddit, HN, Quora.",m:[0,0,0],hours:0,verdict:"Stop",next:"Parked. Needs 30+ posts."},
 ];
 
 let activeFlow='linkedin';
-
 function load(){const s=localStorage.getItem(K);if(s)return JSON.parse(s);save(D);return D;}
 function save(d){localStorage.setItem(K,JSON.stringify(d));}
 function flash(){document.getElementById('saved').classList.add('show');setTimeout(()=>document.getElementById('saved').classList.remove('show'),1200);}
-
-function setFlow(ch){
-  activeFlow=ch;
-  render();
-}
+function setFlow(ch){activeFlow=ch;render();}
 
 function render(){
   const exps=load();
 
-  // North star — total signups from all experiments × 61% activation
-  const totalSignups=exps.reduce((s,e)=>(e.m?s+e.m[2]:s),0);
+  // North star
+  const totalSignups=exps.reduce((s,e)=>s+(e.m?e.m[2]:0),0);
   const activated=Math.round(totalSignups*0.61);
   const pct=Math.min(100,Math.round((activated/20)*100));
   document.getElementById('ns-val').textContent=activated;
   const bar=document.getElementById('ns-bar');
   bar.style.width=pct+'%';
-  bar.style.background=pct>=100?'#5a8a6a':pct>=60?'#c48a3e':'#c45d3e';
+  bar.style.background=pct>=100?'var(--green)':pct>=60?'var(--amber)':'var(--accent)';
 
-  // Time summary
-  const timeByChannel={};
-  exps.forEach(e=>{if(e.hours>0){const c=CH[e.ch]||CH.outbound;timeByChannel[e.ch]=(timeByChannel[e.ch]||0)+e.hours;}});
-  const totalHours=Object.values(timeByChannel).reduce((s,h)=>s+h,0);
-  document.getElementById('time-bar').innerHTML=`
-    <span class="tb-total">${totalHours}h this week</span>
-    ${Object.entries(timeByChannel).sort((a,b)=>b[1]-a[1]).map(([ch,h])=>`<span class="time-chip"><span class="dot" style="background:${CH[ch].color}"></span>${CH[ch].label} ${h}h</span>`).join('')}
-  `;
-
-  // Group by platform
+  // Group
   const groups={};
-  exps.forEach(e=>{
-    const c=e.ch||'linkedin';
-    if(!groups[c])groups[c]=[];
-    groups[c].push(e);
-  });
+  exps.forEach(e=>{const c=e.ch||'linkedin';if(!groups[c])groups[c]=[];groups[c].push(e);});
 
-  // Render flow chart
+  // Flow
   const flowOrder=['linkedin','twitter','reddit','events','email','product','content'];
-  const flowHtml=flowOrder.filter(k=>groups[k]).map(k=>{
+  document.getElementById('flow').innerHTML=flowOrder.filter(k=>groups[k]).map(k=>{
     const info=CH[k];
-    const gExps=groups[k]||[];
-    const signups=gExps.reduce((s,e)=>s+(e.m?e.m[2]:0),0);
-    const count=gExps.length;
-    return `<div class="flow-step ${activeFlow===k?'active':''}" onclick="setFlow('${k}')">
-      <div class="flow-dot" style="background:${info.color}"></div>
+    const g=groups[k]||[];
+    const signups=g.reduce((s,e)=>s+(e.m?e.m[2]:0),0);
+    return`<div class="flow-step ${activeFlow===k?'active':''}" onclick="setFlow('${k}')">
       <div class="flow-name">${info.label}</div>
-      <div class="flow-count">${count} exp${count!==1?'s':''}</div>
-      <div class="flow-signups ${signups>0?'has-data':''}">${signups}</div>
+      <div class="flow-num ${signups>0?'has-data':''}">${signups}</div>
+      <div class="flow-count">${g.length} exp${g.length!==1?'s':''}</div>
     </div>`;
   }).join('');
-  document.getElementById('flow').innerHTML=flowHtml;
 
-  // Only show active flow group
-  const groupOrder=[activeFlow].filter(k=>groups[k]);
+  // Board — active platform only
+  const info=CH[activeFlow];
+  const g=(groups[activeFlow]||[]);
+  const active=g.filter(e=>e.verdict!=='Stop');
+  const stopped=g.filter(e=>e.verdict==='Stop');
 
-  let html='';
-  for(const chKey of groupOrder){
-    const info=CH[chKey]||{label:chKey,color:'#bbb',metrics:['M1','M2','M3'],icon:'📊'};
-    const gExps=groups[chKey].sort((a,b)=>(a.pri??3)-(b.pri??3));
-    const active=gExps.filter(e=>e.status!=='Stopped');
-    const stopped=gExps.filter(e=>e.status==='Stopped');
+  let html=`<div class="platform">
+    <div class="platform-header">
+      <div class="platform-dot" style="background:${info.color}"></div>
+      <div class="platform-title">${info.label}</div>
+      <div class="platform-meta">${g.length} experiments · ${info.metric}</div>
+    </div>
+    <table class="sprint-table">
+      <tr>
+        <th>Experiment</th>
+        <th>Target</th>
+        <th>Actual</th>
+        <th style="text-align:right">Verdict</th>
+      </tr>`;
 
-    // Channel-level aggregates
-    const totals=[0,0,0];
-    gExps.forEach(e=>{if(e.m){totals[0]+=e.m[0];totals[1]+=e.m[1];totals[2]+=e.m[2];}});
-    const totalHrs=gExps.reduce((s,e)=>s+(e.hours||0),0);
+  active.forEach(e=>{
+    const actual=info.calc(e);
+    const actualNum=info.calcNum(e);
+    const hasData=e.m&&e.m[0]>0;
+    const hit=hasData&&actualNum>=e.targetNum;
+    const close=hasData&&actualNum>=e.targetNum*0.8&&actualNum<e.targetNum;
+    const miss=hasData&&actualNum<e.targetNum*0.8;
+    const actualCls=!hasData?'pending':hit?'hit':close?'':'miss';
+    const verdictCls=!e.verdict||e.verdict==='pending'?'pending':e.verdict==='Keep going'?'keep':e.verdict==='Change variables'?'change':e.verdict==='Close, iterate'?'close':'stop';
 
-    // Find best experiment by rate
-    const withData=gExps.filter(e=>e.m&&e.m[0]>0);
-    const rates=withData.map(e=>({id:e.id, name:e.name, rate:info.rateCalc(e.m), rateNum:e.m[0]>0?(e.m[1]/e.m[0]):0, m:e.m, hours:e.hours||0, status:e.status}));
-    rates.sort((a,b)=>b.rateNum-a.rateNum);
-    const bestId=rates.length>0?rates[0].id:null;
+    html+=`<tr class="${actualCls}" onclick="toggleExp(${e.id})" style="cursor:pointer">
+      <td class="exp-name-col">${e.name}</td>
+      <td class="target-col">${e.target}</td>
+      <td class="actual-col ${actualCls}" onclick="event.stopPropagation();editActual(${e.id},this)">${hasData?actual:'—'}</td>
+      <td class="verdict-col"><span class="verdict ${verdictCls}" onclick="event.stopPropagation();cycleVerdict(${e.id})">${e.verdict||'—'}</span></td>
+    </tr>
+    <tr class="exp-expand" id="expand-${e.id}"><td colspan="4">
+      <div class="expand-inner">
+        <div class="expand-field"><div class="expand-label">Idea</div><div class="expand-value">${e.idea}</div></div>
+        <div class="expand-field"><div class="expand-label">Hours</div><div class="expand-value">${e.hours||0}h</div></div>
+        <div class="expand-field"><div class="expand-label">${info.cols[0]}</div><div class="expand-value actual-col" onclick="editM(${e.id},0,this)" style="cursor:pointer">${e.m?e.m[0]:0}</div></div>
+        <div class="expand-field"><div class="expand-label">${info.cols[1]}</div><div class="expand-value actual-col" onclick="editM(${e.id},1,this)" style="cursor:pointer">${e.m?e.m[1]:0}</div></div>
+        <div class="expand-field"><div class="expand-label">${info.cols[2]}</div><div class="expand-value actual-col" onclick="editM(${e.id},2,this)" style="cursor:pointer">${e.m?e.m[2]:0}</div></div>
+        <div class="expand-field"><div class="expand-label">Hours</div><div class="expand-value actual-col" onclick="editHours(${e.id},this)" style="cursor:pointer">${e.hours||0}h</div></div>
+        <div class="expand-next"><div class="expand-label">Next Step</div><div class="expand-next-text" onclick="event.stopPropagation();editNext(${e.id},this)">${e.next||'<span class="ph">What to do next sprint...</span>'}</div></div>
+        <div class="expand-actions">
+          <span class="expand-actions-label">Verdict</span>
+          ${['Keep going','Change variables','Close, iterate','Stop'].map(v=>`<div class="vbtn v-${v==='Keep going'?'keep':v==='Change variables'?'change':v==='Close, iterate'?'close':'stop'} ${e.verdict===v?'active':''}" onclick="event.stopPropagation();setVerdict(${e.id},'${v}')">${v}</div>`).join('')}
+        </div>
+      </div>
+    </td></tr>`;
+  });
 
-    html+=`<div class="ch-group">
-      <div class="ch-header">
-        <div class="ch-color" style="background:${info.color}"></div>
-        <span class="ch-title"><span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px;color:${info.color}">${info.icon}</span>${info.label}</span>
-        <span class="ch-meta">${gExps.length} experiments · ${totalHrs}h${bestId?' · Best: '+rates[0].name:''}</span>
-      </div>`;
+  html+=`</table>`;
 
-    // Comparison table
-    if(rates.length>0){
-      html+=`<div class="compare"><table>
-        <tr><th>Experiment</th>${info.metrics.map(l=>`<th>${l}</th>`).join('')}<th>${info.rateLabel}</th><th>Hours</th></tr>
-        ${rates.map(r=>{
-          const isBest=r.id===bestId;
-          const barPct=rates[0].rateNum>0?Math.round((r.rateNum/rates[0].rateNum)*100):0;
-          return`<tr class="${isBest?'winner-row':''}">
-            <td class="exp-name-cell">${r.name}</td>
-            ${r.m.map(v=>`<td>${v}</td>`).join('')}
-            <td class="rate-cell ${isBest?'best':''}"><div class="rate-bar-wrap"><span>${r.rate}</span><div class="rate-bar"><div class="rate-bar-fill" style="width:${barPct}%"></div></div></div></td>
-            <td>${r.hours}h</td>
-          </tr>`;
-        }).join('')}
-        ${withData.length<gExps.length?`<tr><td colspan="${info.metrics.length+3}" class="no-data">${gExps.length-withData.length} experiment${gExps.length-withData.length>1?'s':''} with no data yet</td></tr>`:''}
-      </table>
-      <div class="source-note">Source: ${info.source}</div>
-      </div>`;
-    }
-
-    html+=active.map(e=>renderExp(e,info)).join('');
-
-    if(stopped.length){
-      html+=`<div class="collapsed-toggle" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
-        <span>Stopped · ${stopped.length}</span><span>&#9660;</span>
-      </div><div style="display:none">${stopped.map(e=>renderExp(e,info)).join('')}</div>`;
-    }
-    html+=`</div>`;
+  if(stopped.length){
+    html+=`<div class="stopped-toggle" onclick="document.getElementById('stopped-${activeFlow}').style.display=document.getElementById('stopped-${activeFlow}').style.display==='none'?'block':'none'">Stopped · ${stopped.length} ▾</div>
+    <div id="stopped-${activeFlow}" style="display:none"><table class="sprint-table" style="opacity:0.5">
+    ${stopped.map(e=>`<tr><td class="exp-name-col">${e.name}</td><td class="target-col">${e.target}</td><td class="actual-col pending">—</td><td class="verdict-col"><span class="verdict stop">Stop</span></td></tr>`).join('')}
+    </table></div>`;
   }
-  document.getElementById('groups').innerHTML=html;
+
+  html+=`</div>`;
+  document.getElementById('board').innerHTML=html;
 }
 
-function renderExp(e,info){
-  const sc=(e.status||'new').toLowerCase();
-  const ml=info.metrics;
-  const hasData=e.m&&(e.m[0]>0||e.m[1]>0||e.m[2]>0);
-  const nc=n=>n>0?'gn':'zr';
-  return`
-  <div class="exp" id="exp-${e.id}" style="border-left-color:${info.color}">
-    <div class="exp-row" onclick="toggle(${e.id})">
-      <div class="exp-left">
-        <div class="exp-name">${e.name}</div>
-        <div class="exp-nums">${hasData
-          ?`<span class="${nc(e.m[0])}">${e.m[0]} ${ml[0].toLowerCase()}</span> · <span class="${nc(e.m[1])}">${e.m[1]} ${ml[1].toLowerCase()}</span> · <span class="${nc(e.m[2])}">${e.m[2]} ${ml[2].toLowerCase()}</span>${e.hours?` · ${e.hours}h`:''}`
-          :(e.hours?`${e.hours}h logged`:'No data yet')}</div>
-      </div>
-      <div class="exp-right">
-        <span class="status ${sc}">${e.status||'New'}</span>
-        <span class="arrow" id="a-${e.id}">&#9660;</span>
-      </div>
-    </div>
-    <div class="exp-detail" id="d-${e.id}">
-      <div class="dm-grid" style="grid-template-columns:repeat(4,1fr)">
-        ${ml.map((label,i)=>`<div class="dm" onclick="editM(${e.id},${i},this)"><div class="dm-label">${label}</div><div class="dm-val">${e.m?e.m[i]:0}</div></div>`).join('')}
-        <div class="dm" onclick="editHours(${e.id},this)"><div class="dm-label">Hours</div><div class="dm-val">${e.hours||0}</div></div>
-      </div>
-      <div class="d-row"><div class="d-label">Target</div><div style="font-size:12px;color:#6b6560">${e.target}</div></div>
-      <div class="d-row"><div class="d-label">Next Step</div><div class="d-next" onclick="event.stopPropagation();editNext(${e.id},this)">${e.next||'<span class="ph">Click to add...</span>'}</div></div>
-      <div class="d-actions">
-        <div class="d-actions-group"><span class="d-actions-label">Status</span>
-          ${['Working','Mixed','Testing','Stopped'].map(s=>`<div class="ab s${s[0].toLowerCase()} ${e.status===s?'active':''}" onclick="event.stopPropagation();setSt(${e.id},'${s}')">${s}</div>`).join('')}
-        </div>
-        <div class="d-actions-group"><span class="d-actions-label">Move</span>
-          <div class="ab m0 ${e.pri===0?'active':''}" onclick="event.stopPropagation();moveTo(${e.id},0)">This Week</div>
-          <div class="ab m1 ${e.pri===1?'active':''}" onclick="event.stopPropagation();moveTo(${e.id},1)">Up Next</div>
-          <div class="ab m2 ${e.pri===2?'active':''}" onclick="event.stopPropagation();moveTo(${e.id},2)">Stopped</div>
-        </div>
-      </div>
-      <div class="d-toggle" onclick="event.stopPropagation();document.getElementById('x-${e.id}').classList.toggle('open')">Details ▾</div>
-      <div class="d-extra" id="x-${e.id}"><div class="de-grid">
-        <div><div class="de-label">Idea</div>${e.idea}</div>
-        <div><div class="de-label">Goal</div>${e.goal}</div>
-        <div><div class="de-label">Platform</div>${e.platform}</div>
-        <div><div class="de-label">Test Size</div>${e.scope}</div>
-      </div></div>
-    </div>
-  </div>`;
+function toggleExp(id){document.getElementById('expand-'+id).classList.toggle('open');}
+
+function cycleVerdict(id){
+  const exps=load();const e=exps.find(x=>x.id===id);
+  const opts=['','Keep going','Change variables','Close, iterate','Stop'];
+  const idx=opts.indexOf(e.verdict);
+  e.verdict=opts[(idx+1)%opts.length];
+  save(exps);flash();render();
 }
 
-function toggle(id){document.getElementById('d-'+id).classList.toggle('open');document.getElementById('a-'+id).classList.toggle('open');}
-function setSt(id,v){const exps=load();exps.find(e=>e.id===id).status=v;save(exps);flash();render();}
-function moveTo(id,pri){const exps=load();const e=exps.find(x=>x.id===id);e.pri=pri;if(pri===2&&e.status!=='Stopped')e.status='Stopped';if(pri===0&&e.status==='Stopped')e.status='Testing';save(exps);flash();render();}
+function setVerdict(id,v){const exps=load();exps.find(x=>x.id===id).verdict=v;save(exps);flash();render();}
+
+function editActual(id,el){
+  const exps=load();const e=exps.find(x=>x.id===id);const info=CH[e.ch];
+  const val=prompt(`${e.name} — enter ${info.cols[1]} count:`,e.m?e.m[1]:0);
+  if(val===null)return;
+  if(!e.m)e.m=[0,0,0];
+  e.m[1]=parseInt(val)||0;
+  save(exps);flash();render();
+}
 
 function editM(id,idx,el){
-  const exps=load();const e=exps.find(x=>x.id===id);if(!e.m)e.m=[0,0,0];
-  const input=document.createElement('input');input.type='number';input.value=e.m[idx];
-  const valEl=el.querySelector('.dm-val');valEl.innerHTML='';valEl.appendChild(input);input.focus();input.select();
-  function c(){e.m[idx]=parseInt(input.value)||0;save(exps);flash();render();}
-  input.addEventListener('blur',c);input.addEventListener('keydown',ev=>{if(ev.key==='Enter')c();});
+  const exps=load();const e=exps.find(x=>x.id===id);const info=CH[e.ch];
+  const val=prompt(`${e.name} — ${info.cols[idx]}:`,e.m?e.m[idx]:0);
+  if(val===null)return;
+  if(!e.m)e.m=[0,0,0];
+  e.m[idx]=parseInt(val)||0;
+  save(exps);flash();render();
 }
+
 function editHours(id,el){
   const exps=load();const e=exps.find(x=>x.id===id);
-  const input=document.createElement('input');input.type='number';input.step='0.5';input.value=e.hours||0;
-  const valEl=el.querySelector('.dm-val');valEl.innerHTML='';valEl.appendChild(input);input.focus();input.select();
-  function c(){e.hours=parseFloat(input.value)||0;save(exps);flash();render();}
-  input.addEventListener('blur',c);input.addEventListener('keydown',ev=>{if(ev.key==='Enter')c();});
+  const val=prompt(`${e.name} — hours:`,e.hours||0);
+  if(val===null)return;
+  e.hours=parseFloat(val)||0;
+  save(exps);flash();render();
 }
+
 function editNext(id,el){
   const exps=load();const e=exps.find(x=>x.id===id);
-  const input=document.createElement('input');input.type='text';input.value=e.next||'';input.placeholder='What to do next...';
+  const input=document.createElement('input');input.type='text';input.value=e.next||'';input.placeholder='What to change next sprint...';
   el.innerHTML='';el.appendChild(input);input.focus();
   function c(){e.next=input.value;save(exps);flash();render();}
   input.addEventListener('blur',c);input.addEventListener('keydown',ev=>{if(ev.key==='Enter')c();});
 }
 
 // Chat
-const SM={'linkedin':{ch:'linkedin',name:'LinkedIn Outbound',target:'>20% reply',scope:'50 · 7 days'},'sales nav':{ch:'linkedin',name:'Sales Nav Outbound',target:'>25% accept',scope:'200 · 7 days'},'reddit':{ch:'reddit',name:'Reddit Listening',target:'>20% reply-back',scope:'20 replies · 7 days'},'twitter':{ch:'twitter',name:'Twitter Outreach',target:'>15% engagement',scope:'20/day · 7 days'},'event':{ch:'events',name:'Event Marketing',target:'>5 signups/event',scope:'2 events'},'coffee':{ch:'events',name:'Coffee Events',target:'>50% conv-to-signup',scope:'2 events · 40 convos'},'email':{ch:'email',name:'Email Campaign',target:'>40% open',scope:'100 sends · 7 days'},'churn':{ch:'product',name:'Win-Back',target:'>5% reactivation',scope:'All churned 90d'},'seo':{ch:'content',name:'SEO Sprint',target:'>500 imp, >2% CTR',scope:'3 posts · 60 days'},'content':{ch:'content',name:'Content Push',target:'>50 imp/post',scope:'3 posts · 7 days'},'slack':{ch:'product',name:'Slack Broadcast',target:'>15% engagement',scope:'3 messages'},'in-app':{ch:'product',name:'In-App Nudges',target:'>15% usage increase',scope:'3 prompts · 7 days'},'gift':{ch:'email',name:'Gift Outreach',target:'>35% response',scope:'15 · $75 · 7 days'},'influencer':{ch:'linkedin',name:'Influencer Monitor',target:'>20% DM response',scope:'5 influencers · 30 DMs'},'warm':{ch:'linkedin',name:'Warm Intros',target:'>40% meeting rate',scope:'10 intros · 7 days'},'referral':{ch:'linkedin',name:'Referral Posts',target:'>30% DM response',scope:'20 DMs · 7 days'},'scrape':{ch:'linkedin',name:'Post Engagers',target:'>3x vs cold',scope:'1 post · 50 leads'},'docs':{ch:'product',name:'Docs Rewrite',target:'>30% ticket reduction',scope:'3 docs · 7 days'}};
+const SM={'linkedin':{ch:'linkedin',name:'LinkedIn Outbound',target:'>20% reply',targetNum:0.20},'sales nav':{ch:'linkedin',name:'Sales Nav Outbound',target:'>25% accept',targetNum:0.25},'reddit':{ch:'reddit',name:'Reddit Listening',target:'>20% reply-back',targetNum:0.20},'twitter':{ch:'twitter',name:'Twitter Outreach',target:'>15% engagement',targetNum:0.15},'event':{ch:'events',name:'Event Marketing',target:'>5 signups',targetNum:0.50},'coffee':{ch:'events',name:'Coffee Events',target:'>50% conv',targetNum:0.50},'email':{ch:'email',name:'Email Campaign',target:'>40% open',targetNum:0.40},'churn':{ch:'product',name:'Win-Back',target:'>5% reactivation',targetNum:0.05},'seo':{ch:'content',name:'SEO Sprint',target:'>2% CTR',targetNum:0.02},'content':{ch:'content',name:'Content Push',target:'>50 imp/post',targetNum:0.01},'slack':{ch:'product',name:'Slack Broadcast',target:'>15% engagement',targetNum:0.15},'in-app':{ch:'product',name:'In-App Nudges',target:'>15% adoption',targetNum:0.15},'gift':{ch:'email',name:'Gift Outreach',target:'>35% response',targetNum:0.35},'influencer':{ch:'linkedin',name:'Influencer Monitor',target:'>20% DM reply',targetNum:0.20},'warm':{ch:'linkedin',name:'Warm Intros',target:'>40% meeting',targetNum:0.40},'referral':{ch:'linkedin',name:'Referral Posts',target:'>30% DM reply',targetNum:0.30},'scrape':{ch:'linkedin',name:'Post Engagers',target:'>3x vs cold',targetNum:0.20},'docs':{ch:'product',name:'Docs Rewrite',target:'>30% fewer tickets',targetNum:0.30}};
 
-function suggest(idea){const l=idea.toLowerCase();let b=null,bs=0;for(const[k,s]of Object.entries(SM)){if(l.includes(k)&&k.length>bs){b=s;bs=k.length;}}return b||{ch:'linkedin',name:idea.split(' ').slice(0,3).join(' '),target:'TBD',scope:'7 days'};}
+function suggest(idea){const l=idea.toLowerCase();let b=null,bs=0;for(const[k,s]of Object.entries(SM)){if(l.includes(k)&&k.length>bs){b=s;bs=k.length;}}return b||{ch:'linkedin',name:idea.split(' ').slice(0,3).join(' '),target:'TBD',targetNum:0};}
 
 let cp=0,cd={};
-function openModal(){cp=0;cd={};document.getElementById('modal').classList.add('open');document.getElementById('chat-msgs').innerHTML='';resetCI();setTimeout(()=>{addBot("What's the idea? Describe it however you want.");document.getElementById('chat-in').focus();},200);}
+function openModal(){cp=0;cd={};document.getElementById('modal').classList.add('open');document.getElementById('chat-msgs').innerHTML='';resetCI();setTimeout(()=>{addBot("What's the idea?");document.getElementById('chat-in').focus();},200);}
 function closeModal(){document.getElementById('modal').classList.remove('open');}
 function resetCI(){document.getElementById('chat-input').innerHTML=`<input type="text" id="chat-in" placeholder="Type here..." onkeydown="if(event.key==='Enter')sendMsg()"><button class="skip" onclick="skipStep()">Skip</button><button onclick="sendMsg()">Send</button>`;}
 function addBot(t){const d=document.createElement('div');d.className='msg bot';d.innerHTML=t;document.getElementById('chat-msgs').appendChild(d);document.getElementById('chat-msgs').scrollTop=99999;}
@@ -1048,27 +383,29 @@ function addUser(t){const d=document.createElement('div');d.className='msg user'
 function sendMsg(){
   const input=document.getElementById('chat-in');const v=input.value.trim();if(!v)return;
   addUser(v);input.value='';
-  if(cp===0){cd.idea=v;cp=1;setTimeout(()=>{addBot("What are you hoping to get out of this?");input.focus();},300);}
+  if(cp===0){cd.idea=v;cp=1;setTimeout(()=>{addBot("What's the goal?");input.focus();},300);}
   else if(cp===1){
-    cd.goal=v==='idk'||v==='not sure'?'To be defined':v;cp=2;
+    cd.goal=v==='idk'||v==='not sure'?'':v;cp=2;
     const s=suggest(cd.idea);Object.assign(cd,s);
-    setTimeout(()=>{addBot("Here's what I'd suggest:");setTimeout(()=>{
-      const d=document.createElement('div');d.className='msg summary';
-      d.innerHTML=`<div style="font-weight:700;margin-bottom:6px">Suggested:</div><div class="sl">Name</div><div class="sv">${cd.name}</div><div class="sl">Channel</div><div class="sv">${(CH[cd.ch]||{}).label||cd.ch}</div><div class="sl">Target</div><div class="sv">${cd.target}</div><div class="sl">Test Size</div><div class="sv">${cd.scope}</div>`;
-      document.getElementById('chat-msgs').appendChild(d);document.getElementById('chat-msgs').scrollTop=99999;
-      setTimeout(()=>{addBot("Look good?");document.getElementById('chat-input').innerHTML=`
-        <button onclick="closeModal()" style="flex:1;padding:8px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid #2c2926;background:transparent;color:#2c2926;font-family:'DM Sans',sans-serif">Cancel</button>
-        <button onclick="confirmAdd()" style="flex:2;padding:8px 16px;border-radius:4px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:#5a8a6a;color:#faf8f5;font-family:'DM Sans',sans-serif">Add to Tracker</button>`;},400);
-    },300);},300);
+    setTimeout(()=>{
+      addBot("Here's what I'd suggest:");
+      setTimeout(()=>{
+        const d=document.createElement('div');d.className='msg summary';
+        d.innerHTML=`<div style="font-weight:500;margin-bottom:6px">Suggested:</div><div class="sl">Name</div><div class="sv">${cd.name}</div><div class="sl">Platform</div><div class="sv">${(CH[cd.ch]||{}).label||cd.ch}</div><div class="sl">Target</div><div class="sv">${cd.target}</div>`;
+        document.getElementById('chat-msgs').appendChild(d);document.getElementById('chat-msgs').scrollTop=99999;
+        setTimeout(()=>{addBot("Look good?");document.getElementById('chat-input').innerHTML=`
+          <button onclick="closeModal()" style="flex:1;padding:8px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--rule);background:transparent;color:var(--text-2);font-family:'DM Sans',sans-serif">Cancel</button>
+          <button onclick="confirmAdd()" style="flex:2;padding:8px 14px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:var(--green);color:#faf8f5;font-family:'DM Sans',sans-serif">Add to Sprint</button>`;},400);
+      },300);
+    },300);
   }
 }
 function skipStep(){if(cp===0){cd.idea='';cp=1;addBot("What's the goal?");}else{cd.goal='';cp=2;const s=suggest(cd.idea||'');Object.assign(cd,s);sendMsg();}}
 
 function confirmAdd(){
   const exps=load(),id=exps.reduce((m,e)=>Math.max(m,e.id),0)+1;
-  exps.push({id,pri:1,ch:cd.ch||'linkedin',name:cd.name,idea:cd.idea||'',goal:cd.goal||'',platform:'',target:cd.target||'',scope:cd.scope||'',status:'Testing',next:'',m:[0,0,0],hours:0});
-  save(exps);flash();closeModal();render();
-  setTimeout(()=>{const c=document.getElementById('exp-'+id);if(c){c.classList.add('highlight');c.scrollIntoView({behavior:'smooth',block:'center'});}},200);
+  exps.push({id,ch:cd.ch||'linkedin',name:cd.name,target:cd.target||'TBD',targetNum:cd.targetNum||0,idea:cd.idea||'',m:[0,0,0],hours:0,verdict:'',next:''});
+  save(exps);flash();closeModal();activeFlow=cd.ch||'linkedin';render();
 }
 
 document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
