@@ -189,8 +189,9 @@ function renderExperimentPage(exps) {
         html += '<div class="pipe-arrow ' + convCls + '">' + convText + '</div>';
       }
       var isKey = v.rateIdx && (sIdx === v.rateIdx[0] || sIdx === v.rateIdx[1]);
+      var isChanged = v.changedStep === sIdx;
       var hasConn = stg.source || stg.note || stg.owner;
-      html += '<div class="pipe-stage' + (isKey ? ' pipe-stage-key' : '') + (hasConn ? ' pipe-stage-noted' : '') + '">' +
+      html += '<div class="pipe-stage' + (isKey ? ' pipe-stage-key' : '') + (isChanged ? ' pipe-stage-changed' : '') + (hasConn ? ' pipe-stage-noted' : '') + '">' +
         '<input type="number" class="pipe-input" value="' + stg.val + '" min="0" ' +
         'onfocus="this.select()" onchange="saveStage(' + e.id + ',\'' + v.id + '\',' + sIdx + ',this.value)">' +
         '<div class="pipe-stage-label" onclick="openStagePanel(' + e.id + ',\'' + v.id + '\',' + sIdx + ')">' +
@@ -402,6 +403,7 @@ function confirmVariation(expId) {
   e.variations.push({
     id: expId + '_v' + (e.variations.length + 1),
     name: stepLabel + ': ' + desc,
+    changedStep: selectedVarStep,
     stages: stages,
     rateIdx: best.rateIdx || (info ? info.rateIdx : [1, 0]),
     started: MONTHS[new Date().getMonth()] + ' ' + new Date().getDate(),

@@ -344,6 +344,8 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .pipe-stage { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--s-8) var(--s-8); background: var(--bg-sub); border: 1px solid var(--rule-faint); border-radius: var(--radius-sm); min-width: 4.5rem; flex-shrink: 0; transition: border-color var(--dur-fast) var(--ease-out); }
 .pipe-stage:focus-within { border-color: var(--accent); }
 .pipe-stage-key { background: var(--surface); border-color: var(--rule); }
+.pipe-stage-changed { background: var(--accent-bg); border-color: var(--accent); }
+.pipe-stage-changed .pipe-stage-label { color: var(--accent); font-weight: 600; }
 .pipe-input {
   font-family: var(--ff-display); font-size: var(--fs-md); font-weight: 600;
   color: var(--text); font-variant-numeric: tabular-nums;
