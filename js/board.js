@@ -16,6 +16,10 @@ function render() {
   var modeChannels = Object.entries(CH).filter(function(p) { return p[1].mode === activeMode; }).map(function(p) { return p[0]; });
   if (!activeFlow || !modeChannels.includes(activeFlow)) activeFlow = modeChannels[0];
 
+  // Sprint label
+  var sp = loadSprint();
+  document.getElementById('sprint-label').textContent = sp.name + ' · ' + sp.start + ' – ' + sp.end + ', ' + sp.year;
+
   // Mode toggle (compact, in top bar)
   var outCount = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === 'outbound' && e.verdict !== 'Stop'; }).length;
   var inCount = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === 'inbound' && e.verdict !== 'Stop'; }).length;
@@ -30,10 +34,10 @@ function render() {
   });
 
   document.getElementById('view-tabs').innerHTML =
-    '<button class="vtab ' + (activeView === 'today' ? 'active' : '') + '" onclick="setView(\'today\')">Today' +
+    '<button class="vtab ' + (activeView === 'today' ? 'active' : '') + '" onclick="setView(\'today\')">Review' +
     (actionCount > 0 ? '<span class="vtab-badge">' + actionCount + '</span>' : '') + '</button>' +
     '<button class="vtab ' + (activeView === 'experiments' ? 'active' : '') + '" onclick="setView(\'experiments\')">Experiments</button>' +
-    '<button class="vtab ' + (activeView === 'weekly' ? 'active' : '') + '" onclick="setView(\'weekly\')">Weekly</button>';
+    '<button class="vtab ' + (activeView === 'weekly' ? 'active' : '') + '" onclick="setView(\'weekly\')">Compare</button>';
 
   // Show/hide views
   document.getElementById('view-today').style.display = activeView === 'today' ? 'block' : 'none';

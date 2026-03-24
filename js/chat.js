@@ -165,6 +165,27 @@ function qaSubmit() {
   closeModal();
 }
 
+/* --- Sprint editor --- */
+function editSprint() {
+  var sp = loadSprint();
+  document.getElementById('modal').classList.add('open');
+  qaOpen = true;
+  document.querySelector('.chat').innerHTML =
+    '<div class="qa-panel"><div class="qa-header"><h2 class="qa-title">Sprint Settings</h2>' +
+    '<button class="chat-close" onclick="closeModal()">&times;</button></div>' +
+    '<div class="qa-body">' +
+    '<div class="qa-field"><label class="qa-label">Sprint Name</label>' +
+    '<input type="text" class="qa-input qa-input-sm" id="sp-name" value="' + sp.name + '"></div>' +
+    '<div class="qa-field"><label class="qa-label">Start Date</label>' +
+    '<input type="text" class="qa-input qa-input-sm" id="sp-start" value="' + sp.start + '" placeholder="e.g. Mar 24"></div>' +
+    '<div class="qa-field"><label class="qa-label">End Date</label>' +
+    '<input type="text" class="qa-input qa-input-sm" id="sp-end" value="' + sp.end + '" placeholder="e.g. Apr 7"></div>' +
+    '<div class="qa-field"><label class="qa-label">Year</label>' +
+    '<input type="text" class="qa-input qa-input-sm" id="sp-year" value="' + sp.year + '"></div>' +
+    '</div><div class="qa-footer"><button class="qa-cancel" onclick="closeModal()">Cancel</button>' +
+    '<button class="qa-submit" onclick="saveSprint({name:document.getElementById(\'sp-name\').value,start:document.getElementById(\'sp-start\').value,end:document.getElementById(\'sp-end\').value,year:document.getElementById(\'sp-year\').value});closeModal();render()">Save</button></div></div>';
+}
+
 /* --- Settings panel --- */
 function openSettings() {
   var key = getAIKey();

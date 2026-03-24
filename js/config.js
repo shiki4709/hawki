@@ -9,7 +9,17 @@
 
 var K = 'gtm_v22';
 var WE_KEY = 'gtm_weeks_v4';
+var SPRINT_KEY = 'gtm_sprint';
 var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function loadSprint() {
+  var s = localStorage.getItem(SPRINT_KEY);
+  return s ? JSON.parse(s) : { name: 'Sprint 1', start: 'Mar 24', end: 'Apr 7', year: '2026' };
+}
+
+function saveSprint(sp) {
+  localStorage.setItem(SPRINT_KEY, JSON.stringify(sp));
+}
 
 var CH = {
   // ── OUTBOUND ──
