@@ -12,16 +12,86 @@
       max-width: 720px; margin: 0 auto; padding: 32px 20px;
     }
 
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
     .header h1 { font-size: 22px; font-weight: 700; }
+    .header .sub { font-size: 12px; color: #86868b; margin-top: 2px; }
     .add-btn {
       padding: 8px 18px; border-radius: 20px; font-size: 12px; font-weight: 600;
       cursor: pointer; border: none; background: #0071e3; color: #fff;
     }
     .add-btn:hover { background: #0077ed; }
 
+    /* North Star */
+    .north-star {
+      background: #fff; border-radius: 16px; padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 16px;
+      text-align: center;
+    }
+    .ns-label { font-size: 11px; color: #86868b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .ns-value {
+      font-size: 48px; font-weight: 800; letter-spacing: -1px; margin: 4px 0;
+      cursor: pointer;
+    }
+    .ns-value:hover { color: #0071e3; }
+    .ns-target { font-size: 13px; color: #86868b; }
+    .ns-bar-track {
+      height: 6px; background: #e8e8ed; border-radius: 3px; margin-top: 12px; overflow: hidden;
+    }
+    .ns-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+
+    /* Metric cards */
+    .metrics {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+      margin-bottom: 24px;
+    }
+    .metric {
+      background: #fff; border-radius: 12px; padding: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04); text-align: center;
+    }
+    .metric .m-value {
+      font-size: 28px; font-weight: 700; cursor: pointer;
+    }
+    .metric .m-value:hover { color: #0071e3; }
+    .metric .m-label { font-size: 10px; color: #86868b; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
+    .metric .m-source { font-size: 9px; color: #bbb; margin-top: 4px; }
+    .metric .m-trend { font-size: 11px; margin-top: 2px; }
+    .metric .m-trend.up { color: #34c759; }
+    .metric .m-trend.down { color: #ff3b30; }
+    .metric .m-trend.flat { color: #86868b; }
+
+    /* Funnel */
+    .funnel {
+      background: #fff; border-radius: 12px; padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 24px;
+    }
+    .funnel h2 { font-size: 13px; font-weight: 700; color: #86868b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+    .funnel-steps {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .funnel-step { text-align: center; flex: 1; }
+    .funnel-step .fs-num { font-size: 22px; font-weight: 700; }
+    .funnel-step .fs-label { font-size: 10px; color: #86868b; text-transform: uppercase; margin-top: 2px; }
+    .funnel-step .fs-rate { font-size: 11px; color: #34c759; font-weight: 600; margin-top: 2px; }
+    .funnel-arr { color: #d2d2d7; font-size: 16px; flex-shrink: 0; padding: 0 4px; }
+
+    /* Channel breakdown */
+    .channels {
+      background: #fff; border-radius: 12px; padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 24px;
+    }
+    .channels h2 { font-size: 13px; font-weight: 700; color: #86868b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+    .ch-row {
+      display: flex; align-items: center; gap: 10px; padding: 8px 0;
+      border-bottom: 1px solid #f5f5f7;
+    }
+    .ch-row:last-child { border: none; }
+    .ch-name { font-size: 13px; font-weight: 600; min-width: 120px; }
+    .ch-bar-track { flex: 1; height: 8px; background: #f0f0f5; border-radius: 4px; overflow: hidden; }
+    .ch-bar-fill { height: 100%; border-radius: 4px; }
+    .ch-num { font-size: 13px; font-weight: 700; min-width: 60px; text-align: right; }
+
     /* Section */
-    .section { margin-bottom: 28px; }
+    .section { margin-bottom: 24px; }
     .section-header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 10px; padding: 0 4px;
@@ -29,11 +99,11 @@
     .section-title { font-size: 13px; font-weight: 700; color: #86868b; text-transform: uppercase; letter-spacing: 0.5px; }
     .section-count { font-size: 12px; color: #aaa; }
 
-    /* Experiment row */
+    /* Experiment rows */
     .exp {
       background: #fff; border-radius: 12px; margin-bottom: 6px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-      overflow: hidden; transition: box-shadow 0.15s;
+      overflow: hidden;
     }
     .exp:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
     .exp.highlight { box-shadow: 0 0 0 2px #0071e3; }
@@ -42,16 +112,13 @@
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 18px; cursor: pointer; gap: 12px;
     }
-
     .exp-left { flex: 1; min-width: 0; }
     .exp-name { font-size: 15px; font-weight: 600; }
     .exp-next-preview {
       font-size: 12px; color: #86868b; margin-top: 2px;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-
     .exp-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-
     .status {
       padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;
       cursor: pointer; position: relative; user-select: none;
@@ -61,64 +128,56 @@
     .status.testing { background: #e8eaf6; color: #3949ab; }
     .status.stopped { background: #f0f0f5; color: #999; }
     .status.new { background: #e3f2fd; color: #1565c0; }
-
-    .expand-icon {
-      font-size: 12px; color: #ccc; transition: transform 0.2s;
-    }
+    .expand-icon { font-size: 12px; color: #ccc; transition: transform 0.2s; }
     .expand-icon.open { transform: rotate(180deg); }
 
     /* Detail panel */
     .exp-detail { display: none; padding: 0 18px 16px; }
     .exp-detail.open { display: block; }
-
     .detail-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
       padding-top: 12px; border-top: 1px solid #f0f0f5;
     }
-    .d-field {}
     .d-label { font-size: 10px; color: #86868b; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 2px; }
     .d-value { font-size: 13px; color: #1d1d1f; }
-
-    .detail-next {
-      margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f5;
+    .detail-status { margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+    .detail-status-label { font-size: 10px; color: #86868b; text-transform: uppercase; letter-spacing: 0.3px; }
+    .status-options { display: flex; gap: 4px; }
+    .status-opt {
+      padding: 4px 10px; border-radius: 16px; font-size: 11px; font-weight: 600;
+      cursor: pointer; border: 2px solid transparent;
     }
+    .status-opt.active { border-color: #1d1d1f; }
+    .status-opt.s-working { background: #e8f8ef; color: #1a7f37; }
+    .status-opt.s-mixed { background: #fff8e1; color: #b45309; }
+    .status-opt.s-testing { background: #e8eaf6; color: #3949ab; }
+    .status-opt.s-stopped { background: #f0f0f5; color: #999; }
+    .detail-next { margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f5; }
     .detail-next-text {
-      font-size: 13px; color: #1d1d1f; cursor: pointer;
-      padding: 8px 12px; border-radius: 8px; background: #f9f9fb;
-      min-height: 36px; line-height: 1.5;
+      font-size: 13px; color: #555; cursor: pointer;
+      padding: 8px 12px; border-radius: 8px; background: #f9f9fb; min-height: 36px;
     }
     .detail-next-text:hover { background: #f0f0f5; }
     .detail-next-text .ph { color: #bbb; }
     .detail-next-text input {
       width: 100%; border: 2px solid #0071e3; border-radius: 8px;
       padding: 8px 12px; font-size: 13px; font-family: inherit; outline: none;
-      background: #fff;
     }
 
-    .detail-status {
-      margin-top: 10px; display: flex; align-items: center; gap: 8px;
-    }
-    .detail-status-label { font-size: 10px; color: #86868b; text-transform: uppercase; letter-spacing: 0.3px; }
-    .status-options { display: flex; gap: 4px; }
-    .status-opt {
-      padding: 4px 10px; border-radius: 16px; font-size: 11px; font-weight: 600;
-      cursor: pointer; border: 2px solid transparent; transition: all 0.1s;
-    }
-    .status-opt:hover { opacity: 0.8; }
-    .status-opt.active { border-color: #1d1d1f; }
-    .status-opt.s-working { background: #e8f8ef; color: #1a7f37; }
-    .status-opt.s-mixed { background: #fff8e1; color: #b45309; }
-    .status-opt.s-testing { background: #e8eaf6; color: #3949ab; }
-    .status-opt.s-stopped { background: #f0f0f5; color: #999; }
-
-    /* Parked section */
+    /* Parked toggle */
     .parked-toggle {
       padding: 12px 18px; background: #fff; border-radius: 12px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
       cursor: pointer; font-size: 13px; color: #86868b;
       display: flex; justify-content: space-between; align-items: center;
     }
-    .parked-toggle:hover { background: #fafafa; }
+
+    /* Editable metric */
+    .m-edit-input {
+      width: 80px; border: 2px solid #0071e3; border-radius: 8px;
+      padding: 4px 8px; font-size: 24px; font-weight: 700; font-family: inherit;
+      text-align: center; outline: none;
+    }
 
     /* Save notice */
     .save-notice {
@@ -129,7 +188,7 @@
     }
     .save-notice.show { opacity: 1; }
 
-    /* Chat Modal */
+    /* Chat modal */
     .modal-overlay {
       display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.3); backdrop-filter: blur(4px);
@@ -147,7 +206,6 @@
     }
     .chat-header h2 { font-size: 15px; font-weight: 700; }
     .chat-close { background: none; border: none; font-size: 18px; color: #86868b; cursor: pointer; }
-
     .chat-messages {
       flex: 1; overflow-y: auto; padding: 16px 20px;
       display: flex; flex-direction: column; gap: 10px;
@@ -156,26 +214,17 @@
       max-width: 85%; padding: 10px 14px; border-radius: 16px;
       font-size: 13px; line-height: 1.5; animation: msgIn 0.2s ease-out;
     }
-    @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .msg.bot {
-      align-self: flex-start; background: #f0f0f5; color: #1d1d1f;
-      border-bottom-left-radius: 4px;
-    }
-    .msg.user {
-      align-self: flex-end; background: #0071e3; color: #fff;
-      border-bottom-right-radius: 4px;
-    }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; } }
+    .msg.bot { align-self: flex-start; background: #f0f0f5; border-bottom-left-radius: 4px; }
+    .msg.user { align-self: flex-end; background: #0071e3; color: #fff; border-bottom-right-radius: 4px; }
     .msg.summary {
-      align-self: flex-start; background: #f0fdf4; color: #1d1d1f;
-      border: 1px solid #bbf7d0; border-radius: 12px; max-width: 100%;
-      font-size: 12px;
+      align-self: flex-start; background: #f0fdf4; border: 1px solid #bbf7d0;
+      border-radius: 12px; max-width: 100%; font-size: 12px;
     }
     .msg.summary .s-label { font-size: 10px; color: #86868b; text-transform: uppercase; letter-spacing: 0.3px; }
     .msg.summary .s-value { font-weight: 600; margin-bottom: 4px; }
-
     .chat-input {
-      padding: 12px 16px; border-top: 1px solid #f0f0f5;
-      display: flex; gap: 8px;
+      padding: 12px 16px; border-top: 1px solid #f0f0f5; display: flex; gap: 8px;
     }
     .chat-input input {
       flex: 1; border: 1px solid #d2d2d7; border-radius: 20px;
@@ -186,13 +235,15 @@
       padding: 10px 18px; border-radius: 20px; font-size: 12px; font-weight: 600;
       cursor: pointer; border: none; background: #0071e3; color: #fff;
     }
-    .chat-input button:disabled { background: #d2d2d7; cursor: default; }
     .chat-input .skip-btn {
       padding: 10px 12px; border-radius: 20px; font-size: 11px;
       cursor: pointer; border: none; background: #f0f0f5; color: #86868b;
     }
 
     @media (max-width: 640px) {
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .funnel-steps { flex-wrap: wrap; gap: 8px; }
+      .funnel-arr { display: none; }
       .detail-grid { grid-template-columns: 1fr; }
     }
   </style>
@@ -200,13 +251,42 @@
 <body>
 
 <div class="header">
-  <h1>Nevara GTM</h1>
+  <div>
+    <h1>Nevara GTM</h1>
+    <div class="sub" id="week-label">Week of Mar 24, 2026</div>
+  </div>
   <button class="add-btn" onclick="openModal()">+ New Experiment</button>
 </div>
 
-<div id="app"></div>
+<!-- North Star -->
+<div class="north-star">
+  <div class="ns-label">Demos Booked This Week</div>
+  <div class="ns-value" id="ns-value" onclick="editMetric('demos')">0</div>
+  <div class="ns-target">Target: <span id="ns-target-num">10</span> / week</div>
+  <div class="ns-bar-track"><div class="ns-bar-fill" id="ns-bar" style="width:0%;background:#0071e3"></div></div>
+</div>
+
+<!-- 3 Supporting Metrics -->
+<div class="metrics" id="metrics"></div>
+
+<!-- Funnel -->
+<div class="funnel">
+  <h2>Funnel This Week</h2>
+  <div class="funnel-steps" id="funnel"></div>
+</div>
+
+<!-- Channel Breakdown -->
+<div class="channels" id="channels-section">
+  <h2>Demos by Channel</h2>
+  <div id="channels"></div>
+</div>
+
+<!-- Experiments -->
+<div id="experiments-section"></div>
+
 <div class="save-notice" id="saved">Saved</div>
 
+<!-- Chat Modal -->
 <div class="modal-overlay" id="modal">
   <div class="chat">
     <div class="chat-header">
@@ -223,107 +303,214 @@
 </div>
 
 <script>
-const K='gtm_v12';
+const K='gtm_v13';
+
+// --- GTM Metrics (editable, saved to localStorage) ---
+const METRICS_KEY='gtm_metrics';
+const DEFAULT_METRICS = {
+  demos: 0,
+  demosTarget: 10,
+  conversations: 0,
+  responseRate: 0,
+  reached: 0,
+  replied: 0,
+  qualified: 0,
+  won: 0,
+  channelDemos: {},
+};
+
+function loadMetrics() {
+  const s = localStorage.getItem(METRICS_KEY);
+  if (s) return JSON.parse(s);
+  saveMetrics(DEFAULT_METRICS);
+  return DEFAULT_METRICS;
+}
+function saveMetrics(m) { localStorage.setItem(METRICS_KEY, JSON.stringify(m)); }
+
+// --- Experiments ---
 const STATUSES=[
-  {v:'Working',l:'Working',h:'Hit target — scale it',c:'working'},
-  {v:'Mixed',l:'Mixed',h:'Close — iterate',c:'mixed'},
-  {v:'Testing',l:'Testing',h:'Need more data',c:'testing'},
-  {v:'Stopped',l:'Stopped',h:'Below target — parked',c:'stopped'},
+  {v:'Working',c:'working'},{v:'Mixed',c:'mixed'},{v:'Testing',c:'testing'},{v:'Stopped',c:'stopped'},
 ];
 
 const DEFAULTS=[
-  {id:1,pri:0,name:"Autopilot Outbound",idea:"Reads ICP filters, clicks through profiles, sends connection requests on autopilot maxing out LinkedIn's 200/week limit. Each lead added to Sales Nav list → flows into Dripify for automated drip sequences.",platform:"LinkedIn, Sales Nav, Dripify",goal:"Generate demos from automated outbound",flywheel:"Find & Reach",target:">25% accept, >10% reply",scope:"200 requests · 7 days",status:"Testing",next:""},
-  {id:2,pri:0,name:"Post Engagers",idea:"Scrape engagements from posts like this — linkedin.com/posts/rmeadows (GTM playbooks for 2026 post). Build lead lists from people who engaged.",platform:"LinkedIn, PhantomBuster",goal:"Build warm leads from viral post engagement",flywheel:"Find & Reach",target:">3x response vs cold",scope:"1 post · 50 leads · 7 days",status:"Testing",next:""},
-  {id:3,pri:0,name:"Referral Posts",idea:"Find posts like Landon Tracy's 'calling on the power of my network' — people actively asking for tool recommendations. DM them.",platform:"LinkedIn",goal:"Reach buyers who are actively evaluating tools right now",flywheel:"Find & Reach",target:">30% DM response",scope:"20 DMs · 7 days",status:"Testing",next:""},
-  {id:4,pri:0,name:"Influencer Monitor",idea:"Follow folks like Mark Roberge, see which AE/sales reps are engaging with their content, and DM those AEs.",platform:"LinkedIn",goal:"Surface in-market AEs from influencer audiences",flywheel:"Find & Reach",target:">20% DM response",scope:"5 influencers · 30 DMs · 7 days",status:"Testing",next:""},
-  {id:5,pri:0,name:"Warm Intros",idea:"Go to my LinkedIn network and see who is connected to my target accounts. Request warm intros.",platform:"LinkedIn, Sales Nav",goal:"Convert existing network into qualified meetings",flywheel:"Find & Reach",target:">40% meeting rate",scope:"10 intros · 7 days",status:"Testing",next:""},
-  {id:6,pri:0,name:"Gift Outreach",idea:"Go to the AE profile, find an interesting thing about them, send a personalized gift.",platform:"LinkedIn, Email",goal:"Test if personal gifts lift response rate vs no-gift",flywheel:"Find & Reach",target:">35% meeting rate",scope:"15 AEs · $75 · 7 days",status:"Testing",next:""},
-  {id:7,pri:1,name:"User Segmentation",idea:"Which user has churned, which user has returned, which user has been retained. Segment and re-engage.",platform:"Email, In-App",goal:"Reactivate churned users, retain active ones",flywheel:"Attract & Retain",target:">5% reactivation, >40% open",scope:"All users · 30 days",status:"Testing",next:""},
-  {id:8,pri:1,name:"Twitter Outreach",idea:"Replying to the right people on Twitter. Just surface the folks who are talking about sales pain and reply.",platform:"Twitter/X",goal:"Build presence + find in-market AEs",flywheel:"Find & Reach",target:">15% engagement rate",scope:"20 replies/day · 7 days",status:"Testing",next:""},
-  {id:9,pri:1,name:"Reddit Listening",idea:"Surface the posts on Reddit about sales pain and competitor complaints. Will reply with value.",platform:"Reddit",goal:"Find AEs venting about competitors and start conversations",flywheel:"Find & Reach",target:">20% reply-back rate",scope:"20 replies · 7 days",status:"Testing",next:""},
-  {id:10,pri:1,name:"In-App Nudges",idea:"Slack broadcasts and in-platform messaging to existing users about underused features.",platform:"Slack, In-App",goal:"Increase feature adoption for existing users",flywheel:"Attract & Retain",target:">15% usage increase",scope:"3 prompts · 7 days",status:"Testing",next:""},
-  {id:11,pri:1,name:"Docs Rewrite",idea:"Product documentation and enablement — make onboarding faster and reduce support load.",platform:"Website, Help Center",goal:"Reduce time-to-value and support tickets",flywheel:"Attract & Retain",target:">30% reduction in tickets",scope:"3 docs · 7 days",status:"Testing",next:""},
-  {id:12,pri:2,name:"SEO Sprint",idea:"AI SEO optimization — rank for AE pain point keywords.",platform:"Website, Google",goal:"Drive organic traffic from search",flywheel:"Build Awareness",target:">500 imp, >2% CTR",scope:"3 posts · 60 days",status:"Stopped",next:"Parked. SEO takes 2-3 months. Focus outbound first."},
-  {id:13,pri:2,name:"Content Blitz",idea:"Organic content across channels — LinkedIn, Twitter, Reddit, Hacker News, Quora, and similar communities.",platform:"LinkedIn, Twitter/X, Reddit, HN, Quora",goal:"Prospects see Nevara everywhere before outbound hits",flywheel:"Build Awareness",target:">50 imp/post, >10 leads/mo",scope:"3 posts × 5 channels",status:"Stopped",next:"Parked. Content needs 30+ posts before breakout."},
-  {id:14,pri:0,name:"Coffee Events",idea:"In-person marketing — give out coffee at sales meetups and events, start conversations with AEs.",platform:"In-person events",goal:"Convert face-to-face conversations into demos",flywheel:"Find & Reach",target:">50% conv-to-demo, >3 demos",scope:"2 events · 40 convos",status:"Testing",next:""},
+  {id:1,pri:0,name:"Autopilot Outbound",idea:"Reads ICP filters, clicks through profiles, sends connection requests on autopilot maxing out LinkedIn's 200/week limit. Each lead added to Sales Nav list → flows into Dripify for automated drip sequences.",platform:"LinkedIn, Sales Nav, Dripify",goal:"Generate demos from automated outbound",flywheel:"Find & Reach",target:">25% accept, >10% reply",scope:"200 requests · 7 days",status:"Testing",next:"",channel:"LinkedIn"},
+  {id:2,pri:0,name:"Post Engagers",idea:"Scrape engagements from posts like rmeadows (GTM playbooks for 2026 post). Build lead lists from people who engaged.",platform:"LinkedIn, PhantomBuster",goal:"Build warm leads from viral post engagement",flywheel:"Find & Reach",target:">3x response vs cold",scope:"1 post · 50 leads · 7 days",status:"Testing",next:"",channel:"LinkedIn"},
+  {id:3,pri:0,name:"Referral Posts",idea:"Find posts like Landon Tracy's 'calling on the power of my network' — people actively asking for tool recommendations. DM them.",platform:"LinkedIn",goal:"Reach buyers who are actively evaluating tools right now",flywheel:"Find & Reach",target:">30% DM response",scope:"20 DMs · 7 days",status:"Testing",next:"",channel:"LinkedIn"},
+  {id:4,pri:0,name:"Influencer Monitor",idea:"Follow folks like Mark Roberge, see which AE/sales reps are engaging with their content, and DM those AEs.",platform:"LinkedIn",goal:"Surface in-market AEs from influencer audiences",flywheel:"Find & Reach",target:">20% DM response",scope:"5 influencers · 30 DMs · 7 days",status:"Testing",next:"",channel:"LinkedIn"},
+  {id:5,pri:0,name:"Warm Intros",idea:"Go to my LinkedIn network and see who is connected to my target accounts. Request warm intros.",platform:"LinkedIn, Sales Nav",goal:"Convert existing network into qualified meetings",flywheel:"Find & Reach",target:">40% meeting rate",scope:"10 intros · 7 days",status:"Testing",next:"",channel:"LinkedIn"},
+  {id:6,pri:0,name:"Gift Outreach",idea:"Go to the AE profile, find an interesting thing about them, send a personalized gift.",platform:"LinkedIn, Email",goal:"Test if personal gifts lift response rate vs no-gift",flywheel:"Find & Reach",target:">35% meeting rate",scope:"15 AEs · $75 · 7 days",status:"Testing",next:"",channel:"LinkedIn"},
+  {id:7,pri:1,name:"User Segmentation",idea:"Which user has churned, which user has returned, which user has been retained. Segment and re-engage.",platform:"Email, In-App",goal:"Reactivate churned users, retain active ones",flywheel:"Attract & Retain",target:">5% reactivation, >40% open",scope:"All users · 30 days",status:"Testing",next:"",channel:"Email"},
+  {id:8,pri:1,name:"Twitter Outreach",idea:"Replying to the right people on Twitter. Just surface the folks who are talking about sales pain and reply.",platform:"Twitter/X",goal:"Build presence + find in-market AEs",flywheel:"Find & Reach",target:">15% engagement rate",scope:"20 replies/day · 7 days",status:"Testing",next:"",channel:"Twitter"},
+  {id:9,pri:1,name:"Reddit Listening",idea:"Surface the posts on Reddit about sales pain and competitor complaints. Will reply with value.",platform:"Reddit",goal:"Find AEs venting about competitors and start conversations",flywheel:"Find & Reach",target:">20% reply-back rate",scope:"20 replies · 7 days",status:"Testing",next:"",channel:"Reddit"},
+  {id:10,pri:1,name:"In-App Nudges",idea:"Slack broadcasts and in-platform messaging to existing users about underused features.",platform:"Slack, In-App",goal:"Increase feature adoption for existing users",flywheel:"Attract & Retain",target:">15% usage increase",scope:"3 prompts · 7 days",status:"Testing",next:"",channel:"In-App"},
+  {id:11,pri:1,name:"Docs Rewrite",idea:"Product documentation and enablement — make onboarding faster and reduce support load.",platform:"Website, Help Center",goal:"Reduce time-to-value and support tickets",flywheel:"Attract & Retain",target:">30% reduction in tickets",scope:"3 docs · 7 days",status:"Testing",next:"",channel:"Website"},
+  {id:12,pri:2,name:"SEO Sprint",idea:"AI SEO optimization — rank for AE pain point keywords.",platform:"Website, Google",goal:"Drive organic traffic from search",flywheel:"Build Awareness",target:">500 imp, >2% CTR",scope:"3 posts · 60 days",status:"Stopped",next:"Parked. SEO takes 2-3 months.",channel:"Website"},
+  {id:13,pri:2,name:"Content Blitz",idea:"Organic content across channels — LinkedIn, Twitter, Reddit, Hacker News, Quora, and similar communities.",platform:"LinkedIn, Twitter/X, Reddit, HN, Quora",goal:"Prospects see Nevara everywhere before outbound hits",flywheel:"Build Awareness",target:">50 imp/post, >10 leads/mo",scope:"3 posts × 5 channels",status:"Stopped",next:"Parked. Needs 30+ posts before breakout.",channel:"Content"},
+  {id:14,pri:0,name:"Coffee Events",idea:"In-person marketing — give out coffee at sales meetups and events, start conversations with AEs.",platform:"In-person events",goal:"Convert face-to-face conversations into demos",flywheel:"Find & Reach",target:">50% conv-to-demo, >3 demos",scope:"2 events · 40 convos",status:"Testing",next:"",channel:"Events"},
 ];
 
 function load(){const s=localStorage.getItem(K);if(s)return JSON.parse(s);save(DEFAULTS);return DEFAULTS;}
 function save(d){localStorage.setItem(K,JSON.stringify(d));}
 function flash(){const el=document.getElementById('saved');el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1200);}
 
-function getStatusCls(s){
-  if(!s)return'new';
-  const u=s.toLowerCase();
-  if(u==='working')return'working';
-  if(u==='mixed')return'mixed';
-  if(u==='testing')return'testing';
-  if(u==='stopped')return'stopped';
-  return'new';
-}
+// --- Render ---
 
 function render(){
-  const exps=load();
-  const thisWeek=exps.filter(e=>e.pri===0);
-  const upNext=exps.filter(e=>e.pri===1);
-  const parked=exps.filter(e=>e.pri===2);
+  const m = loadMetrics();
+  const exps = load();
+  exps.sort((a,b)=>(a.pri??3)-(b.pri??3));
 
-  let html='';
+  // North Star
+  const pct = m.demosTarget > 0 ? Math.min(100, Math.round((m.demos / m.demosTarget) * 100)) : 0;
+  const barColor = pct >= 100 ? '#34c759' : pct >= 60 ? '#ff9f0a' : '#0071e3';
+  document.getElementById('ns-value').textContent = m.demos;
+  document.getElementById('ns-target-num').textContent = m.demosTarget;
+  document.getElementById('ns-bar').style.width = pct + '%';
+  document.getElementById('ns-bar').style.background = barColor;
 
-  // This Week
-  html+=renderSection('This Week', thisWeek, `${thisWeek.filter(e=>e.status==='Working').length} working`);
+  // 3 metrics
+  const rr = m.reached > 0 ? ((m.replied / m.reached) * 100).toFixed(1) : '0';
+  document.getElementById('metrics').innerHTML = `
+    <div class="metric">
+      <div class="m-value" onclick="editMetric('conversations')">${m.conversations}</div>
+      <div class="m-label">Conversations</div>
+      <div class="m-source">Dripify + Email + DMs</div>
+    </div>
+    <div class="metric">
+      <div class="m-value" onclick="editMetric('reached')">${rr}%</div>
+      <div class="m-label">Response Rate</div>
+      <div class="m-source">${m.replied} replied / ${m.reached} reached</div>
+    </div>
+    <div class="metric">
+      <div class="m-value" style="font-size:18px;color:#1d1d1f;cursor:default">${getBestChannel(exps)}</div>
+      <div class="m-label">Best Channel</div>
+      <div class="m-source">Most demos this week</div>
+    </div>
+  `;
 
-  // Up Next
-  if(upNext.length) html+=renderSection('Up Next', upNext, `${upNext.length} experiments`);
+  // Funnel
+  const demoRate = m.replied > 0 ? Math.round((m.demos / m.replied) * 100) : 0;
+  const replyRate = m.reached > 0 ? ((m.replied / m.reached) * 100).toFixed(1) : 0;
+  const qualRate = m.demos > 0 ? Math.round((m.qualified / m.demos) * 100) : 0;
+  const winRate = m.qualified > 0 ? Math.round((m.won / m.qualified) * 100) : 0;
 
-  // Parked
-  if(parked.length){
-    html+=`<div class="section"><div class="parked-toggle" onclick="toggleParked()">
+  document.getElementById('funnel').innerHTML = `
+    <div class="funnel-step">
+      <div class="fs-num" style="cursor:pointer" onclick="editMetric('reached')">${m.reached}</div>
+      <div class="fs-label">Reached</div>
+    </div>
+    <div class="funnel-arr">&rarr;</div>
+    <div class="funnel-step">
+      <div class="fs-num" style="cursor:pointer" onclick="editMetric('replied')">${m.replied}</div>
+      <div class="fs-label">Replied</div>
+      <div class="fs-rate">${replyRate}%</div>
+    </div>
+    <div class="funnel-arr">&rarr;</div>
+    <div class="funnel-step">
+      <div class="fs-num" style="cursor:pointer" onclick="editMetric('demos')">${m.demos}</div>
+      <div class="fs-label">Demos</div>
+      <div class="fs-rate">${demoRate}%</div>
+    </div>
+    <div class="funnel-arr">&rarr;</div>
+    <div class="funnel-step">
+      <div class="fs-num" style="cursor:pointer" onclick="editMetric('qualified')">${m.qualified}</div>
+      <div class="fs-label">Qualified</div>
+      <div class="fs-rate">${qualRate}%</div>
+    </div>
+    <div class="funnel-arr">&rarr;</div>
+    <div class="funnel-step">
+      <div class="fs-num" style="cursor:pointer" onclick="editMetric('won')">${m.won}</div>
+      <div class="fs-label">Won</div>
+      <div class="fs-rate">${winRate}%</div>
+    </div>
+  `;
+
+  // Channels
+  const channels = {};
+  exps.forEach(e => {
+    const ch = e.channel || 'Other';
+    if (!channels[ch]) channels[ch] = 0;
+    channels[ch] += (m.channelDemos && m.channelDemos[e.id]) || 0;
+  });
+  const maxCh = Math.max(1, ...Object.values(channels));
+  const chColors = { LinkedIn:'#0a66c2', Events:'#ff9f0a', Reddit:'#ff4500', Twitter:'#1da1f2', Email:'#34c759', 'In-App':'#5856d6', Website:'#86868b', Content:'#ff2d55' };
+  document.getElementById('channels').innerHTML = Object.entries(channels)
+    .sort((a,b) => b[1] - a[1])
+    .map(([ch, count]) => `
+      <div class="ch-row">
+        <div class="ch-name">${ch}</div>
+        <div class="ch-bar-track"><div class="ch-bar-fill" style="width:${(count/maxCh)*100}%;background:${chColors[ch]||'#86868b'}"></div></div>
+        <div class="ch-num">${count} demos</div>
+      </div>
+    `).join('');
+
+  // Experiments
+  const thisWeek = exps.filter(e => e.pri === 0);
+  const upNext = exps.filter(e => e.pri === 1);
+  const parked = exps.filter(e => e.pri === 2);
+
+  let html = '';
+  html += renderSection('This Week', thisWeek);
+  if (upNext.length) html += renderSection('Up Next', upNext);
+  if (parked.length) {
+    html += `<div class="section"><div class="parked-toggle" onclick="toggleParked()">
       <span>Stopped · ${parked.length} experiments</span>
       <span class="expand-icon" id="parked-arrow">&#9660;</span>
     </div><div id="parked-list" style="display:none;margin-top:6px">${parked.map(renderExp).join('')}</div></div>`;
   }
-
-  document.getElementById('app').innerHTML=html;
+  document.getElementById('experiments-section').innerHTML = html;
 }
 
-function renderSection(title, exps, subtitle){
-  return`<div class="section">
+function getBestChannel(exps) {
+  const m = loadMetrics();
+  const channels = {};
+  exps.forEach(e => {
+    const ch = e.channel || 'Other';
+    if (!channels[ch]) channels[ch] = 0;
+    channels[ch] += (m.channelDemos && m.channelDemos[e.id]) || 0;
+  });
+  const sorted = Object.entries(channels).sort((a,b) => b[1] - a[1]);
+  if (sorted.length && sorted[0][1] > 0) return sorted[0][0];
+  return 'No data yet';
+}
+
+function renderSection(title, exps) {
+  return `<div class="section">
     <div class="section-header">
       <span class="section-title">${title}</span>
-      <span class="section-count">${subtitle}</span>
+      <span class="section-count">${exps.length}</span>
     </div>
     ${exps.map(renderExp).join('')}
   </div>`;
 }
 
-function renderExp(e){
-  const sc=getStatusCls(e.status);
-  return`
+function renderExp(e) {
+  const sc = e.status ? e.status.toLowerCase() : 'new';
+  return `
   <div class="exp" id="exp-${e.id}">
     <div class="exp-row" onclick="toggle(${e.id})">
       <div class="exp-left">
         <div class="exp-name">${e.name}</div>
-        <div class="exp-next-preview">${e.next||'No next step yet'}</div>
+        <div class="exp-next-preview">${e.next || 'No next step yet'}</div>
       </div>
       <div class="exp-right">
-        <span class="status ${sc}">${e.status||'New'}</span>
+        <span class="status ${sc}">${e.status || 'New'}</span>
         <span class="expand-icon" id="arrow-${e.id}">&#9660;</span>
       </div>
     </div>
     <div class="exp-detail" id="detail-${e.id}">
       <div class="detail-grid">
-        <div class="d-field"><div class="d-label">Idea</div><div class="d-value">${e.idea}</div></div>
-        <div class="d-field"><div class="d-label">Goal</div><div class="d-value">${e.goal}</div></div>
-        <div class="d-field"><div class="d-label">Platform</div><div class="d-value">${e.platform}</div></div>
-        <div class="d-field"><div class="d-label">Stage</div><div class="d-value">${e.flywheel}</div></div>
-        <div class="d-field"><div class="d-label">Target</div><div class="d-value" style="font-family:monospace;font-size:12px">${e.target}</div></div>
-        <div class="d-field"><div class="d-label">Test Size</div><div class="d-value">${e.scope}</div></div>
+        <div><div class="d-label">Idea</div><div class="d-value">${e.idea}</div></div>
+        <div><div class="d-label">Goal</div><div class="d-value">${e.goal}</div></div>
+        <div><div class="d-label">Platform</div><div class="d-value">${e.platform}</div></div>
+        <div><div class="d-label">Target</div><div class="d-value" style="font-family:monospace;font-size:12px">${e.target}</div></div>
+        <div><div class="d-label">Test Size</div><div class="d-value">${e.scope}</div></div>
+        <div><div class="d-label">Stage</div><div class="d-value">${e.flywheel}</div></div>
       </div>
       <div class="detail-status">
         <span class="detail-status-label">Status</span>
         <div class="status-options">
-          ${STATUSES.map(s=>`<div class="status-opt s-${s.c} ${e.status===s.v?'active':''}" onclick="event.stopPropagation();setStatus(${e.id},'${s.v}')" title="${s.h}">${s.l}</div>`).join('')}
+          ${STATUSES.map(s=>`<div class="status-opt s-${s.c} ${e.status===s.v?'active':''}" onclick="event.stopPropagation();setStatus(${e.id},'${s.v}')">${s.v}</div>`).join('')}
         </div>
       </div>
       <div class="detail-status" style="margin-top:8px">
@@ -337,42 +524,34 @@ function renderExp(e){
       <div class="detail-next">
         <div class="d-label">Next Step</div>
         <div class="detail-next-text" onclick="event.stopPropagation();editNext(${e.id},this)">
-          ${e.next||'<span class="ph">Click to add what to do next...</span>'}
+          ${e.next || '<span class="ph">Click to add what to do next...</span>'}
         </div>
       </div>
     </div>
   </div>`;
 }
 
-function toggle(id){
-  const d=document.getElementById('detail-'+id);
-  const a=document.getElementById('arrow-'+id);
-  d.classList.toggle('open');
-  a.classList.toggle('open');
-}
+// --- Interactions ---
 
-function toggleParked(){
-  const el=document.getElementById('parked-list');
-  const a=document.getElementById('parked-arrow');
-  const open=el.style.display==='none';
-  el.style.display=open?'block':'none';
-  a.classList.toggle('open',open);
+function toggle(id) {
+  document.getElementById('detail-'+id).classList.toggle('open');
+  document.getElementById('arrow-'+id).classList.toggle('open');
 }
-
-function setStatus(id,v){
-  const exps=load();exps.find(e=>e.id===id).status=v;save(exps);flash();render();
+function toggleParked() {
+  const el = document.getElementById('parked-list');
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'block' : 'none';
+  document.getElementById('parked-arrow').classList.toggle('open', open);
 }
-
-function moveTo(id,pri){
-  const exps=load();
-  const e=exps.find(x=>x.id===id);
+function setStatus(id,v) { const exps=load();exps.find(e=>e.id===id).status=v;save(exps);flash();render(); }
+function moveTo(id,pri) {
+  const exps=load();const e=exps.find(x=>x.id===id);
   e.pri=pri;
-  if(pri===2 && e.status!=='Stopped') e.status='Stopped';
-  if(pri===0 && e.status==='Stopped') e.status='Testing';
+  if(pri===2&&e.status!=='Stopped')e.status='Stopped';
+  if(pri===0&&e.status==='Stopped')e.status='Testing';
   save(exps);flash();render();
 }
-
-function editNext(id,el){
+function editNext(id,el) {
   const exps=load();const e=exps.find(x=>x.id===id);
   const input=document.createElement('input');input.type='text';input.value=e.next||'';input.placeholder='What to do next...';
   el.innerHTML='';el.appendChild(input);input.focus();
@@ -380,197 +559,130 @@ function editNext(id,el){
   input.addEventListener('blur',commit);input.addEventListener('keydown',ev=>{if(ev.key==='Enter')commit();});
 }
 
-// Chat-based experiment creation
-// Only asks 2 things: idea + goal. Bot suggests everything else.
+// --- Editable Metrics ---
+
+function editMetric(key) {
+  const m = loadMetrics();
+  let label, current;
+  if (key === 'demos') { label = 'Demos booked this week'; current = m.demos; }
+  else if (key === 'conversations') { label = 'Qualified conversations'; current = m.conversations; }
+  else if (key === 'reached') { label = 'People reached (sent/contacted)'; current = m.reached; }
+  else if (key === 'replied') { label = 'People who replied'; current = m.replied; }
+  else if (key === 'qualified') { label = 'Qualified opportunities'; current = m.qualified; }
+  else if (key === 'won') { label = 'Deals won'; current = m.won; }
+
+  const val = prompt(label + ':', current);
+  if (val === null) return;
+  const num = parseInt(val) || 0;
+  m[key] = num;
+  saveMetrics(m);
+  flash();
+  render();
+}
+
+// --- Chat ---
 
 const SUGGEST_MAP = {
-  'linkedin': { platform:'LinkedIn', flywheel:'Find & Reach', target:'>20% reply rate', scope:'50 outreach · 7 days', name:'LinkedIn Outbound' },
-  'sales nav': { platform:'LinkedIn, Sales Nav', flywheel:'Find & Reach', target:'>25% accept, >10% reply', scope:'200 requests · 7 days', name:'Sales Nav Outbound' },
-  'dripify': { platform:'LinkedIn, Sales Nav, Dripify', flywheel:'Find & Reach', target:'>25% accept, >10% reply', scope:'200 requests · 7 days', name:'Drip Sequence' },
-  'reddit': { platform:'Reddit', flywheel:'Find & Reach', target:'>20% reply-back rate', scope:'20 replies · 7 days', name:'Reddit Listening' },
-  'twitter': { platform:'Twitter/X', flywheel:'Build Awareness', target:'>15% engagement rate', scope:'20 replies/day · 7 days', name:'Twitter Outreach' },
-  'event': { platform:'In-person events', flywheel:'Find & Reach', target:'>3 demos per event', scope:'2 events · 7 days', name:'Event Marketing' },
-  'coffee': { platform:'In-person events', flywheel:'Find & Reach', target:'>50% conv-to-demo', scope:'2 events · 40 convos', name:'Coffee Events' },
-  'meetup': { platform:'In-person events', flywheel:'Find & Reach', target:'>3 demos per event', scope:'2 events · 7 days', name:'Meetup Outreach' },
-  'email': { platform:'Email', flywheel:'Find & Reach', target:'>40% open, >5% click', scope:'100 sends · 7 days', name:'Email Campaign' },
-  'churn': { platform:'Email, In-App', flywheel:'Attract & Retain', target:'>5% reactivation', scope:'All churned 90d · 30 days', name:'Win-Back' },
-  're-engage': { platform:'Email, In-App', flywheel:'Attract & Retain', target:'>5% reactivation', scope:'All churned 90d · 30 days', name:'Win-Back' },
-  'seo': { platform:'Website, Google', flywheel:'Build Awareness', target:'>500 impressions, >2% CTR', scope:'3 posts · 60 days', name:'SEO Sprint' },
-  'content': { platform:'LinkedIn, Twitter/X, Reddit', flywheel:'Build Awareness', target:'>50 imp/post', scope:'3 posts · 7 days', name:'Content Push' },
-  'slack': { platform:'Slack, In-App', flywheel:'Attract & Retain', target:'>15% engagement', scope:'3 messages · 7 days', name:'Slack Broadcast' },
-  'in-app': { platform:'In-App', flywheel:'Attract & Retain', target:'>15% feature usage increase', scope:'3 prompts · 7 days', name:'In-App Nudges' },
-  'docs': { platform:'Website, Help Center', flywheel:'Attract & Retain', target:'>30% reduction in support tickets', scope:'3 docs · 7 days', name:'Docs Rewrite' },
-  'gift': { platform:'LinkedIn, Email', flywheel:'Find & Reach', target:'>35% response rate', scope:'15 targets · $75 · 7 days', name:'Gift Outreach' },
-  'influencer': { platform:'LinkedIn', flywheel:'Find & Reach', target:'>20% DM response', scope:'5 influencers · 30 DMs · 7 days', name:'Influencer Monitor' },
-  'warm intro': { platform:'LinkedIn', flywheel:'Find & Reach', target:'>40% meeting rate', scope:'10 intros · 7 days', name:'Warm Intros' },
-  'referral': { platform:'LinkedIn', flywheel:'Find & Reach', target:'>30% DM response', scope:'20 DMs · 7 days', name:'Referral Posts' },
-  'scrape': { platform:'LinkedIn, PhantomBuster', flywheel:'Find & Reach', target:'>3x response vs cold', scope:'1 post · 50 leads · 7 days', name:'Post Engagers' },
-  'phantom': { platform:'LinkedIn, PhantomBuster', flywheel:'Find & Reach', target:'>3x response vs cold', scope:'1 post · 50 leads · 7 days', name:'Post Engagers' },
-  'webinar': { platform:'Zoom, LinkedIn', flywheel:'Build Awareness', target:'>50 attendees, >10% to demo', scope:'1 webinar · 14 days prep', name:'Webinar' },
-  'podcast': { platform:'Podcast platforms', flywheel:'Build Awareness', target:'>100 listens, >5 inbound leads', scope:'1 episode · 30 days', name:'Podcast Appearance' },
-  'cold call': { platform:'Phone', flywheel:'Find & Reach', target:'>5% meeting rate', scope:'50 calls · 7 days', name:'Cold Calling' },
-  'ads': { platform:'LinkedIn Ads, Google Ads', flywheel:'Build Awareness', target:'>2% CTR, <$50 CAC', scope:'$500 budget · 14 days', name:'Paid Ads Test' },
-  'partner': { platform:'Partner channels', flywheel:'Find & Reach', target:'>5 qualified intros', scope:'3 partners · 14 days', name:'Partner Outreach' },
+  'linkedin':{platform:'LinkedIn',flywheel:'Find & Reach',target:'>20% reply rate',scope:'50 outreach · 7 days',name:'LinkedIn Outbound',channel:'LinkedIn'},
+  'sales nav':{platform:'LinkedIn, Sales Nav',flywheel:'Find & Reach',target:'>25% accept, >10% reply',scope:'200 requests · 7 days',name:'Sales Nav Outbound',channel:'LinkedIn'},
+  'dripify':{platform:'LinkedIn, Sales Nav, Dripify',flywheel:'Find & Reach',target:'>25% accept, >10% reply',scope:'200 requests · 7 days',name:'Drip Sequence',channel:'LinkedIn'},
+  'reddit':{platform:'Reddit',flywheel:'Find & Reach',target:'>20% reply-back rate',scope:'20 replies · 7 days',name:'Reddit Listening',channel:'Reddit'},
+  'twitter':{platform:'Twitter/X',flywheel:'Build Awareness',target:'>15% engagement rate',scope:'20 replies/day · 7 days',name:'Twitter Outreach',channel:'Twitter'},
+  'event':{platform:'In-person events',flywheel:'Find & Reach',target:'>3 demos per event',scope:'2 events · 7 days',name:'Event Marketing',channel:'Events'},
+  'coffee':{platform:'In-person events',flywheel:'Find & Reach',target:'>50% conv-to-demo',scope:'2 events · 40 convos',name:'Coffee Events',channel:'Events'},
+  'email':{platform:'Email',flywheel:'Find & Reach',target:'>40% open, >5% click',scope:'100 sends · 7 days',name:'Email Campaign',channel:'Email'},
+  'churn':{platform:'Email, In-App',flywheel:'Attract & Retain',target:'>5% reactivation',scope:'All churned 90d · 30 days',name:'Win-Back',channel:'Email'},
+  'seo':{platform:'Website, Google',flywheel:'Build Awareness',target:'>500 imp, >2% CTR',scope:'3 posts · 60 days',name:'SEO Sprint',channel:'Website'},
+  'content':{platform:'LinkedIn, Twitter/X, Reddit',flywheel:'Build Awareness',target:'>50 imp/post',scope:'3 posts · 7 days',name:'Content Push',channel:'Content'},
+  'slack':{platform:'Slack, In-App',flywheel:'Attract & Retain',target:'>15% engagement',scope:'3 messages · 7 days',name:'Slack Broadcast',channel:'In-App'},
+  'in-app':{platform:'In-App',flywheel:'Attract & Retain',target:'>15% usage increase',scope:'3 prompts · 7 days',name:'In-App Nudges',channel:'In-App'},
+  'gift':{platform:'LinkedIn, Email',flywheel:'Find & Reach',target:'>35% response rate',scope:'15 targets · $75 · 7 days',name:'Gift Outreach',channel:'LinkedIn'},
+  'influencer':{platform:'LinkedIn',flywheel:'Find & Reach',target:'>20% DM response',scope:'5 influencers · 30 DMs · 7 days',name:'Influencer Monitor',channel:'LinkedIn'},
+  'warm intro':{platform:'LinkedIn',flywheel:'Find & Reach',target:'>40% meeting rate',scope:'10 intros · 7 days',name:'Warm Intros',channel:'LinkedIn'},
+  'referral':{platform:'LinkedIn',flywheel:'Find & Reach',target:'>30% DM response',scope:'20 DMs · 7 days',name:'Referral Posts',channel:'LinkedIn'},
+  'scrape':{platform:'LinkedIn, PhantomBuster',flywheel:'Find & Reach',target:'>3x response vs cold',scope:'1 post · 50 leads · 7 days',name:'Post Engagers',channel:'LinkedIn'},
+  'meetup':{platform:'In-person events',flywheel:'Find & Reach',target:'>3 demos per event',scope:'2 events · 7 days',name:'Meetup Outreach',channel:'Events'},
+  'docs':{platform:'Website, Help Center',flywheel:'Attract & Retain',target:'>30% reduction in tickets',scope:'3 docs · 7 days',name:'Docs Rewrite',channel:'Website'},
+  'ads':{platform:'LinkedIn Ads, Google Ads',flywheel:'Build Awareness',target:'>2% CTR, <$50 CAC',scope:'$500 budget · 14 days',name:'Paid Ads Test',channel:'Ads'},
 };
 
-function suggestFromIdea(idea) {
-  const lower = idea.toLowerCase();
-  let best = null;
-  let bestScore = 0;
-  for (const [keyword, suggestion] of Object.entries(SUGGEST_MAP)) {
-    if (lower.includes(keyword) && keyword.length > bestScore) {
-      best = suggestion;
-      bestScore = keyword.length;
-    }
+function suggestFromIdea(idea){
+  const lower=idea.toLowerCase();let best=null,bestScore=0;
+  for(const[kw,sug] of Object.entries(SUGGEST_MAP)){
+    if(lower.includes(kw)&&kw.length>bestScore){best=sug;bestScore=kw.length;}
   }
-  // Default if no match
-  if (!best) {
-    best = { platform:'TBD', flywheel:'Find & Reach', target:'Define after scoping', scope:'7 days', name: idea.split(' ').slice(0, 3).join(' ') };
-  }
-  return { ...best };
+  return best||{platform:'TBD',flywheel:'Find & Reach',target:'Define after scoping',scope:'7 days',name:idea.split(' ').slice(0,3).join(' '),channel:'Other'};
 }
 
-let chatPhase = 0; // 0=ask idea, 1=ask goal, 2=show suggestion, 3=done
-let chatData = {};
+let chatPhase=0,chatData={};
 
-function openModal() {
-  chatPhase = 0;
-  chatData = {};
+function openModal(){
+  chatPhase=0;chatData={};
   document.getElementById('modal').classList.add('open');
-  document.getElementById('chat-msgs').innerHTML = '';
+  document.getElementById('chat-msgs').innerHTML='';
   resetChatInput();
-  setTimeout(() => {
-    addBotMsg("What's the idea? Just describe it however you want.");
-    document.getElementById('chat-in').focus();
-  }, 200);
+  setTimeout(()=>{addBotMsg("What's the idea? Just describe it however you want.");document.getElementById('chat-in').focus();},200);
 }
-
-function closeModal() {
-  document.getElementById('modal').classList.remove('open');
-}
-
-function resetChatInput() {
-  document.getElementById('chat-input').innerHTML = `
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+function resetChatInput(){
+  document.getElementById('chat-input').innerHTML=`
     <input type="text" id="chat-in" placeholder="Type here..." onkeydown="if(event.key==='Enter')sendMsg()">
-    <button onclick="sendMsg()">Send</button>
-  `;
+    <button class="skip-btn" onclick="skipStep()">Skip</button>
+    <button onclick="sendMsg()">Send</button>`;
 }
+function addBotMsg(t){const d=document.createElement('div');d.className='msg bot';d.innerHTML=t;document.getElementById('chat-msgs').appendChild(d);document.getElementById('chat-msgs').scrollTop=99999;}
+function addUserMsg(t){const d=document.createElement('div');d.className='msg user';d.textContent=t;document.getElementById('chat-msgs').appendChild(d);document.getElementById('chat-msgs').scrollTop=99999;}
 
-function addBotMsg(text) {
-  const msgs = document.getElementById('chat-msgs');
-  const div = document.createElement('div');
-  div.className = 'msg bot';
-  div.innerHTML = text;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
+function sendMsg(){
+  const input=document.getElementById('chat-in');const val=input.value.trim();if(!val)return;
+  addUserMsg(val);input.value='';
 
-function addUserMsg(text) {
-  const msgs = document.getElementById('chat-msgs');
-  const div = document.createElement('div');
-  div.className = 'msg user';
-  div.textContent = text;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function addSummaryCard() {
-  const msgs = document.getElementById('chat-msgs');
-  const d = chatData;
-  const div = document.createElement('div');
-  div.className = 'msg summary';
-  div.innerHTML = `
-    <div style="font-weight:700;font-size:14px;margin-bottom:10px">Here's what I'd suggest:</div>
-    <div class="s-label">Name</div><div class="s-value">${d.name}</div>
-    <div class="s-label">Idea</div><div class="s-value">${d.idea}</div>
-    <div class="s-label">Goal</div><div class="s-value">${d.goal}</div>
-    <div class="s-label">Platform</div><div class="s-value">${d.platform}</div>
-    <div class="s-label">Target</div><div class="s-value">${d.target}</div>
-    <div class="s-label">Test Size</div><div class="s-value">${d.scope}</div>
-    <div class="s-label">Stage</div><div class="s-value">${d.flywheel}</div>
-  `;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function sendMsg() {
-  const input = document.getElementById('chat-in');
-  const val = input.value.trim();
-  if (!val) return;
-  addUserMsg(val);
-  input.value = '';
-
-  if (chatPhase === 0) {
-    // Got the idea
-    chatData.idea = val;
-    chatPhase = 1;
-    setTimeout(() => {
-      addBotMsg("Got it. What are you hoping to get out of this? (e.g., more demos, more users, brand awareness — or just say 'not sure')");
-      input.focus();
-    }, 300);
-
-  } else if (chatPhase === 1) {
-    // Got the goal
-    chatData.goal = val === 'not sure' || val === 'idk' ? '' : val;
-    chatPhase = 2;
-
-    // Auto-suggest everything else
-    const suggestion = suggestFromIdea(chatData.idea);
-    chatData.name = suggestion.name;
-    chatData.platform = suggestion.platform;
-    chatData.target = suggestion.target;
-    chatData.scope = suggestion.scope;
-    chatData.flywheel = suggestion.flywheel;
-    if (!chatData.goal) chatData.goal = 'To be defined with operator';
-
-    setTimeout(() => {
-      addBotMsg("Based on your idea, here's how I'd structure the experiment:");
-      setTimeout(() => {
-        addSummaryCard();
-        setTimeout(() => {
-          addBotMsg("Look good? You can edit any of these after adding.");
-          // Switch to confirm buttons
-          document.getElementById('chat-input').innerHTML = `
+  if(chatPhase===0){
+    chatData.idea=val;chatPhase=1;
+    setTimeout(()=>{addBotMsg("What are you hoping to get out of this?");input.focus();},300);
+  } else if(chatPhase===1){
+    chatData.goal=val==='idk'||val==='not sure'?'':val;chatPhase=2;
+    const s=suggestFromIdea(chatData.idea);
+    Object.assign(chatData,s);
+    if(!chatData.goal)chatData.goal='To be defined';
+    setTimeout(()=>{
+      addBotMsg("Based on your idea, here's how I'd set it up:");
+      setTimeout(()=>{
+        const msgs=document.getElementById('chat-msgs');
+        const div=document.createElement('div');div.className='msg summary';
+        div.innerHTML=`
+          <div style="font-weight:700;margin-bottom:8px">Suggested experiment:</div>
+          <div class="s-label">Name</div><div class="s-value">${chatData.name}</div>
+          <div class="s-label">Platform</div><div class="s-value">${chatData.platform}</div>
+          <div class="s-label">Target</div><div class="s-value">${chatData.target}</div>
+          <div class="s-label">Test Size</div><div class="s-value">${chatData.scope}</div>
+        `;
+        msgs.appendChild(div);msgs.scrollTop=99999;
+        setTimeout(()=>{
+          addBotMsg("Look good? You can edit everything after adding.");
+          document.getElementById('chat-input').innerHTML=`
             <button onclick="closeModal()" style="flex:1;padding:10px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:#f0f0f5;color:#86868b">Cancel</button>
-            <button onclick="confirmAdd()" style="flex:2;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#34c759;color:#fff">Add to Tracker</button>
-          `;
-        }, 400);
-      }, 300);
-    }, 300);
-
-  } else if (chatPhase === 3) {
-    // Editing phase — user is refining
-    input.focus();
+            <button onclick="confirmAdd()" style="flex:2;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#34c759;color:#fff">Add to Tracker</button>`;
+        },400);
+      },300);
+    },300);
   }
 }
 
-function confirmAdd() {
-  const exps = load();
-  const id = exps.reduce((m, e) => Math.max(m, e.id), 0) + 1;
-  exps.push({
-    id, pri: 1,
-    name: chatData.name,
-    idea: chatData.idea,
-    goal: chatData.goal,
-    platform: chatData.platform,
-    flywheel: chatData.flywheel,
-    target: chatData.target,
-    scope: chatData.scope,
-    status: 'Testing',
-    next: ''
-  });
-  save(exps);
-  flash();
-  closeModal();
-  render();
-  setTimeout(() => {
-    const c = document.getElementById('exp-' + id);
-    if (c) { c.classList.add('highlight'); c.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-  }, 200);
+function skipStep(){
+  if(chatPhase===0){chatData.idea='';chatPhase=1;addBotMsg("What are you hoping to get out of this?");}
+  else if(chatPhase===1){chatData.goal='';chatPhase=2;sendMsg();}
 }
 
-document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+function confirmAdd(){
+  const exps=load(),id=exps.reduce((m,e)=>Math.max(m,e.id),0)+1;
+  exps.push({id,pri:1,name:chatData.name,idea:chatData.idea||'',goal:chatData.goal||'',platform:chatData.platform||'',flywheel:chatData.flywheel||'',target:chatData.target||'',scope:chatData.scope||'',status:'Testing',next:'',channel:chatData.channel||'Other'});
+  save(exps);flash();closeModal();render();
+  setTimeout(()=>{const c=document.getElementById('exp-'+id);if(c){c.classList.add('highlight');c.scrollIntoView({behavior:'smooth',block:'center'});}},200);
+}
+
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
 render();
 </script>
