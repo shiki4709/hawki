@@ -108,6 +108,93 @@ var CH = {
   }
 };
 
+/* --- Tracking source hints per channel stage --- */
+var TRACKING = {
+  li_outreach: {
+    'ICP filtered': 'Sales Nav → Saved Search → count results',
+    'Connections sent': 'Sales Nav → Sent invitations this week (max 200/wk)',
+    'Accepted': 'LinkedIn → My Network → count new connections',
+    'In Dripify drip': 'Dripify dashboard → Active campaigns → leads in sequence',
+    'Replied': 'Dripify → Campaign stats → Replied count, or LinkedIn inbox count',
+    'Signed up': 'Nevara signup dashboard or CRM',
+    'Referral posts found': 'LinkedIn Search: "calling on my network" → filter past week',
+    'People identified': 'Count from search results / post comments',
+    'DMs sent': 'LinkedIn → Messaging → count sent this period',
+    'Influencers tracked': 'Your LinkedIn saved list of thought leaders',
+    'AEs surfaced': 'Check post engagers on tracked influencer posts'
+  },
+  lead_lists: {
+    'Posts found': 'LinkedIn Search → filter by topic/hashtag → count relevant posts',
+    'Engagers scraped': 'Phantom Buster → LinkedIn Post Likers/Commenters → export CSV row count',
+    'ICP filtered': 'Filter CSV by title/company → count matching rows',
+    'DMs sent': 'LinkedIn messaging or Dripify → sent count',
+    'Replied': 'LinkedIn inbox → count replies from this list',
+    'Signed up': 'Nevara signup dashboard or CRM',
+    'Speaker posts found': 'LinkedIn → search speaker names → count event-related posts',
+    'Commenters scraped': 'Phantom Buster → extract commenters → CSV row count',
+    'Competitor posts': 'LinkedIn → Gong/Outreach/Salesloft company pages → count recent posts'
+  },
+  warm_intros: {
+    'Target accounts': 'Your target account list (CRM or spreadsheet)',
+    'Mutual connections': 'LinkedIn → each target → check "shared connections"',
+    'Intro asks sent': 'Count messages sent asking for intros',
+    'Meetings booked': 'Calendar → count booked meetings from intros',
+    'Signed up': 'Nevara signup dashboard or CRM'
+  },
+  gifts: {
+    'AEs researched': 'Count LinkedIn profiles researched for gift ideas',
+    'Gifts sent': 'Sendoso/Postal dashboard → sent count, or manual tracking',
+    'Responses': 'Count thank-you replies or follow-up conversations',
+    'Meetings': 'Calendar → meetings booked from gift recipients',
+    'Signed up': 'Nevara signup dashboard or CRM'
+  },
+  email: {
+    'Sent': 'Email tool (Apollo/Outreach/Mailchimp) → campaign sent count',
+    'Opened': 'Email tool → open tracking',
+    'Clicked': 'Email tool → click tracking',
+    'Signed up': 'Nevara signup dashboard or CRM'
+  },
+  events: {
+    'Events attended': 'Count events you went to',
+    'Conversations': 'Estimate conversations had at each event',
+    'Contacts': 'Count business cards / LinkedIn connections from events',
+    'Signed up': 'Nevara signup dashboard or CRM'
+  },
+  li_content: {
+    'Posts published': 'LinkedIn → Activity → Posts → count this period',
+    'Impressions': 'LinkedIn → each post → view analytics → sum impressions',
+    'Engagements': 'LinkedIn → post analytics → sum likes + comments + shares',
+    'Followers gained': 'LinkedIn → Analytics → Followers → net new this period',
+    'Inbound DMs': 'LinkedIn inbox → count unsolicited messages from non-connections',
+    'Stories published': 'LinkedIn → Activity → count customer story posts'
+  },
+  content_seo: {
+    'Pages published': 'CMS → count new pages published',
+    'Indexed': 'Google Search Console → Coverage → Valid pages',
+    'Site visits': 'Google Analytics → organic traffic',
+    'Signed up': 'Nevara signup dashboard or CRM'
+  },
+  product: {
+    'Churned identified': 'Product analytics → users inactive >30 days',
+    'Re-engaged': 'Count users who received win-back email/message',
+    'Returned': 'Product analytics → previously churned users who logged in',
+    'Retained': 'Product analytics → returned users still active after 7 days',
+    'Messages sent': 'Slack analytics or in-app messaging tool → sent count',
+    'Opened': 'Messaging tool → open/read count',
+    'Engaged': 'Messaging tool → click or action count',
+    'Activated': 'Product analytics → users who completed key action',
+    'Pages rewritten': 'Docs platform → count updated pages',
+    'Page views': 'Docs analytics → total views',
+    'Ticket reduction': 'Support tool → compare ticket count before/after'
+  }
+};
+
+function getTrackingHint(exp, stageLabel) {
+  var chTrack = TRACKING[exp.ch];
+  if (chTrack && chTrack[stageLabel]) return chTrack[stageLabel];
+  return 'Update this number manually';
+}
+
 /* --- Rate calc helpers (used by board + weeks) --- */
 function expRate(e) {
   var ri = e.rateIdx || CH[e.ch].rateIdx;

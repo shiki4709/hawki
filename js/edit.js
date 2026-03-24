@@ -30,6 +30,14 @@ function inlineEdit(el, currentVal, onSave, opts) {
     wrap.appendChild(labelEl);
   }
 
+  // Tracking hint
+  if (opts.hint) {
+    var hintEl = document.createElement('div');
+    hintEl.className = 'ie-hint';
+    hintEl.textContent = opts.hint;
+    wrap.appendChild(hintEl);
+  }
+
   var row = document.createElement('div');
   row.className = 'ie-row';
 
@@ -136,13 +144,14 @@ function editStage(id, idx, el) {
   var exps = load();
   var e = exps.find(function(x) { return x.id === id; });
   var stg = e.stages[idx];
+  var hint = getTrackingHint(e, stg.label);
 
   inlineEdit(el, stg.val, function(val) {
     var exps2 = load();
     var e2 = exps2.find(function(x) { return x.id === id; });
     e2.stages[idx].val = val;
     save(exps2); flash(); render();
-  }, { label: stg.label });
+  }, { label: stg.label, hint: hint });
 }
 
 function editHours(id, el) {

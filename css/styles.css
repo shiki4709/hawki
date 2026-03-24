@@ -949,7 +949,17 @@ body {
   color: var(--text-3);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  margin-bottom: var(--s-6);
+  margin-bottom: var(--s-4);
+}
+.ie-hint {
+  font-size: var(--fs-xs);
+  color: var(--text-4);
+  line-height: var(--lh-body);
+  margin-bottom: var(--s-8);
+  padding: var(--s-6) var(--s-8);
+  background: var(--bg-sub);
+  border-radius: var(--s-4);
+  border-left: 2px solid var(--inbound);
 }
 
 .ie-row {
