@@ -23,11 +23,6 @@ function render() {
     '<button class="mode-pill ' + (activeMode === 'outbound' ? 'active' : '') + '" onclick="setMode(\'outbound\')">Out <span class="mode-pill-n">' + outCount + '</span></button>' +
     '<button class="mode-pill ' + (activeMode === 'inbound' ? 'active' : '') + '" onclick="setMode(\'inbound\')">In <span class="mode-pill-n">' + inCount + '</span></button>';
 
-  var sources = loadSources();
-  var hasConnected = Object.keys(sources).some(function(k) { return sources[k].type !== 'manual'; });
-  document.getElementById('sync-btn-wrap').innerHTML = hasConnected
-    ? '<button class="sync-all-btn" onclick="syncAll(function(n){showToast(n+\' synced\');render();})">Sync</button>' : '';
-
   document.getElementById('view-tabs').innerHTML =
     '<button class="vtab ' + (activeView === 'experiments' ? 'active' : '') + '" onclick="setView(\'experiments\')">Experiments</button>' +
     '<button class="vtab ' + (activeView === 'weekly' ? 'active' : '') + '" onclick="setView(\'weekly\')">Compare</button>';
@@ -206,9 +201,7 @@ function renderExperiment(e) {
   // Add variation button
   html += '<div class="add-var-trigger" onclick="event.stopPropagation();addVariation(' + e.id + ')"><span class="inline-add-icon">+</span> New variation</div>';
 
-  // Data source + delete
   html += '<div class="exp-bottom">' +
-    '<button class="exp-source-btn" onclick="event.stopPropagation();openConnect(' + e.id + ')">Connect data</button>' +
     '<button class="delete-btn" onclick="event.stopPropagation();deleteExp(' + e.id + ')">Delete</button></div>';
 
   html += '</div></div></div></div>';
