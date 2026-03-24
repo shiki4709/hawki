@@ -16,7 +16,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 // Boot
-render();
+try { render(); } catch(e) { document.getElementById('view-experiments').style.display='block'; document.getElementById('view-experiments').innerHTML='<pre style="color:red">'+e.message+'\n'+e.stack+'</pre>'; }
 
 // Auto-sync connected sources on load
 syncAll(function(n) { if (n > 0) { showToast(n + ' sources synced'); render(); } });
