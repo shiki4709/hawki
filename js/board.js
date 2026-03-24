@@ -1,10 +1,10 @@
 /* ================================================================
-   Board — View router + experiment rendering
-   Three views: today / experiments / weekly
+   Board — Two views: Experiments (working view) + Compare
+   Health indicators on every experiment row.
    ================================================================ */
 
 var activeMode = 'outbound';
-var activeView = 'today';
+var activeView = 'experiments';
 var activeFlow = null;
 
 function setMode(m) { activeMode = m; activeFlow = null; render(); }
@@ -20,37 +20,25 @@ function render() {
   var sp = loadSprint();
   document.getElementById('sprint-label').textContent = sp.name + ' · ' + sp.start + ' – ' + sp.end + ', ' + sp.year;
 
-  // Mode toggle (compact, in top bar)
+  // Mode toggle
   var outCount = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === 'outbound' && e.verdict !== 'Stop'; }).length;
   var inCount = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === 'inbound' && e.verdict !== 'Stop'; }).length;
   document.getElementById('mode-toggle').innerHTML =
     '<button class="mode-pill ' + (activeMode === 'outbound' ? 'active' : '') + '" onclick="setMode(\'outbound\')">Out <span class="mode-pill-n">' + outCount + '</span></button>' +
     '<button class="mode-pill ' + (activeMode === 'inbound' ? 'active' : '') + '" onclick="setMode(\'inbound\')">In <span class="mode-pill-n">' + inCount + '</span></button>';
 
-  // View tabs
-  var actionCount = 0;
-  exps.filter(function(e) { return e.verdict !== 'Stop' && CH[e.ch] && CH[e.ch].mode === activeMode; }).forEach(function(e) {
-    if (getExpStatus(e) !== null) actionCount++;
-  });
-
+  // View tabs — just two
   document.getElementById('view-tabs').innerHTML =
-    '<button class="vtab ' + (activeView === 'today' ? 'active' : '') + '" onclick="setView(\'today\')">Review' +
-    (actionCount > 0 ? '<span class="vtab-badge">' + actionCount + '</span>' : '') + '</button>' +
     '<button class="vtab ' + (activeView === 'experiments' ? 'active' : '') + '" onclick="setView(\'experiments\')">Experiments</button>' +
     '<button class="vtab ' + (activeView === 'weekly' ? 'active' : '') + '" onclick="setView(\'weekly\')">Compare</button>';
 
-  // Show/hide views
-  document.getElementById('view-today').style.display = activeView === 'today' ? 'block' : 'none';
   document.getElementById('view-experiments').style.display = activeView === 'experiments' ? 'block' : 'none';
   document.getElementById('view-weekly').style.display = activeView === 'weekly' ? 'block' : 'none';
 
-  // Render active view
-  if (activeView === 'today') {
-    renderToday();
-  } else if (activeView === 'experiments') {
+  if (activeView === 'experiments') {
     renderExperimentsView(exps, modeChannels);
-  } else if (activeView === 'weekly') {
-    renderTimeSeries();
+  } else {
+    if (typeof renderTimeSeries === 'function') renderTimeSeries();
   }
 }
 
@@ -60,10 +48,10 @@ function render() {
 
 function renderExperimentsView(exps, modeChannels) {
   var el = document.getElementById('view-experiments');
-
-  // North star
   var modeExps = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === activeMode; });
   var isOut = activeMode === 'outbound';
+
+  // North star
   var total = modeExps.reduce(function(s, e) { return s + expBottomVal(e); }, 0);
   var nsTarget = isOut ? 15 : 30;
   var pct = Math.min(100, Math.round((total / nsTarget) * 100));
@@ -105,41 +93,52 @@ function renderExperimentsView(exps, modeChannels) {
     var g = groups[activeFlow] || [];
     var active = g.filter(function(e) { return e.verdict !== 'Stop'; });
     var stopped = g.filter(function(e) { return e.verdict === 'Stop'; });
-    html += renderBoard(info, g, active, stopped);
+    html += renderBoard(info, active, stopped);
   }
 
   el.innerHTML = html;
 }
 
 /* ================================================================
-   Experiment Board HTML
+   Experiment Board — with health indicators
    ================================================================ */
 
-function renderBoard(info, g, active, stopped) {
-  var html = '<div class="platform">' +
-    '<div class="platform-head"><div class="platform-dot" style="background:' + info.color + '"></div>' +
-    '<div class="platform-name">' + info.label + '</div>' +
-    '<div class="platform-meta">' + active.length + ' active &middot; ' + info.metric + '</div></div>';
-
-  html += '<div class="exp-list">';
+function renderBoard(info, active, stopped) {
+  var html = '<div class="exp-list">';
 
   active.forEach(function(e) {
     var rate = expRateStr(e);
     var rateNum = expRate(e);
     var hasData = expHasData(e);
-    var hit = hasData && rateNum >= e.targetNum;
-    var close = hasData && rateNum >= e.targetNum * 0.8 && rateNum < e.targetNum;
-    var rateCls = !hasData ? 'pending' : hit ? 'hit' : close ? '' : 'miss';
     var vCls = verdictCls(e.verdict);
 
-    html += '<div class="exp-item"><div class="exp-row-v2">' +
-      '<div class="exp-name" onclick="editName(' + e.id + ',this)">' + e.name + '</div>' +
-      '<div class="exp-rate ' + rateCls + '" onclick="toggleExp(' + e.id + ')" style="cursor:pointer">' + rate + '</div>' +
-      '<div><span class="verdict ' + vCls + '" onclick="cycleVerdict(' + e.id + ')">' + (e.verdict || '—') + '</span>' +
-      '<span class="exp-expand-btn" onclick="toggleExp(' + e.id + ')" title="Expand">&#9662;</span></div></div>';
+    // Health indicator from benchmarks
+    var bm = getBenchmark(e);
+    var health = '';
+    if (hasData && bm) {
+      if (rateNum >= bm.good)       health = '<span class="health health-good" title="Above benchmark">●</span>';
+      else if (rateNum >= bm.avg)   health = '<span class="health health-ok" title="At average">●</span>';
+      else if (rateNum > 0)         health = '<span class="health health-low" title="Below average">●</span>';
+    }
 
-    // Expanded
+    html += '<div class="exp-item"><div class="exp-row-v2">' +
+      '<div class="exp-name" onclick="editName(' + e.id + ',this)">' + health + e.name + '</div>' +
+      '<div class="exp-rate">' + rate + '</div>' +
+      '<div><span class="verdict ' + vCls + '" onclick="cycleVerdict(' + e.id + ')">' + (e.verdict || '—') + '</span>' +
+      '<span class="exp-expand-btn" onclick="toggleExp(' + e.id + ')">&#9662;</span></div></div>';
+
+    // Expanded detail
     html += '<div class="exp-expand-wrap" id="expand-' + e.id + '"><div class="exp-expand-inner"><div class="exp-detail">';
+
+    // AI suggestion inside detail
+    if (hasData) {
+      var sg = suggestVerdict(e);
+      if (sg.verdict) {
+        html += '<div class="exp-ai">AI: <strong>' + sg.verdict + '</strong> — ' + sg.reason + '</div>';
+      } else if (sg.reason) {
+        html += '<div class="exp-ai exp-ai-wait">' + sg.reason + '</div>';
+      }
+    }
 
     // Pipeline
     html += '<div class="pipe">';
@@ -155,6 +154,7 @@ function renderBoard(info, g, active, stopped) {
     });
     html += '</div>';
 
+    // Fields
     html += '<div class="exp-detail-row">' +
       '<div class="detail-field"><div class="detail-label">Target</div><div class="detail-value editable" onclick="editTarget(' + e.id + ',this)">' + e.target + '</div></div>' +
       '<div class="detail-field"><div class="detail-label">Hours</div><div class="detail-value editable" onclick="editHours(' + e.id + ',this)">' + (e.hours || 0) + 'h</div></div></div>';
@@ -163,24 +163,21 @@ function renderBoard(info, g, active, stopped) {
       '<div class="detail-next-text" onclick="event.stopPropagation();editNext(' + e.id + ',this)">' +
       (e.next || '<span class="ph">What to do next...</span>') + '</div></div>';
 
+    // Verdict
     html += '<div class="verdict-group"><span class="verdict-group-label">Verdict</span>' +
       ['Keep going', 'Change variables', 'Close, iterate', 'Stop'].map(function(v) {
         var bc = v === 'Keep going' ? 'keep' : v === 'Change variables' ? 'change' : v === 'Close, iterate' ? 'close' : 'stop';
         return '<div class="vbtn v-' + bc + ' ' + (e.verdict === v ? 'active' : '') + '" onclick="event.stopPropagation();setVerdict(' + e.id + ',\'' + v + '\')">' + v + '</div>';
       }).join('') + '</div>';
 
-    // More details + delete
+    // More + Delete
     html += '<div class="detail-more-toggle" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle(\'open\')">More details</div>' +
       '<div class="detail-more">';
-    if (e.tools) html += '<div class="detail-field"><div class="detail-label">Tools</div><div class="detail-value editable" onclick="editTools(' + e.id + ',this)">' + e.tools + '</div></div>';
-    if (e.idea) html += '<div class="detail-field"><div class="detail-label">Idea</div><div class="detail-value editable" onclick="editIdea(' + e.id + ',this)">' + e.idea + '</div></div>';
-    if (!e.tools) html += '<div class="detail-field"><div class="detail-label">Tools</div><div class="detail-value editable ph" onclick="editTools(' + e.id + ',this)">Add tools...</div></div>';
-    if (!e.idea) html += '<div class="detail-field"><div class="detail-label">Idea</div><div class="detail-value editable ph" onclick="editIdea(' + e.id + ',this)">Add idea...</div></div>';
+    html += '<div class="detail-field"><div class="detail-label">Tools</div><div class="detail-value editable" onclick="editTools(' + e.id + ',this)">' + (e.tools || '<span class="ph">Add tools...</span>') + '</div></div>';
+    html += '<div class="detail-field"><div class="detail-label">Idea</div><div class="detail-value editable" onclick="editIdea(' + e.id + ',this)">' + (e.idea || '<span class="ph">Add idea...</span>') + '</div></div>';
     html += '</div>';
 
-    // Delete — always visible at bottom
     html += '<div class="detail-danger"><button class="delete-btn" onclick="event.stopPropagation();deleteExp(' + e.id + ')">Delete experiment</button></div>';
-
     html += '</div></div></div></div>';
   });
 
@@ -191,16 +188,14 @@ function renderBoard(info, g, active, stopped) {
     html += '<div class="stopped-toggle" onclick="document.getElementById(\'stopped-' + activeFlow + '\').style.display=document.getElementById(\'stopped-' + activeFlow + '\').style.display===\'none\'?\'block\':\'none\'">Stopped &middot; ' + stopped.length + '</div>' +
       '<div id="stopped-' + activeFlow + '" class="stopped-list"><div class="exp-list">' +
       stopped.map(function(e) {
-        return '<div class="exp-item"><div class="exp-row-v2">' +
-          '<div class="exp-name">' + e.name + '</div>' +
+        return '<div class="exp-item"><div class="exp-row-v2"><div class="exp-name">' + e.name + '</div>' +
           '<div class="exp-rate pending">—</div>' +
           '<div style="display:flex;gap:var(--s-6);align-items:center;justify-content:flex-end">' +
-          '<button class="delete-btn-sm" onclick="deleteExp(' + e.id + ')" title="Delete">x</button>' +
+          '<button class="delete-btn-sm" onclick="deleteExp(' + e.id + ')">x</button>' +
           '<span class="verdict stop">Stop</span></div></div></div>';
       }).join('') + '</div></div>';
   }
 
-  html += '</div>';
   return html;
 }
 
@@ -220,11 +215,10 @@ function setVerdict(id, v) {
 }
 
 function editName(id, el) {
-  var exps = load(), e = exps.find(function(x) { return x.id === id; });
-  inlineEdit(el, e.name, function(val) {
+  inlineEdit(el, load().find(function(x) { return x.id === id; }).name, function(val) {
     if (!val.trim()) return;
-    var exps2 = load(); exps2.find(function(x) { return x.id === id; }).name = val.trim();
-    save(exps2); flash(); render();
+    var exps = load(); exps.find(function(x) { return x.id === id; }).name = val.trim();
+    save(exps); flash(); render();
   }, { type: 'text', label: 'Experiment name' });
 }
 
@@ -240,28 +234,23 @@ function editTarget(id, el) {
 }
 
 function editTools(id, el) {
-  var exps = load(), e = exps.find(function(x) { return x.id === id; });
-  inlineEdit(el, e.tools || '', function(val) {
-    var exps2 = load(); exps2.find(function(x) { return x.id === id; }).tools = val;
-    save(exps2); flash(); render();
+  inlineEdit(el, load().find(function(x) { return x.id === id; }).tools || '', function(val) {
+    var exps = load(); exps.find(function(x) { return x.id === id; }).tools = val;
+    save(exps); flash(); render();
   }, { type: 'text', label: 'Tools' });
 }
 
 function editIdea(id, el) {
-  var exps = load(), e = exps.find(function(x) { return x.id === id; });
-  inlineEdit(el, e.idea || '', function(val) {
-    var exps2 = load(); exps2.find(function(x) { return x.id === id; }).idea = val;
-    save(exps2); flash(); render();
+  inlineEdit(el, load().find(function(x) { return x.id === id; }).idea || '', function(val) {
+    var exps = load(); exps.find(function(x) { return x.id === id; }).idea = val;
+    save(exps); flash(); render();
   }, { type: 'text', label: 'Idea' });
 }
 
 function deleteExp(id) {
-  var exps = load();
-  var e = exps.find(function(x) { return x.id === id; });
-  if (!e) return;
-  if (!confirm('Delete "' + e.name + '"? This cannot be undone.')) return;
-  var filtered = exps.filter(function(x) { return x.id !== id; });
-  save(filtered); flash(); render();
+  var exps = load(), e = exps.find(function(x) { return x.id === id; });
+  if (!e || !confirm('Delete "' + e.name + '"?')) return;
+  save(exps.filter(function(x) { return x.id !== id; })); flash(); render();
 }
 
 function editNext(id, el) {

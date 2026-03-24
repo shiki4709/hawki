@@ -55,6 +55,13 @@ function calcCellDelta(curr, prev) {
   return { text: formatNum(diff), cls: 'down' };
 }
 
+function showToast(msg) {
+  var el = document.getElementById('saved');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(function() { el.classList.remove('show'); el.textContent = 'Saved'; }, 1500);
+}
+
 function verdictCls(v) {
   if (!v || v === 'pending') return 'pending';
   if (v === 'Keep going') return 'keep';

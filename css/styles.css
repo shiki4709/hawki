@@ -217,82 +217,6 @@ body {
   margin-top: var(--s-4);
 }
 
-/* ================================================================
-   REVIEW — Decision screen (no numbers, just calls)
-   ================================================================ */
-
-.rv-clear { padding: var(--s-48) 0; text-align: center; }
-.rv-clear-title {
-  font-family: var(--ff-display); font-size: var(--fs-lg); font-weight: 500;
-  color: var(--text); margin-bottom: var(--s-4);
-}
-.rv-clear-sub { font-size: var(--fs-sm); color: var(--text-4); line-height: var(--lh-body); }
-
-.rv-item {
-  padding: var(--s-16); background: var(--surface);
-  border-radius: var(--s-6); margin-bottom: var(--s-6);
-}
-.rv-head {
-  display: flex; justify-content: space-between; align-items: flex-start;
-}
-.rv-name {
-  font-family: var(--ff-display); font-size: var(--fs-md); font-weight: 500;
-  color: var(--text); letter-spacing: -0.005em;
-}
-.rv-meta { font-size: var(--fs-xs); color: var(--text-4); margin-top: var(--s-2); }
-
-.rv-tag {
-  font-size: var(--fs-xs); font-weight: 600; padding: var(--s-2) var(--s-8);
-  border-radius: var(--s-4); white-space: nowrap; flex-shrink: 0;
-}
-.rv-tag-grey  { color: var(--muted);   background: var(--muted-bg); }
-.rv-tag-amber { color: var(--change);  background: var(--change-bg); }
-.rv-tag-blue  { color: var(--inbound); background: var(--inbound-bg); }
-.rv-tag-green { color: var(--hit);     background: var(--hit-bg); }
-
-.rv-body { margin-top: var(--s-12); }
-.rv-body-light { font-size: var(--fs-sm); color: var(--text-3); line-height: var(--lh-body); }
-
-.rv-ai {
-  font-size: var(--fs-sm); color: var(--text-2); line-height: var(--lh-body);
-  padding: var(--s-8) var(--s-12); background: var(--bg); border-radius: var(--s-4);
-  margin-bottom: var(--s-12); border: 1px solid var(--rule-faint);
-}
-.rv-ai-wait { color: var(--text-4); }
-
-.rv-what {
-  font-size: var(--fs-sm); color: var(--text-2); line-height: var(--lh-body);
-  padding: var(--s-8) var(--s-12); background: var(--bg); border-radius: var(--s-4);
-  margin-bottom: var(--s-12);
-}
-
-.rv-btns { display: flex; gap: var(--s-6); flex-wrap: wrap; }
-.rv-btn {
-  font-family: var(--ff-body); font-size: var(--fs-xs); font-weight: 600;
-  padding: var(--s-6) var(--s-16); border-radius: var(--s-4);
-  cursor: pointer; border: 1.5px solid transparent;
-  transition: opacity var(--dur-fast) var(--ease-out);
-}
-.rv-btn:hover { opacity: 0.8; }
-.rv-btn-green   { color: var(--hit); background: var(--hit-bg); border-color: oklch(48% 0.10 155 / 0.15); }
-.rv-btn-amber   { color: var(--change); background: var(--change-bg); border-color: oklch(55% 0.12 65 / 0.15); }
-.rv-btn-blue    { color: var(--inbound); background: var(--inbound-bg); border-color: oklch(52% 0.12 250 / 0.15); }
-.rv-btn-red     { color: var(--accent); background: var(--accent-bg); border-color: oklch(52% 0.16 28 / 0.15); }
-.rv-btn-outline { color: var(--text-3); background: transparent; border-color: var(--rule); }
-.rv-btn-outline:hover { border-color: var(--text-4); }
-
-.rv-inp {
-  width: 100%; border: 1.5px solid var(--accent); border-radius: var(--s-4);
-  padding: var(--s-8) var(--s-12); font-size: var(--fs-sm);
-  font-family: var(--ff-body); outline: none; background: var(--bg); color: var(--text);
-  margin-top: var(--s-8);
-}
-.rv-hint { font-size: var(--fs-xs); color: var(--text-4); margin-top: var(--s-4); }
-
-.rv-footer {
-  font-size: var(--fs-xs); color: var(--text-4); padding: var(--s-12) 0; text-align: center;
-}
-
 /* Settings button */
 .settings-btn {
   width: 2rem; height: 2rem;
@@ -617,6 +541,22 @@ body {
 
 /* Placeholder text in editable fields */
 .detail-value.ph { color: var(--text-4); }
+
+/* Health indicators */
+.health {
+  font-size: 8px; margin-right: var(--s-6); vertical-align: middle;
+}
+.health-good { color: var(--hit); }
+.health-ok   { color: var(--change); }
+.health-low  { color: var(--accent); }
+
+/* AI suggestion inside experiment detail */
+.exp-ai {
+  font-size: var(--fs-sm); color: var(--text-2); line-height: var(--lh-body);
+  padding: var(--s-8) var(--s-12); background: var(--bg-sub); border-radius: var(--s-4);
+  margin-bottom: var(--s-16); border: 1px solid var(--rule-faint);
+}
+.exp-ai-wait { color: var(--text-4); }
 
 /* --- Stopped --- */
 .stopped-toggle {
