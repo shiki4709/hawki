@@ -324,7 +324,7 @@
     /* Column header */
     .exp-cols {
       display: grid;
-      grid-template-columns: 1fr 5.5rem 6rem 5rem 7.5rem;
+      grid-template-columns: 1fr 5.5rem 6rem 5.5rem 4.5rem 7.5rem;
       gap: var(--s-8);
       padding: 0 0 var(--s-8);
       border-bottom: 1.5px solid var(--rule);
@@ -347,13 +347,21 @@
 
     .exp-row {
       display: grid;
-      grid-template-columns: 1fr 5.5rem 6rem 5rem 7.5rem;
+      grid-template-columns: 1fr 5.5rem 6rem 5.5rem 4.5rem 7.5rem;
       gap: var(--s-8);
       align-items: center;
       padding: var(--s-12) 0;
       cursor: pointer;
       transition: background var(--dur-fast) var(--ease-out);
     }
+    .exp-rate {
+      font-size: var(--fs-sm);
+      font-variant-numeric: tabular-nums;
+      color: var(--text-3);
+    }
+    .exp-rate.hit { color: var(--hit); font-weight: 600; }
+    .exp-rate.miss { color: var(--accent); }
+    .exp-rate.pending { color: var(--text-4); }
     .exp-row:hover { background: var(--bg-sub); }
 
     .exp-name {
@@ -896,7 +904,9 @@
       .exp-cols > :nth-child(2),
       .exp-row  > :nth-child(2),
       .exp-cols > :nth-child(3),
-      .exp-row  > :nth-child(3) {
+      .exp-row  > :nth-child(3),
+      .exp-cols > :nth-child(4),
+      .exp-row  > :nth-child(4) {
         display: none;
       }
       .flow-tab { min-width: 4.25rem; padding: var(--s-8) var(--s-12); }
@@ -1059,6 +1069,7 @@ function render(){
         <div class="exp-col-label">Started</div>
         <div class="exp-col-label">Target</div>
         <div class="exp-col-label">Actual</div>
+        <div class="exp-col-label">Rate</div>
         <div class="exp-col-label" style="text-align:right">Verdict</div>
       </div>`;
 
@@ -1080,7 +1091,8 @@ function render(){
           <span class="exp-date-icon" onclick="event.stopPropagation();editDate(${e.id},this.parentElement)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
         </div>
         <div class="exp-target">${e.target}</div>
-        <div class="exp-actual ${actualCls}" onclick="event.stopPropagation();editActual(${e.id},this)">${hasData?actual:'—'}</div>
+        <div class="exp-actual ${actualCls}" onclick="event.stopPropagation();editActual(${e.id},this)">${hasData?e.m[1]+' '+info.cols[1].toLowerCase():'—'}</div>
+        <div class="exp-rate ${actualCls}">${hasData?actual:'—'}</div>
         <div><span class="verdict ${verdictCls}" onclick="event.stopPropagation();cycleVerdict(${e.id})">${e.verdict||'—'}</span></div>
       </div>
       <div class="exp-expand-wrap" id="expand-${e.id}">
@@ -1126,6 +1138,7 @@ function render(){
       <div class="exp-date">${e.started||'—'}</div>
       <div class="exp-target">${e.target}</div>
       <div class="exp-actual pending">—</div>
+      <div class="exp-rate pending">—</div>
       <div><span class="verdict stop" style="float:right">Stop</span></div>
     </div></div>`).join('')}
     </div></div>`;
