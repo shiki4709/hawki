@@ -9,66 +9,58 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: #fafafa; color: #111;
-      max-width: 860px; margin: 0 auto; padding: 32px 24px;
+      max-width: 1100px; margin: 0 auto; padding: 32px 24px;
     }
 
-    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
     .header h1 { font-size: 20px; font-weight: 700; }
     .header .sub { font-size: 12px; color: #999; }
     .add-btn {
       background: #111; color: #fff; border: none;
       padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;
     }
+    .add-btn:hover { background: #333; }
 
+    /* Week dividers */
     .week-label {
       font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase;
-      letter-spacing: 0.5px; margin: 24px 0 8px;
+      letter-spacing: 0.5px; margin: 28px 0 10px;
+      display: flex; align-items: center; gap: 8px;
     }
+    .week-label:first-child { margin-top: 0; }
+    .week-line { flex: 1; height: 1px; background: #e5e7eb; }
 
-    .exp {
-      background: #fff; border: 1px solid #eee; border-radius: 8px;
-      padding: 14px 16px; margin-bottom: 6px;
+    /* Table */
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      text-align: left; padding: 8px 10px;
+      font-size: 10px; font-weight: 600; color: #aaa;
+      text-transform: uppercase; letter-spacing: 0.4px;
+      border-bottom: 2px solid #eee;
+      position: sticky; top: 0; background: #fafafa;
     }
-    .exp.queued { opacity: 0.35; }
-    .exp.highlight { border-color: #3b82f6; animation: hl 2s ease-out forwards; }
-    @keyframes hl { to { border-color: #eee; } }
+    td { padding: 10px; border-bottom: 1px solid #f3f4f6; vertical-align: top; }
+    tr:hover td { background: #f9f9f9; }
+    tr.queued td { opacity: 0.4; }
+    tr.highlight td { background: #eff6ff; animation: hl 3s ease-out forwards; }
+    @keyframes hl { to { background: transparent; } }
 
-    .exp-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      gap: 12px;
+    .idea-cell { font-weight: 600; max-width: 240px; }
+    .hyp-cell { color: #555; font-size: 12px; max-width: 200px; }
+    .kpi-cell { font-family: 'SF Mono', monospace; font-size: 12px; color: #333; white-space: nowrap; }
+    .test-cell { font-size: 12px; color: #666; max-width: 260px; }
+
+    .signal-badge {
+      display: inline-block; padding: 2px 8px;
+      border-radius: 10px; font-size: 10px; font-weight: 700;
     }
+    .signal-badge.yes { background: #d1fae5; color: #065f46; }
+    .signal-badge.no { background: #fee2e2; color: #991b1b; }
+    .signal-badge.weak { background: #fef3c7; color: #92400e; }
+    .signal-badge.early { background: #e0e7ff; color: #3730a3; }
+    .signal-badge.pending { background: #f3f4f6; color: #bbb; }
 
-    .exp-name { font-weight: 600; font-size: 13px; }
-    .exp-channel { font-size: 11px; color: #999; }
-
-    .exp-right { display: flex; align-items: center; gap: 10px; }
-
-    .kpi-pills { display: flex; gap: 6px; flex-wrap: wrap; }
-    .kpi-pill {
-      font-size: 11px; font-weight: 600;
-      padding: 2px 8px; border-radius: 4px;
-      background: #f3f4f6; color: #555;
-    }
-    .kpi-pill.good { background: #d1fae5; color: #065f46; }
-    .kpi-pill.bad { background: #fee2e2; color: #991b1b; }
-    .kpi-pill.ok { background: #fef3c7; color: #92400e; }
-
-    .badge {
-      font-size: 10px; font-weight: 700; padding: 3px 8px;
-      border-radius: 10px; white-space: nowrap;
-    }
-    .badge.yes { background: #d1fae5; color: #065f46; }
-    .badge.weak { background: #fef3c7; color: #92400e; }
-    .badge.early { background: #e0e7ff; color: #3730a3; }
-    .badge.queued-b { background: #f3f4f6; color: #bbb; }
-    .badge.no { background: #fee2e2; color: #991b1b; }
-
-    .exp-verdict {
-      font-size: 11px; color: #777; margin-top: 6px;
-      padding-top: 6px; border-top: 1px solid #f5f5f5;
-    }
+    .next-cell { font-size: 12px; color: #444; }
 
     /* Modal */
     .modal-overlay {
@@ -90,9 +82,9 @@
     .parse-msg.error { color: #dc2626; display: none; }
     .parse-msg.success { color: #059669; display: none; }
 
-    @media (max-width: 600px) {
-      .exp-row { grid-template-columns: 1fr; }
-      .exp-right { justify-content: flex-start; }
+    @media (max-width: 768px) {
+      table { font-size: 12px; }
+      .test-cell, .hyp-cell { display: none; }
     }
   </style>
 </head>
@@ -101,7 +93,7 @@
   <div class="header">
     <div>
       <h1>Nevara GTM</h1>
-      <div class="sub">Week 1 — Mar 24, 2026</div>
+      <div class="sub">Hypothesis Tracker</div>
     </div>
     <button class="add-btn" onclick="openModal()">+ Add from Bot</button>
   </div>
@@ -122,79 +114,76 @@
   </div>
 
 <script>
-const K = 'gtm_v3';
+const K = 'gtm_v4';
 
 const DEFAULTS = [
-  { id:1, name:"LinkedIn — Signal-Based (Clay)", ch:"LinkedIn", wk:1, st:"done",
-    kpis:[{l:"Accept",v:"41%",s:"good"},{l:"Reply",v:"24.6%",s:"good"},{l:"Demos",v:"3",s:"neutral"}],
-    sig:"yes", verdict:"Winner. Hiring signals produce highest-intent leads." },
-  { id:2, name:"LinkedIn — Post-Engagement", ch:"LinkedIn", wk:1, st:"done",
-    kpis:[{l:"Accept",v:"38%",s:"good"},{l:"Reply",v:"21.5%",s:"good"},{l:"Demos",v:"3",s:"neutral"}],
-    sig:"yes", verdict:"Strong. Run alongside signal-based." },
-  { id:3, name:"LinkedIn — Deal-Context", ch:"LinkedIn", wk:1, st:"done",
-    kpis:[{l:"Accept",v:"30%",s:"ok"},{l:"Reply",v:"17.1%",s:"ok"},{l:"Demos",v:"2",s:"neutral"}],
-    sig:"weak", verdict:"Weakest variant. Deprioritize." },
-  { id:4, name:"Post-Engager List — Commenters", ch:"Content Mining", wk:1, st:"done",
-    kpis:[{l:"ICP Match",v:"38%",s:"good"},{l:"Reply",v:"23.5%",s:"good"},{l:"Demos",v:"3",s:"neutral"}],
-    sig:"yes", verdict:"Highest intent. Run on 5 more posts." },
-  { id:5, name:"Post-Engager List — Likers", ch:"Content Mining", wk:1, st:"done",
-    kpis:[{l:"ICP Match",v:"12%",s:"ok"},{l:"Reply",v:"9.1%",s:"bad"},{l:"Demos",v:"1",s:"neutral"}],
-    sig:"weak", verdict:"Cut. Commenters are 3x better." },
-  { id:6, name:"Coffee at Sales Meetup", ch:"Events", wk:1, st:"done",
-    kpis:[{l:"Convos",v:"40",s:"neutral"},{l:"Emails",v:"18",s:"neutral"},{l:"Demos",v:"6",s:"good"},{l:"$/Demo",v:"$25",s:"good"}],
-    sig:"yes", verdict:"Highest conversion. Book 2/month." },
-  { id:7, name:"Reddit Listening — r/sales", ch:"Reddit", wk:1, st:"running",
-    kpis:[{l:"Replies",v:"20",s:"neutral"},{l:"Reply-backs",v:"4",s:"neutral"},{l:"Rate",v:"20%",s:"good"}],
-    sig:"early", verdict:"Building presence. 60-day play." },
-  { id:8, name:"Twitter Listening", ch:"Twitter", wk:1, st:"running",
-    kpis:[{l:"Replies",v:"15",s:"neutral"},{l:"Reply-backs",v:"2",s:"neutral"},{l:"Rate",v:"13%",s:"ok"}],
-    sig:"early", verdict:"Lower than Reddit. Reduce effort." },
-  { id:9, name:"Referral Post DMs", ch:"LinkedIn", wk:2, st:"queued", kpis:[], sig:null, verdict:null },
-  { id:10, name:"Influencer Monitoring", ch:"LinkedIn", wk:2, st:"queued", kpis:[], sig:null, verdict:null },
-  { id:11, name:"Warm Intros", ch:"LinkedIn", wk:2, st:"queued", kpis:[], sig:null, verdict:null },
-  { id:12, name:"Personalized + $5 Gift", ch:"LinkedIn", wk:2, st:"queued", kpis:[], sig:null, verdict:null },
-  { id:13, name:"Churned User Re-Engagement", ch:"Email", wk:3, st:"queued", kpis:[], sig:null, verdict:null },
-  { id:14, name:"Twitter Presence Building", ch:"Twitter", wk:3, st:"queued", kpis:[], sig:null, verdict:null },
+  { id:1, wk:"W1", idea:"Auto-pilot LinkedIn prospecting → Sales Nav → Dripify", hyp:"Personalized connection requests + drip sequences convert AEs at Series B+", kpi:">25% accept, >10% reply", test:"Send 200 requests with deal-context personalization. Dripify 3-step sequence.", signal:"", next:"" },
+  { id:2, wk:"W1", idea:"Scrape engagements from viral GTM posts → lead lists", hyp:"Post engagers are 3x more likely to respond than cold leads", kpi:">3x response rate delta", test:"Extract engagers from rmeadows post. Split-test engaged vs cold list.", signal:"", next:"" },
+  { id:3, wk:"W1", idea:"Reddit/Twitter listening → reply to AE pain posts", hyp:"AEs posting about competitor pain respond to helpful replies >20%", kpi:">20% response rate", test:"Find 20 complaint threads on r/sales + Twitter. Reply with value. DM 10.", signal:"", next:"" },
+  { id:4, wk:"W1", idea:"Coffee marketing at sales meetups", hyp:"Face-to-face + free coffee converts to demos at >50%", kpi:">50% conv-to-demo, >3 demos/event", test:"Attend 2 events. Coffee + conversations. Track convos → emails → demos.", signal:"", next:"" },
+  { id:5, wk:"W2", idea:"'Calling on my network' referral posts → DM", hyp:"Sales leaders asking for recs respond >30%", kpi:">30% DM response rate", test:"Search alert. DM 20 posters from last 7 days.", signal:"", next:"" },
+  { id:6, wk:"W2", idea:"Follow sales influencers → surface engaging AEs → DM", hyp:"AEs engaging with thought leaders are in-market", kpi:">20% DM response rate", test:"Monitor top 5 influencers. DM 30 AEs who engaged.", signal:"", next:"" },
+  { id:7, wk:"W2", idea:"Mine own LinkedIn network → warm intros", hyp:"Warm intros convert >40% vs <5% cold", kpi:">40% meeting rate", test:"Cross-reference target accounts against connections. Request 10 intros.", signal:"", next:"" },
+  { id:8, wk:"W2", idea:"Hyper-personalized outreach + gift", hyp:"Personal-interest messages convert >35%", kpi:">35% meeting rate", test:"Pick 15 AEs. Research each. Send personalized message/gift.", signal:"", next:"" },
+  { id:9, wk:"W3", idea:"Churned user re-engagement", hyp:"Churned users reactivate >5%", kpi:">5% reactivation, >40% open rate", test:"Send 'here's what changed' email. Measure opens + reactivation.", signal:"", next:"" },
+  { id:10, wk:"W3", idea:"Twitter reply presence building", hyp:"Consistent replies generate inbound DMs", kpi:">5 inbound DMs/week in 30 days", test:"Reply to 20 tweets daily for 7 days. Track engagement + DMs.", signal:"", next:"" },
+  { id:11, wk:"W3", idea:"Slack broadcasts + in-product messaging", hyp:"In-product prompts increase adoption >15%", kpi:">15% feature usage increase", test:"Launch 3 in-app prompts. Measure adoption before/after.", signal:"", next:"" },
+  { id:12, wk:"W3", idea:"Product docs and enablement", hyp:"Better docs reduce time-to-value >30%", kpi:">30% reduction in time-to-value", test:"Rewrite top 3 docs. Measure ticket volume before/after.", signal:"", next:"" },
+  { id:13, wk:"W4+", idea:"AI SEO optimization", hyp:"AE pain point content drives >100 visits/month", kpi:">500 impressions, >2% CTR", test:"Publish 3 SEO posts targeting AE pain keywords.", signal:"", next:"" },
+  { id:14, wk:"W4+", idea:"Organic content across LinkedIn/Twitter/Reddit/HN/Quora", hyp:"Cross-posted content generates >10 leads/month", kpi:">50 impressions/post, >10 leads/month", test:"Cross-post 3 pieces. Track per-channel engagement.", signal:"", next:"" },
 ];
 
-function load() { const s=localStorage.getItem(K); if(s) return JSON.parse(s); save(DEFAULTS); return DEFAULTS; }
+function load() { const s = localStorage.getItem(K); if(s) return JSON.parse(s); save(DEFAULTS); return DEFAULTS; }
 function save(d) { localStorage.setItem(K, JSON.stringify(d)); }
 
 function render() {
   const exps = load();
+
+  // Group by week
   const weeks = {};
-  exps.forEach(e => { const w = 'Week '+e.wk; if(!weeks[w]) weeks[w]=[]; weeks[w].push(e); });
+  exps.forEach(e => { if(!weeks[e.wk]) weeks[e.wk]=[]; weeks[e.wk].push(e); });
+
+  // Sort week keys
+  const weekOrder = Object.keys(weeks).sort((a,b) => {
+    const na = a.replace(/\D/g,'') || '99';
+    const nb = b.replace(/\D/g,'') || '99';
+    return parseInt(na) - parseInt(nb);
+  });
 
   let html = '';
-  for (const [wk, list] of Object.entries(weeks)) {
-    html += `<div class="week-label">${wk}</div>`;
-    html += list.map(e => {
-      const q = e.st === 'queued';
-      const badge = e.sig
-        ? `<span class="badge ${e.sig}">${e.sig==='yes'?'YES':e.sig==='weak'?'WEAK':e.sig==='early'?'EARLY':e.sig.toUpperCase()}</span>`
-        : e.st==='running' ? '<span class="badge early">RUNNING</span>'
-        : '<span class="badge queued-b">QUEUED</span>';
+  for (const wk of weekOrder) {
+    html += `<div class="week-label">${wk} <div class="week-line"></div></div>`;
+    html += `<table><thead><tr>
+      <th>Idea</th>
+      <th>Hypothesis</th>
+      <th>KPI</th>
+      <th>This Week's Test</th>
+      <th>Signal?</th>
+      <th>Next Step</th>
+    </tr></thead><tbody>`;
 
-      const pills = e.kpis.map(k =>
-        `<span class="kpi-pill ${k.s}">${k.l}: ${k.v}</span>`
-      ).join('');
+    for (const e of weeks[wk]) {
+      const isQueued = !e.signal && !e.next;
+      const sigClass = e.signal
+        ? (e.signal.toLowerCase().includes('yes') ? 'yes'
+          : e.signal.toLowerCase().includes('no') ? 'no'
+          : e.signal.toLowerCase().includes('weak') ? 'weak'
+          : e.signal.toLowerCase().includes('early') ? 'early'
+          : 'pending')
+        : 'pending';
 
-      return `
-        <div class="exp ${q?'queued':''}" id="exp-${e.id}">
-          <div class="exp-row">
-            <div>
-              <span class="exp-name">${e.name}</span>
-              <span class="exp-channel">${e.ch}</span>
-            </div>
-            <div class="exp-right">
-              <div class="kpi-pills">${pills}</div>
-              ${badge}
-            </div>
-          </div>
-          ${e.verdict ? `<div class="exp-verdict">${e.verdict}</div>` : ''}
-        </div>`;
-    }).join('');
+      html += `<tr class="${isQueued && wk !== 'W1' ? 'queued' : ''}" id="exp-${e.id}">
+        <td class="idea-cell">${e.idea}</td>
+        <td class="hyp-cell">${e.hyp}</td>
+        <td class="kpi-cell">${e.kpi}</td>
+        <td class="test-cell">${e.test}</td>
+        <td>${e.signal ? `<span class="signal-badge ${sigClass}">${e.signal}</span>` : '<span class="signal-badge pending">—</span>'}</td>
+        <td class="next-cell">${e.next || ''}</td>
+      </tr>`;
+    }
+    html += `</tbody></table>`;
   }
+
   document.getElementById('list').innerHTML = html;
 }
 
@@ -207,31 +196,33 @@ function addFromBot() {
   const r = {};
   t.split('\n').forEach(l => {
     const s = l.replace(/\*\*/g,'').trim();
-    if(/^idea:/i.test(s)) r.name=s.replace(/^idea:\s*/i,'');
-    else if(/^hypothesis:/i.test(s)) r.hyp=s.replace(/^hypothesis:\s*/i,'');
-    else if(/^kpi:/i.test(s)) r.kpi=s.replace(/^kpi:\s*/i,'');
-    else if(/^this week/i.test(s)) r.test=s.replace(/^this week'?s? test:\s*/i,'');
+    if(/^idea:/i.test(s)) r.idea = s.replace(/^idea:\s*/i,'');
+    else if(/^hypothesis:/i.test(s)) r.hyp = s.replace(/^hypothesis:\s*/i,'');
+    else if(/^kpi:/i.test(s)) r.kpi = s.replace(/^kpi:\s*/i,'');
+    else if(/^this week/i.test(s)) r.test = s.replace(/^this week'?s? test:\s*/i,'');
   });
-  if(!r.name){document.getElementById('pe').style.display='block';document.getElementById('ps').style.display='none';return;}
+  if(!r.idea){ document.getElementById('pe').style.display='block'; document.getElementById('ps').style.display='none'; return; }
 
-  const exps=load();
-  const id=exps.reduce((m,e)=>Math.max(m,e.id),0)+1;
+  const exps = load();
+  const id = exps.reduce((m,e) => Math.max(m,e.id),0) + 1;
   exps.push({
-    id, name:r.name, ch:"New", wk:2, st:"queued",
-    kpis: r.kpi ? [{l:"Target",v:"pending",s:"neutral"}] : [],
-    sig:null, verdict: r.test || null
+    id, wk: "New", idea: r.idea, hyp: r.hyp || "", kpi: r.kpi || "",
+    test: r.test || "", signal: "", next: ""
   });
   save(exps);
   document.getElementById('pe').style.display='none';
   document.getElementById('ps').style.display='block';
-  setTimeout(()=>{ closeModal(); render(); setTimeout(()=>{
-    const c=document.getElementById('exp-'+id);
-    if(c){c.classList.add('highlight');c.scrollIntoView({behavior:'smooth',block:'center'});}
-  },100);},400);
+  setTimeout(() => {
+    closeModal(); render();
+    setTimeout(() => {
+      const row = document.getElementById('exp-'+id);
+      if(row){ row.classList.add('highlight'); row.scrollIntoView({behavior:'smooth',block:'center'}); }
+    }, 100);
+  }, 400);
 }
 
-document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+document.getElementById('modal').addEventListener('click', function(e){ if(e.target===this)closeModal(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
 
 render();
 </script>
