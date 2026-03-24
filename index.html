@@ -219,11 +219,6 @@
       border-radius: 1.5px;
       transition: width 0.5s var(--ease-out);
     }
-    .ns-sub {
-      font-size: var(--fs-xs);
-      color: var(--text-4);
-      margin-top: var(--s-8);
-    }
 
     /* --- Flow Navigation --- */
     .flow-nav {
@@ -324,7 +319,7 @@
     /* Column header */
     .exp-cols {
       display: grid;
-      grid-template-columns: 1fr 5.5rem 6rem 5.5rem 4.5rem 7.5rem;
+      grid-template-columns: 1fr 5.5rem 6rem 5rem 4.5rem 7.5rem;
       gap: var(--s-8);
       padding: 0 0 var(--s-8);
       border-bottom: 1.5px solid var(--rule);
@@ -347,7 +342,7 @@
 
     .exp-row {
       display: grid;
-      grid-template-columns: 1fr 5.5rem 6rem 5.5rem 4.5rem 7.5rem;
+      grid-template-columns: 1fr 5.5rem 6rem 5rem 4.5rem 7.5rem;
       gap: var(--s-8);
       align-items: center;
       padding: var(--s-12) 0;
@@ -408,18 +403,6 @@
     .exp-actual.hit { color: var(--hit); }
     .exp-actual.miss { color: var(--accent); }
     .exp-actual.pending { color: var(--text-4); font-weight: 400; }
-    .exp-actual input {
-      width: 4rem;
-      border: 1.5px solid var(--accent);
-      border-radius: var(--s-4);
-      padding: var(--s-2) var(--s-6);
-      font-size: var(--fs-sm);
-      font-family: var(--ff-body);
-      outline: none;
-      background: var(--bg);
-      color: var(--text);
-      text-align: right;
-    }
 
     /* Verdict pill */
     .verdict {
@@ -461,10 +444,31 @@
     }
     .exp-detail-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
-      gap: var(--s-12) var(--s-24);
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--s-8);
       margin-bottom: var(--s-16);
     }
+    .detail-metric {
+      padding: var(--s-12);
+      background: var(--surface);
+      border-radius: var(--s-6);
+      cursor: pointer;
+      transition: background var(--dur-fast) var(--ease-out);
+    }
+    .detail-metric:hover { background: var(--rule-faint); }
+    .detail-metric-val {
+      font-family: var(--ff-display);
+      font-size: var(--fs-lg);
+      font-weight: 600;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+    .detail-metric-label {
+      font-size: var(--fs-xs);
+      color: var(--text-3);
+      margin-top: var(--s-2);
+    }
+
     .detail-field {}
     .detail-label {
       font-size: var(--fs-xs);
@@ -484,25 +488,9 @@
       transition: color var(--dur-fast) var(--ease-out);
     }
     .detail-value.editable:hover { color: var(--accent); }
-    .detail-value input {
-      width: 100%;
-      border: 1.5px solid var(--accent);
-      border-radius: var(--s-4);
-      padding: var(--s-4) var(--s-8);
-      font-size: var(--fs-sm);
-      font-family: var(--ff-body);
-      outline: none;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    .detail-idea {
-      grid-column: 1 / -1;
-    }
 
     .detail-next {
-      grid-column: 1 / -1;
-      margin-top: var(--s-4);
+      margin-top: var(--s-12);
     }
     .detail-next-text {
       font-size: var(--fs-sm);
@@ -529,195 +517,13 @@
       color: var(--text);
     }
 
-    /* PLG Funnel */
-    .plg-funnel {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 0;
-      margin-bottom: var(--s-32);
-      padding: var(--s-16) 0;
-      border-top: 1px solid var(--rule);
-      border-bottom: 1px solid var(--rule);
-    }
-    .funnel-step { text-align: center; flex: 1; }
-    .funnel-num {
-      font-family: var(--ff-display);
-      font-size: var(--fs-lg);
-      font-weight: 600;
-      color: var(--text);
-    }
-    .funnel-label {
-      font-size: var(--fs-xs);
-      font-weight: 600;
-      color: var(--text-3);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-top: var(--s-2);
-    }
-    .funnel-rate {
-      font-size: var(--fs-xs);
-      color: var(--hit);
-      font-weight: 500;
-    }
-    .funnel-source {
-      font-size: 9px;
-      color: var(--text-4);
-      margin-top: var(--s-2);
-    }
-    .funnel-arr {
-      color: var(--text-4);
-      font-size: 14px;
-      flex-shrink: 0;
-      padding: 0 var(--s-4);
-    }
-
-    /* Auto vs Manual sections */
-    .detail-section-label {
-      font-size: var(--fs-xs);
-      font-weight: 600;
-      color: var(--text-4);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: var(--s-8);
-    }
-    .detail-auto-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--s-8);
-      margin-bottom: var(--s-4);
-    }
-    .detail-auto {
-      padding: var(--s-12);
-      background: var(--surface);
-      border-radius: var(--s-6);
-      border-left: 2px solid var(--rule);
-    }
-    .detail-auto-val {
-      font-family: var(--ff-display);
-      font-size: var(--fs-lg);
-      font-weight: 600;
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-    }
-    .detail-auto-label {
-      font-size: var(--fs-xs);
-      color: var(--text-3);
-      margin-top: var(--s-2);
-    }
-    .detail-auto-source {
-      font-size: 10px;
-      color: var(--text-4);
-      margin-top: var(--s-4);
-      display: flex;
-      align-items: center;
-      gap: 3px;
-    }
-    .detail-manual-grid {
-      display: flex;
-      flex-direction: column;
-      gap: var(--s-8);
-    }
-    .detail-manual {
-    }
-    .detail-idea-toggle {
-      font-size: var(--fs-xs);
-      color: var(--text-4);
-      cursor: pointer;
-      margin-top: var(--s-12);
-    }
-    .detail-idea-toggle:hover { color: var(--accent); }
-    .detail-idea-content {
-      display: none;
-      font-size: var(--fs-sm);
-      color: var(--text-3);
-      margin-top: var(--s-6);
-      line-height: var(--lh-body);
-    }
-    .detail-idea-content.open { display: block; }
-
-    /* Comparison ranking */
-    .compare-rank {
-      margin-bottom: var(--s-24);
-      padding: var(--s-16);
-      background: var(--bg-sub);
-      border-radius: var(--s-6);
-    }
-    .compare-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--s-12);
-    }
-    .compare-label {
-      font-size: var(--fs-xs);
-      font-weight: 600;
-      color: var(--text-4);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-    .compare-best {
-      font-size: var(--fs-xs);
-      font-weight: 600;
-      color: var(--hit);
-    }
-    .compare-bars {
-      display: flex;
-      flex-direction: column;
-      gap: var(--s-8);
-    }
-    .compare-bar-row {
-      display: grid;
-      grid-template-columns: 140px 1fr 60px 70px;
-      align-items: center;
-      gap: var(--s-8);
-    }
-    .compare-bar-name {
-      font-family: var(--ff-display);
-      font-size: var(--fs-sm);
-      font-weight: 500;
-      color: var(--text-2);
-    }
-    .compare-bar-row.is-best .compare-bar-name {
-      color: var(--text);
-      font-weight: 600;
-    }
-    .compare-bar-track {
-      height: 4px;
-      background: var(--surface);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .compare-bar-fill {
-      height: 100%;
-      border-radius: 2px;
-      transition: width 0.4s var(--ease-out);
-    }
-    .compare-bar-val {
-      font-size: var(--fs-sm);
-      font-weight: 500;
-      font-variant-numeric: tabular-nums;
-      color: var(--text-3);
-      text-align: right;
-    }
-    .compare-bar-val.is-best {
-      color: var(--hit);
-      font-weight: 700;
-    }
-    .compare-bar-signups {
-      font-size: var(--fs-xs);
-      color: var(--text-4);
-      text-align: right;
-    }
-
     /* Verdict buttons in expanded view */
     .verdict-group {
-      grid-column: 1 / -1;
       display: flex;
       align-items: center;
       gap: var(--s-6);
       flex-wrap: wrap;
-      margin-top: var(--s-8);
+      margin-top: var(--s-12);
     }
     .verdict-group-label {
       font-size: var(--fs-xs);
@@ -745,6 +551,22 @@
     .vbtn.v-change  { background: var(--accent-bg); color: var(--accent); }
     .vbtn.v-close   { background: var(--change-bg); color: var(--change); }
     .vbtn.v-stop    { background: var(--muted-bg);  color: var(--muted); }
+
+    .detail-idea-toggle {
+      font-size: var(--fs-xs);
+      color: var(--text-4);
+      cursor: pointer;
+      margin-top: var(--s-12);
+    }
+    .detail-idea-toggle:hover { color: var(--accent); }
+    .detail-idea-content {
+      display: none;
+      font-size: var(--fs-sm);
+      color: var(--text-3);
+      margin-top: var(--s-6);
+      line-height: var(--lh-body);
+    }
+    .detail-idea-content.open { display: block; }
 
     /* --- Stopped Toggle --- */
     .stopped-toggle {
@@ -972,16 +794,14 @@
   <div class="sprint-dates">Mar 24 -- 28, 2026</div>
 
   <div class="ns">
-    <div class="ns-label">Activated Users</div>
+    <div class="ns-label">Signups this week</div>
     <div class="ns-row">
       <div class="ns-value" id="ns-val">0</div>
-      <div class="ns-of">/ 20 target</div>
+      <div class="ns-of">/ <span id="ns-target">20</span> target</div>
     </div>
     <div class="ns-track"><div class="ns-fill" id="ns-bar"></div></div>
-    <div class="ns-sub">Downloaded + signed up + first call completed</div>
   </div>
 
-  <div class="plg-funnel" id="plg-funnel"></div>
   <div class="flow-nav" id="flow"></div>
 
   <div id="board"></div>
@@ -1001,60 +821,46 @@
 </div>
 
 <script>
-const K='gtm_v19';
+const K='gtm_v20';
 const VERDICTS=['pending','Keep going','Change variables','Close, iterate','Stop'];
 
 const CH={
   linkedin:{label:'LinkedIn',color:'oklch(48% 0.12 250)',metric:'Reply Rate',
     calc:(e)=>e.m[0]>0?((e.m[1]/e.m[0])*100).toFixed(1)+'%':'—',
     calcNum:(e)=>e.m[0]>0?e.m[1]/e.m[0]:0,
-    cols:['Sent','Replies','Signups'],
-    sources:['Dripify','Dripify','Nevara analytics'],
-    actualLabel:'replies'},
+    cols:['Sent','Replies','Signups']},
   twitter:{label:'Twitter',color:'oklch(52% 0.10 45)',metric:'Engagement',
     calc:(e)=>e.m[0]>0?((e.m[1]/e.m[0])*100).toFixed(1)+'%':'—',
     calcNum:(e)=>e.m[0]>0?e.m[1]/e.m[0]:0,
-    cols:['Replies posted','Engagements','Site visits'],
-    sources:['Manual','X analytics','UTM tracking'],
-    actualLabel:'engagements'},
+    cols:['Replies posted','Engagements','Site visits']},
   reddit:{label:'Reddit',color:'oklch(52% 0.16 28)',metric:'Reply-back Rate',
     calc:(e)=>e.m[0]>0?((e.m[1]/e.m[0])*100).toFixed(1)+'%':'—',
     calcNum:(e)=>e.m[0]>0?e.m[1]/e.m[0]:0,
-    cols:['Replies posted','Reply-backs','Site visits'],
-    sources:['Manual','Manual','UTM tracking'],
-    actualLabel:'reply-backs'},
+    cols:['Replies posted','Reply-backs','Site visits']},
   events:{label:'Events',color:'oklch(55% 0.12 65)',metric:'Conv-to-Signup',
     calc:(e)=>e.m[0]>0?((e.m[2]/e.m[0])*100).toFixed(1)+'%':'—',
     calcNum:(e)=>e.m[0]>0?e.m[2]/e.m[0]:0,
-    cols:['Conversations','Contacts collected','Signups'],
-    sources:['Manual','Manual','QR / UTM'],
-    actualLabel:'signups'},
+    cols:['Conversations','Contacts collected','Signups']},
   email:{label:'Email',color:'oklch(48% 0.10 155)',metric:'Click-to-Signup',
     calc:(e)=>e.m[1]>0?((e.m[2]/e.m[1])*100).toFixed(1)+'%':'—',
     calcNum:(e)=>e.m[1]>0?e.m[2]/e.m[1]:0,
-    cols:['Sent','Clicks','Signups'],
-    sources:['Email tool','Email tool','UTM tracking'],
-    actualLabel:'clicks'},
+    cols:['Sent','Clicks','Signups']},
   product:{label:'Product',color:'oklch(50% 0.015 55)',metric:'Activation Rate',
     calc:(e)=>e.m[0]>0?((e.m[2]/e.m[0])*100).toFixed(1)+'%':'—',
     calcNum:(e)=>e.m[0]>0?e.m[2]/e.m[0]:0,
-    cols:['Users targeted','Feature engaged','Activated/Retained'],
-    sources:['Mixpanel','Mixpanel','Mixpanel'],
-    actualLabel:'activated'},
+    cols:['Users targeted','Feature engaged','Activated/Retained']},
   content:{label:'Content',color:'oklch(48% 0.08 30)',metric:'Visit-to-Signup',
     calc:(e)=>e.m[1]>0?((e.m[2]/e.m[1])*100).toFixed(2)+'%':'—',
     calcNum:(e)=>e.m[1]>0?e.m[2]/e.m[1]:0,
-    cols:['Published','Impressions','Signups'],
-    sources:['Manual','Google Analytics','UTM tracking'],
-    actualLabel:'signups'},
+    cols:['Published','Impressions','Signups']},
 };
 
 const D=[
-  {id:1,ch:'linkedin',name:"Autopilot Outbound",started:"Mar 24",target:">10% reply rate",targetNum:0.10,idea:"Reads ICP filters, sends connection requests on autopilot via Sales Nav → Dripify.",m:[200,17,3],hours:4,verdict:"",next:""},
+  {id:1,ch:'linkedin',name:"Autopilot Outbound",started:"Mar 24",target:">10% reply rate",targetNum:0.10,idea:"Reads ICP filters, sends connection requests on autopilot via Sales Nav.",m:[200,17,3],hours:4,verdict:"",next:""},
   {id:2,ch:'linkedin',name:"Post Engagers",started:"Mar 24",target:">20% reply rate",targetNum:0.20,idea:"Scrape engagements from posts like rmeadows. Build lead lists.",m:[34,8,5],hours:2,verdict:"Keep going",next:"Run on 5 more posts. Commenters only."},
   {id:3,ch:'linkedin',name:"Referral Posts",started:"Mar 24",target:">30% reply rate",targetNum:0.30,idea:"Find 'calling on my network' posts. DM people asking for recs.",m:[20,7,2],hours:1.5,verdict:"Keep going",next:""},
   {id:4,ch:'linkedin',name:"Influencer Monitor",started:"Mar 24",target:">20% reply rate",targetNum:0.20,idea:"Follow Mark Roberge etc, see which AEs engage, DM them.",m:[30,4,1],hours:2,verdict:"Change variables",next:"Try commenting on their posts first before DMing."},
-  {id:5,ch:'linkedin',name:"Warm Intros",started:"Mar 25",target:">40% meeting rate",targetNum:0.40,idea:"Mine LinkedIn network → warm intros to target accounts.",m:[10,5,3],hours:1,verdict:"Keep going",next:"Draft blurbs for Maruthi."},
+  {id:5,ch:'linkedin',name:"Warm Intros",started:"Mar 25",target:">40% meeting rate",targetNum:0.40,idea:"Mine LinkedIn network — warm intros to target accounts.",m:[10,5,3],hours:1,verdict:"Keep going",next:"Draft blurbs for Maruthi."},
   {id:6,ch:'email',name:"Gift Outreach",started:"Mar 25",target:">35% click rate",targetNum:0.35,idea:"Find interesting thing about AE, send personalized gift.",m:[15,4,1],hours:3,verdict:"",next:""},
   {id:7,ch:'events',name:"Coffee Events",started:"Mar 26",target:">10% conv-to-signup",targetNum:0.10,idea:"Coffee at sales meetups, start conversations with AEs.",m:[40,18,3],hours:5,verdict:"Close, iterate",next:"Book 2 more. Try branded cups + QR."},
   {id:8,ch:'twitter',name:"Twitter Outreach",started:"Mar 24",target:">15% engagement",targetNum:0.15,idea:"Reply to right people on Twitter. Surface AEs talking about pain.",m:[100,6,0],hours:2,verdict:"",next:""},
@@ -1075,39 +881,21 @@ function setFlow(ch){activeFlow=ch;render();}
 function render(){
   const exps=load();
 
-  // North star — PLG funnel from product analytics
+  // North star — total signups
   const totalSignups=exps.reduce((s,e)=>s+(e.m?e.m[2]:0),0);
-  const activated=Math.round(totalSignups*0.61);
-  const pqls=Math.round(activated*0.4);
-  const paid=Math.round(pqls*0.25);
-  const pct=Math.min(100,Math.round((activated/20)*100));
-  document.getElementById('ns-val').textContent=activated;
+  const nsTarget=20;
+  const pct=Math.min(100,Math.round((totalSignups/nsTarget)*100));
+  document.getElementById('ns-val').textContent=totalSignups;
+  document.getElementById('ns-target').textContent=nsTarget;
   const bar=document.getElementById('ns-bar');
   bar.style.width=pct+'%';
   bar.style.background=pct>=100?'var(--hit)':pct>=60?'var(--change)':'var(--accent)';
-
-  // PLG funnel
-  const funnelEl=document.getElementById('plg-funnel');
-  if(funnelEl){
-    const actRate=totalSignups>0?Math.round((activated/totalSignups)*100):0;
-    const pqlRate=activated>0?Math.round((pqls/activated)*100):0;
-    const paidRate=pqls>0?Math.round((paid/pqls)*100):0;
-    funnelEl.innerHTML=`
-      <div class="funnel-step"><div class="funnel-num">${totalSignups}</div><div class="funnel-label">Signups</div><div class="funnel-source">Nevara DB</div></div>
-      <div class="funnel-arr">&rarr;</div>
-      <div class="funnel-step"><div class="funnel-num">${activated}</div><div class="funnel-label">Activated</div><div class="funnel-rate">${actRate}%</div><div class="funnel-source">Mixpanel</div></div>
-      <div class="funnel-arr">&rarr;</div>
-      <div class="funnel-step"><div class="funnel-num">${pqls}</div><div class="funnel-label">PQLs</div><div class="funnel-rate">${pqlRate}%</div><div class="funnel-source">Mixpanel</div></div>
-      <div class="funnel-arr">&rarr;</div>
-      <div class="funnel-step"><div class="funnel-num">${paid}</div><div class="funnel-label">Paid</div><div class="funnel-rate">${paidRate}%</div><div class="funnel-source">Stripe</div></div>
-    `;
-  }
 
   // Group
   const groups={};
   exps.forEach(e=>{const c=e.ch||'linkedin';if(!groups[c])groups[c]=[];groups[c].push(e);});
 
-  // Flow
+  // Flow tabs
   const flowOrder=['linkedin','twitter','reddit','events','email','product','content'];
   document.getElementById('flow').innerHTML=flowOrder.filter(k=>groups[k]).map(k=>{
     const info=CH[k];
@@ -1126,40 +914,12 @@ function render(){
   const active=g.filter(e=>e.verdict!=='Stop');
   const stopped=g.filter(e=>e.verdict==='Stop');
 
-  // Comparison — rank experiments by rate metric
-  const withData=g.filter(e=>e.m&&e.m[0]>0);
-  const ranked=withData.map(e=>({id:e.id,name:e.name,rate:info.calc(e),rateNum:info.calcNum(e),signups:e.m?e.m[2]:0,hours:e.hours||0})).sort((a,b)=>b.rateNum-a.rateNum);
-  const bestId=ranked.length>0?ranked[0].id:null;
-  const bestRate=ranked.length>0?ranked[0].rateNum:0;
-
   let html=`<div class="platform">
     <div class="platform-head">
       <div class="platform-dot" style="background:${info.color}"></div>
       <div class="platform-name">${info.label}</div>
       <div class="platform-meta">${g.length} experiments &middot; ${info.metric}</div>
     </div>`;
-
-  // Comparison ranking
-  if(ranked.length>1){
-    html+=`<div class="compare-rank">
-      <div class="compare-header">
-        <span class="compare-label">Ranked by ${info.metric}</span>
-        ${bestId?`<span class="compare-best">Best: ${ranked[0].name} (${ranked[0].rate})</span>`:''}
-      </div>
-      <div class="compare-bars">
-        ${ranked.map(r=>{
-          const barPct=bestRate>0?Math.round((r.rateNum/bestRate)*100):0;
-          const isBest=r.id===bestId;
-          return`<div class="compare-bar-row ${isBest?'is-best':''}">
-            <div class="compare-bar-name">${r.name}</div>
-            <div class="compare-bar-track"><div class="compare-bar-fill" style="width:${barPct}%;background:${isBest?'var(--hit)':'var(--text-4)'}"></div></div>
-            <div class="compare-bar-val ${isBest?'is-best':''}">${r.rate}</div>
-            <div class="compare-bar-signups">${r.signups} signups</div>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-  }
 
   html+=`<div class="exp-list">
       <div class="exp-cols">
@@ -1172,14 +932,17 @@ function render(){
       </div>`;
 
   active.forEach(e=>{
-    const actual=info.calc(e);
-    const actualNum=info.calcNum(e);
+    const rate=info.calc(e);
+    const rateNum=info.calcNum(e);
     const hasData=e.m&&e.m[0]>0;
-    const hit=hasData&&actualNum>=e.targetNum;
-    const close=hasData&&actualNum>=e.targetNum*0.8&&actualNum<e.targetNum;
-    const miss=hasData&&actualNum<e.targetNum*0.8;
+    const hit=hasData&&rateNum>=e.targetNum;
+    const close=hasData&&rateNum>=e.targetNum*0.8&&rateNum<e.targetNum;
+    const miss=hasData&&rateNum<e.targetNum*0.8;
     const actualCls=!hasData?'pending':hit?'hit':close?'':'miss';
     const verdictCls=!e.verdict||e.verdict==='pending'?'pending':e.verdict==='Keep going'?'keep':e.verdict==='Change variables'?'change':e.verdict==='Close, iterate'?'close':'stop';
+
+    // Actual column shows the raw number from the key metric
+    const actualRaw=hasData?e.m[1]:'—';
 
     html+=`<div class="exp-item">
       <div class="exp-row" onclick="toggleExp(${e.id})">
@@ -1189,35 +952,32 @@ function render(){
           <span class="exp-date-icon" onclick="event.stopPropagation();editDate(${e.id},this.parentElement)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
         </div>
         <div class="exp-target">${e.target}</div>
-        <div class="exp-actual ${actualCls}" onclick="event.stopPropagation();editActual(${e.id},this)">${hasData?e.m[1]+' '+info.actualLabel:'—'}</div>
-        <div class="exp-rate ${actualCls}">${hasData?actual:'—'}</div>
+        <div class="exp-actual ${actualCls}" onclick="event.stopPropagation();editM(${e.id},1,this)">${actualRaw}</div>
+        <div class="exp-rate ${actualCls}">${hasData?rate:'—'}</div>
         <div><span class="verdict ${verdictCls}" onclick="event.stopPropagation();cycleVerdict(${e.id})">${e.verdict||'—'}</span></div>
       </div>
       <div class="exp-expand-wrap" id="expand-${e.id}">
         <div class="exp-expand-inner">
           <div class="exp-detail">
-            <div class="detail-section-label">Synced from tools</div>
-            <div class="detail-auto-grid">
-              <div class="detail-auto"><div class="detail-auto-val">${e.m?e.m[0]:0}</div><div class="detail-auto-label">${info.cols[0]}</div><div class="detail-auto-source"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> ${info.sources?info.sources[0]:'Auto'}</div></div>
-              <div class="detail-auto"><div class="detail-auto-val">${e.m?e.m[1]:0}</div><div class="detail-auto-label">${info.cols[1]}</div><div class="detail-auto-source"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> ${info.sources?info.sources[1]:'Auto'}</div></div>
-              <div class="detail-auto"><div class="detail-auto-val">${e.m?e.m[2]:0}</div><div class="detail-auto-label">${info.cols[2]}</div><div class="detail-auto-source"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> ${info.sources?info.sources[2]:'Auto'}</div></div>
+            <div class="exp-detail-grid">
+              ${info.cols.map((col,idx)=>`<div class="detail-metric" onclick="event.stopPropagation();editM(${e.id},${idx},this)">
+                <div class="detail-metric-val">${e.m?e.m[idx]:0}</div>
+                <div class="detail-metric-label">${col}</div>
+              </div>`).join('')}
             </div>
-            <div class="detail-section-label" style="margin-top:var(--s-16)">Your input</div>
-            <div class="detail-manual-grid">
-              <div class="detail-manual">
-                <div class="detail-label">Hours spent</div>
-                <div class="detail-value editable" onclick="editHours(${e.id},this)">${e.hours||0}h <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;color:var(--text-4)"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-              </div>
-              <div class="detail-manual detail-next">
-                <div class="detail-label">Next step</div>
-                <div class="detail-next-text" onclick="event.stopPropagation();editNext(${e.id},this)">${e.next||'<span class="ph">What to change next sprint...</span>'} <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;color:var(--text-4)"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-              </div>
-              <div class="verdict-group">
-                <span class="verdict-group-label">Verdict</span>
-                ${['Keep going','Change variables','Close, iterate','Stop'].map(v=>`<div class="vbtn v-${v==='Keep going'?'keep':v==='Change variables'?'change':v==='Close, iterate'?'close':'stop'} ${e.verdict===v?'active':''}" onclick="event.stopPropagation();setVerdict(${e.id},'${v}')">${v}</div>`).join('')}
-              </div>
+            <div class="detail-field">
+              <div class="detail-label">Hours spent</div>
+              <div class="detail-value editable" onclick="editHours(${e.id},this)">${e.hours||0}h</div>
             </div>
-            <div class="detail-idea-toggle" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle('open')">View idea ▾</div>
+            <div class="detail-next">
+              <div class="detail-label">Next step</div>
+              <div class="detail-next-text" onclick="event.stopPropagation();editNext(${e.id},this)">${e.next||'<span class="ph">What to change next sprint...</span>'}</div>
+            </div>
+            <div class="verdict-group">
+              <span class="verdict-group-label">Verdict</span>
+              ${['Keep going','Change variables','Close, iterate','Stop'].map(v=>`<div class="vbtn v-${v==='Keep going'?'keep':v==='Change variables'?'change':v==='Close, iterate'?'close':'stop'} ${e.verdict===v?'active':''}" onclick="event.stopPropagation();setVerdict(${e.id},'${v}')">${v}</div>`).join('')}
+            </div>
+            <div class="detail-idea-toggle" onclick="event.stopPropagation();this.nextElementSibling.classList.toggle('open')">View idea &#9662;</div>
             <div class="detail-idea-content">${e.idea}</div>
           </div>
         </div>
@@ -1257,15 +1017,6 @@ function cycleVerdict(id){
 }
 
 function setVerdict(id,v){const exps=load();exps.find(x=>x.id===id).verdict=v;save(exps);flash();render();}
-
-function editActual(id,el){
-  const exps=load();const e=exps.find(x=>x.id===id);const info=CH[e.ch];
-  const val=prompt(`${e.name} — enter ${info.cols[1]} count:`,e.m?e.m[1]:0);
-  if(val===null)return;
-  if(!e.m)e.m=[0,0,0];
-  e.m[1]=parseInt(val)||0;
-  save(exps);flash();render();
-}
 
 function editM(id,idx,el){
   const exps=load();const e=exps.find(x=>x.id===id);const info=CH[e.ch];
