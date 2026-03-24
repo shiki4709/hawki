@@ -182,23 +182,24 @@
       <div class="flywheel">
         <div class="fw-step p1">
           <div class="icon">&#127919;</div>
-          <div class="label">Outbound</div>
-          <div class="desc">Find and reach AEs who are in-market now</div>
+          <div class="label">Find & Reach</div>
+          <div class="desc">Go out and contact prospects directly — LinkedIn DMs, events, social replies</div>
         </div>
         <div class="fw-arr">&#8594;</div>
         <div class="fw-step p2">
           <div class="icon">&#128172;</div>
-          <div class="label">Trust</div>
-          <div class="desc">They've seen you before the DM lands</div>
+          <div class="label">Build Awareness</div>
+          <div class="desc">Make prospects see Nevara before you DM them — content, replies, SEO</div>
         </div>
         <div class="fw-arr">&#8594;</div>
         <div class="fw-step p3">
           <div class="icon">&#127793;</div>
-          <div class="label">Inbound</div>
-          <div class="desc">They come to you — product, docs, SEO</div>
+          <div class="label">Attract & Retain</div>
+          <div class="desc">Pull people in and keep them — product, docs, re-engagement</div>
         </div>
         <div class="fw-arr">&#8635;</div>
       </div>
+      <p style="font-size:11px;color:#999;text-align:center;margin-bottom:14px;">Each stage feeds the next. Awareness makes outreach convert better. Outreach generates users. Retention creates word-of-mouth.</p>
 
       <div class="how-rules">
         <div class="how-rule">
@@ -254,20 +255,20 @@ const SIGNALS = [
 ];
 
 const DEFAULTS = [
-  { id:1, wk:"W1", idea:"LinkedIn prospecting via Sales Nav + Dripify", platform:"LinkedIn, Sales Nav, Dripify", goal:"Generate qualified demos from cold outbound", flywheel:"Outbound", kpi:">25% accept, >10% reply", test:"200 requests w/ personalization. Dripify 3-step.", signal:"", next:"" },
-  { id:2, wk:"W1", idea:"Scrape viral GTM post engagers → lead lists", platform:"LinkedIn, PhantomBuster", goal:"Build warm lead lists from content engagement", flywheel:"Outbound", kpi:">3x response rate vs cold", test:"Extract engagers from rmeadows post. A/B vs cold.", signal:"", next:"" },
-  { id:3, wk:"W1", idea:"Reddit/Twitter listening → reply to AE pain", platform:"Reddit, Twitter/X", goal:"Find in-market AEs through complaint signals", flywheel:"Outbound + Trust", kpi:">20% response rate", test:"20 threads r/sales + Twitter. Reply w/ value. DM 10.", signal:"", next:"" },
-  { id:4, wk:"W1", idea:"Coffee marketing at sales meetups", platform:"In-person events", goal:"Convert face-to-face conversations into demos", flywheel:"Outbound + Trust", kpi:">50% conv-to-demo, >3 demos", test:"2 events. Coffee + talk. Track convos → demos.", signal:"", next:"" },
-  { id:5, wk:"W2", idea:"'Calling on my network' posts → DM", platform:"LinkedIn", goal:"Reach buyers actively evaluating tools", flywheel:"Outbound", kpi:">30% DM response", test:"Search alert. DM 20 posters from last 7 days.", signal:"", next:"" },
-  { id:6, wk:"W2", idea:"Sales influencer followers → surface AEs → DM", platform:"LinkedIn", goal:"Surface in-market AEs from influencer audiences", flywheel:"Outbound", kpi:">20% DM response", test:"Monitor 5 influencers. DM 30 engaging AEs.", signal:"", next:"" },
-  { id:7, wk:"W2", idea:"Mine LinkedIn network → warm intros", platform:"LinkedIn, Sales Nav", goal:"Convert existing network into qualified meetings", flywheel:"Outbound", kpi:">40% meeting rate", test:"Cross-ref accounts. Request 10 intros.", signal:"", next:"" },
-  { id:8, wk:"W2", idea:"Hyper-personalized outreach + $5 gift", platform:"LinkedIn, Email, Starbucks", goal:"Test if gifting lifts response rate vs no-gift", flywheel:"Outbound + Trust", kpi:">35% meeting rate", test:"15 AEs. Research + gift.", signal:"", next:"" },
-  { id:9, wk:"W3", idea:"Churned user re-engagement", platform:"Email, In-App", goal:"Reactivate churned users with product updates", flywheel:"Inbound", kpi:">5% reactivation, >40% open", test:"'Here's what changed' email sequence.", signal:"", next:"" },
-  { id:10, wk:"W3", idea:"Twitter reply presence building", platform:"Twitter/X", goal:"Build brand awareness so outbound DMs aren't cold", flywheel:"Trust", kpi:">5 DMs/week in 30 days", test:"Reply to 20 tweets daily for 7 days.", signal:"", next:"" },
-  { id:11, wk:"W3", idea:"Slack + in-product messaging", platform:"Slack, In-App", goal:"Increase feature adoption for existing users", flywheel:"Inbound", kpi:">15% feature usage increase", test:"3 in-app prompts. Before/after.", signal:"", next:"" },
-  { id:12, wk:"W3", idea:"Product docs and enablement", platform:"Website, Help Center", goal:"Reduce time-to-value and support burden", flywheel:"Inbound", kpi:">30% reduction time-to-value", test:"Rewrite top 3 docs. Track tickets.", signal:"", next:"" },
-  { id:13, wk:"W4+", idea:"AI SEO optimization", platform:"Website, Google", goal:"Drive organic inbound from AE pain searches", flywheel:"Trust + Inbound", kpi:">500 impressions, >2% CTR", test:"3 SEO posts on AE pain keywords.", signal:"", next:"" },
-  { id:14, wk:"W4+", idea:"Organic content across 5 channels", platform:"LinkedIn, Twitter/X, Reddit, HN, Quora", goal:"Build multi-channel presence so prospects see Nevara everywhere", flywheel:"Trust", kpi:">50 imp/post, >10 leads/mo", test:"Cross-post 3 pieces. Per-channel tracking.", signal:"", next:"" },
+  { id:1, wk:"W1", idea:"LinkedIn prospecting via Sales Nav + Dripify", platform:"LinkedIn, Sales Nav, Dripify", goal:"Generate qualified demos from cold outbound", flywheel:"Find & Reach", kpi:">25% accept, >10% reply", test:"200 requests w/ personalization. Dripify 3-step.", signal:"", next:"" },
+  { id:2, wk:"W1", idea:"Scrape viral GTM post engagers → lead lists", platform:"LinkedIn, PhantomBuster", goal:"Build warm lead lists from content engagement", flywheel:"Find & Reach", kpi:">3x response rate vs cold", test:"Extract engagers from rmeadows post. A/B vs cold.", signal:"", next:"" },
+  { id:3, wk:"W1", idea:"Reddit/Twitter listening → reply to AE pain", platform:"Reddit, Twitter/X", goal:"Find in-market AEs through complaint signals", flywheel:"Find & Reach", kpi:">20% response rate", test:"20 threads r/sales + Twitter. Reply w/ value. DM 10.", signal:"", next:"" },
+  { id:4, wk:"W1", idea:"Coffee marketing at sales meetups", platform:"In-person events", goal:"Convert face-to-face conversations into demos", flywheel:"Find & Reach", kpi:">50% conv-to-demo, >3 demos", test:"2 events. Coffee + talk. Track convos → demos.", signal:"", next:"" },
+  { id:5, wk:"W2", idea:"'Calling on my network' posts → DM", platform:"LinkedIn", goal:"Reach buyers actively evaluating tools", flywheel:"Find & Reach", kpi:">30% DM response", test:"Search alert. DM 20 posters from last 7 days.", signal:"", next:"" },
+  { id:6, wk:"W2", idea:"Sales influencer followers → surface AEs → DM", platform:"LinkedIn", goal:"Surface in-market AEs from influencer audiences", flywheel:"Find & Reach", kpi:">20% DM response", test:"Monitor 5 influencers. DM 30 engaging AEs.", signal:"", next:"" },
+  { id:7, wk:"W2", idea:"Mine LinkedIn network → warm intros", platform:"LinkedIn, Sales Nav", goal:"Convert existing network into qualified meetings", flywheel:"Find & Reach", kpi:">40% meeting rate", test:"Cross-ref accounts. Request 10 intros.", signal:"", next:"" },
+  { id:8, wk:"W2", idea:"Hyper-personalized outreach + $5 gift", platform:"LinkedIn, Email, Starbucks", goal:"Test if gifting lifts response rate vs no-gift", flywheel:"Find & Reach", kpi:">35% meeting rate", test:"15 AEs. Research + gift.", signal:"", next:"" },
+  { id:9, wk:"W3", idea:"Churned user re-engagement", platform:"Email, In-App", goal:"Reactivate churned users with product updates", flywheel:"Attract & Retain", kpi:">5% reactivation, >40% open", test:"'Here's what changed' email sequence.", signal:"", next:"" },
+  { id:10, wk:"W3", idea:"Twitter reply presence building", platform:"Twitter/X", goal:"Make prospects recognize Nevara before outbound hits", flywheel:"Build Awareness", kpi:">5 DMs/week in 30 days", test:"Reply to 20 tweets daily for 7 days.", signal:"", next:"" },
+  { id:11, wk:"W3", idea:"Slack + in-product messaging", platform:"Slack, In-App", goal:"Increase feature adoption for existing users", flywheel:"Attract & Retain", kpi:">15% feature usage increase", test:"3 in-app prompts. Before/after.", signal:"", next:"" },
+  { id:12, wk:"W3", idea:"Product docs and enablement", platform:"Website, Help Center", goal:"Reduce time-to-value and support burden", flywheel:"Attract & Retain", kpi:">30% reduction time-to-value", test:"Rewrite top 3 docs. Track tickets.", signal:"", next:"" },
+  { id:13, wk:"W4+", idea:"AI SEO optimization", platform:"Website, Google", goal:"Drive organic traffic from AE pain searches", flywheel:"Build Awareness", kpi:">500 impressions, >2% CTR", test:"3 SEO posts on AE pain keywords.", signal:"", next:"" },
+  { id:14, wk:"W4+", idea:"Organic content across 5 channels", platform:"LinkedIn, Twitter/X, Reddit, HN, Quora", goal:"Prospects see Nevara everywhere before outbound hits", flywheel:"Build Awareness", kpi:">50 imp/post, >10 leads/mo", test:"Cross-post 3 pieces. Per-channel tracking.", signal:"", next:"" },
 ];
 
 function load() { const s=localStorage.getItem(K); if(s) return JSON.parse(s); save(DEFAULTS); return DEFAULTS; }
@@ -289,7 +290,7 @@ function render() {
 
       const fwHtml = e.flywheel ? e.flywheel.split('+').map(f => {
         const ft = f.trim().toLowerCase();
-        const cls = ft.includes('outbound')?'p1': ft.includes('trust')?'p2': ft.includes('inbound')?'p3':'p1';
+        const cls = ft.includes('find')||ft.includes('reach')?'p1': ft.includes('aware')?'p2': ft.includes('attract')||ft.includes('retain')?'p3':'p1';
         return `<span class="tag ${cls}">${f.trim()}</span>`;
       }).join(' ') : '';
 
