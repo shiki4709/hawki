@@ -12,8 +12,10 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from linkedin import scrape_post_likers, load_cookies
 
-# Serve the dashboard from the parent directory
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+# Serve the dashboard — check current dir first, then parent (for local dev)
+this_dir = os.path.abspath(os.path.dirname(__file__))
+parent_dir = os.path.abspath(os.path.join(this_dir, ".."))
+static_dir = this_dir if os.path.exists(os.path.join(this_dir, "index.html")) else parent_dir
 app = Flask(__name__, static_folder=None)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
@@ -314,7 +316,7 @@ def status():
 
 @app.route("/")
 def index():
-    return send_from_directory(parent_dir, "index.html")
+    return send_from_directory(static_dir, "index.html")
 
 
 @app.route("/<path:path>")
@@ -322,7 +324,7 @@ def static_files(path):
     # Don't serve paths starting with 'api'
     if path.startswith("api"):
         return jsonify({"error": "Not found"}), 404
-    return send_from_directory(parent_dir, path)
+    return send_from_directory(static_dir, path)
 
 
 if __name__ == "__main__":
