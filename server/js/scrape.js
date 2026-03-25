@@ -101,6 +101,8 @@ function runScrape(postUrl, callback) {
     if (xhr.status === 200) {
       try {
         var result = JSON.parse(xhr.responseText);
+        if (result.error) { callback(result.error); return; }
+        if (!result.leads || !result.leads.length) { callback('No leads found. Cookie may be expired.'); return; }
         var leads = result.leads.map(function(l) {
           l.icp_match = matchesICP(l.title);
           l.scraped_from = postUrl;
