@@ -238,14 +238,22 @@ function renderRunner() {
       'Opens each profile\'s posts in a new tab. Copy any post URL and paste above to scrape.' +
       '</div>';
     watchList.forEach(function(w) {
+      // Count how many posts from this influencer we've already scraped
+      var scrapedPosts = scrapes.filter(function(sc) {
+        return sc.url && sc.url.indexOf(w.username) >= 0;
+      });
+      var lastScraped = scrapedPosts.length > 0 ? timeAgo(scrapedPosts[0].date) : '';
+
       html += '<div class="rc-watch-item">' +
         '<div class="rc-watch-info">' +
         '<a href="' + w.url + '" target="_blank" rel="noopener" class="rc-watch-name">' + w.name + '</a>' +
         (w.headline ? '<span class="rc-watch-headline">' + w.headline.substring(0, 60) + '</span>' : '') +
+        '<span class="rc-watch-stats">' +
+        (scrapedPosts.length > 0 ? scrapedPosts.length + ' scraped · last ' + lastScraped : 'Not scraped yet') +
+        '</span>' +
         '</div>' +
         '<div class="rc-watch-actions">' +
         '<a href="' + w.url + '/recent-activity/all/" target="_blank" rel="noopener" class="rc-watch-view">Posts</a>' +
-        '<a href="' + w.url + '" target="_blank" rel="noopener" class="rc-watch-bell" title="Go to profile and click the bell icon">Follow</a>' +
         '<button class="scrape-remove-btn" onclick="removeFromWatchList(\'' + w.username + '\')">Remove</button>' +
         '</div></div>';
     });
