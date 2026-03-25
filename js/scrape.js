@@ -438,6 +438,7 @@ function unmarkMessaged(profileUrl) {
   var d = loadMessaged();
   delete d[profileUrl];
   saveMessaged(d);
+  autoUpdatePipelineCounts();
   render();
 }
 
