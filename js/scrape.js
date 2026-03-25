@@ -219,8 +219,20 @@ function renderRunner() {
     '</div>' +
     '<div class="scrape-hint">' +
     '<span onclick="toggleICPConfig()" style="cursor:pointer;text-decoration:underline dotted;color:var(--text-3)">ICP: ' +
-    icp.titles.slice(0, 4).join(', ') + (icp.titles.length > 4 ? '...' : '') + '</span></div>' +
+    icp.titles.slice(0, 4).join(', ') + (icp.titles.length > 4 ? '...' : '') + '</span>' +
+    ' · <span onclick="toggleSettings()" style="cursor:pointer;text-decoration:underline dotted;color:var(--text-3)">' +
+    (localStorage.getItem('hawki_claude_key') ? 'AI drafts on' : 'AI drafts off') + '</span></div>' +
     '</div>';
+
+  // Settings (hidden by default)
+  html += '<div id="hawki-settings" style="display:none;margin-bottom:var(--s-24)">' +
+    '<div class="scrape-icp-field">' +
+    '<label class="scrape-icp-label">Claude API Key (for AI-drafted messages)</label>' +
+    '<input type="password" class="qa-input qa-input-sm" id="hawki-api-key" ' +
+    'value="' + (localStorage.getItem('hawki_claude_key') || '') + '" ' +
+    'placeholder="sk-ant-..." onchange="saveClaudeKey()">' +
+    '<div style="font-size:11px;color:var(--text-4);margin-top:4px">Get a key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--inbound)">console.anthropic.com</a> · Without a key, messages use a simple template</div>' +
+    '</div></div>';
 
   // (post discovery removed — LinkedIn blocks all search APIs)
 
@@ -500,26 +512,68 @@ function renderLeadRow(l) {
 }
 
 function messageAndTrack(profileUrl, firstName, commentText, postTitle) {
-  // Draft a message
-  var msg = '';
-  if (commentText) {
-    msg = 'Hi ' + firstName + ', saw your comment on the "' + postTitle + '" post — "' + commentText + '". Would love to connect and chat about this.';
+  var apiKey = localStorage.getItem('hawki_claude_key') || '';
+
+  if (apiKey) {
+    // Use Claude to draft a personalized message
+    showToast('Drafting with AI...');
+    var apiUrl = getApiUrl();
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', apiUrl + '/api/draft-message');
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.timeout = 15000;
+
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        var result = JSON.parse(xhr.responseText);
+        copyAndOpen(result.message, profileUrl);
+      } else {
+        // Fallback to template
+        copyAndOpen(templateDraft(firstName, commentText, postTitle), profileUrl);
+      }
+    };
+
+    xhr.onerror = function() {
+      copyAndOpen(templateDraft(firstName, commentText, postTitle), profileUrl);
+    };
+
+    // Get the full lead data for richer context
+    var scrapes = loadScrapes();
+    var lead = null;
+    scrapes.forEach(function(sc) {
+      sc.leads.forEach(function(l) {
+        if (l.linkedin_url === profileUrl) lead = l;
+      });
+    });
+
+    xhr.send(JSON.stringify({
+      api_key: apiKey,
+      name: lead ? lead.name : firstName,
+      headline: lead ? lead.title : '',
+      comment: commentText,
+      post_title: postTitle,
+    }));
   } else {
-    msg = 'Hi ' + firstName + ', noticed you engaged with the "' + postTitle + '" post. Thought we might have a lot to share around this topic — would love to connect.';
+    // No API key — use template
+    copyAndOpen(templateDraft(firstName, commentText, postTitle), profileUrl);
   }
 
-  // Copy to clipboard
+  markMessaged(profileUrl);
+}
+
+function templateDraft(firstName, commentText, postTitle) {
+  if (commentText) {
+    return 'Hi ' + firstName + ', saw your comment on the "' + postTitle + '" post — "' + commentText + '". Would love to connect and chat about this.';
+  }
+  return 'Hi ' + firstName + ', noticed you engaged with the "' + postTitle + '" post. Thought we might have a lot to share around this topic — would love to connect.';
+}
+
+function copyAndOpen(msg, profileUrl) {
   navigator.clipboard.writeText(msg).then(function() {
     showToast('Message copied to clipboard');
   }).catch(function() {
-    // Fallback
     prompt('Copy this message:', msg);
   });
-
-  // Mark as messaged
-  markMessaged(profileUrl);
-
-  // Open their profile
   window.open(profileUrl, '_blank');
 }
 
@@ -703,6 +757,23 @@ function startScrape() {
 function removeScrape(id) {
   var scrapes = loadScrapes().filter(function(s) { return s.id !== id; });
   saveScrapes(scrapes);
+  render();
+}
+
+function toggleSettings() {
+  var el = document.getElementById('hawki-settings');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function saveClaudeKey() {
+  var key = document.getElementById('hawki-api-key').value.trim();
+  if (key) {
+    localStorage.setItem('hawki_claude_key', key);
+    showToast('API key saved — AI drafts enabled');
+  } else {
+    localStorage.removeItem('hawki_claude_key');
+    showToast('API key removed — using templates');
+  }
   render();
 }
 

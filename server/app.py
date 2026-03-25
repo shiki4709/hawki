@@ -135,6 +135,63 @@ def find_posts():
     return jsonify({"posts": posts, "query": keywords})
 
 
+@app.route("/api/draft-message", methods=["POST"])
+def draft_message():
+    """Use Claude to draft a personalized outreach message."""
+    data = request.get_json()
+    api_key = data.get("api_key", "").strip()
+    if not api_key:
+        return jsonify({"error": "No API key provided"}), 400
+
+    lead_name = data.get("name", "")
+    first_name = lead_name.split(" ")[0] if lead_name else ""
+    headline = data.get("headline", "")
+    comment = data.get("comment", "")
+    post_title = data.get("post_title", "")
+    tone = data.get("tone", "friendly and professional")
+
+    prompt = f"""Write a short LinkedIn connection message (2-3 sentences max) from a GTM professional to {lead_name}.
+
+Context:
+- Their headline: {headline}
+- They engaged with a post about: {post_title}
+{"- They commented: " + '"' + comment + '"' if comment else "- They liked the post"}
+
+Rules:
+- Start with "Hi {first_name},"
+- Reference the post or their comment specifically
+- Be {tone}
+- End with a soft CTA (connect, chat, share ideas)
+- No emojis, no buzzwords, no "I'd love to pick your brain"
+- Sound human, not automated
+- Keep it under 300 characters"""
+
+    try:
+        resp = http_requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key": api_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json",
+            },
+            json={
+                "model": "claude-haiku-4-5-20251001",
+                "max_tokens": 200,
+                "messages": [{"role": "user", "content": prompt}],
+            },
+            timeout=15,
+        )
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    if resp.status_code != 200:
+        return jsonify({"error": f"Claude API error: {resp.status_code}"}), resp.status_code
+
+    result = resp.json()
+    message = result.get("content", [{}])[0].get("text", "")
+    return jsonify({"message": message})
+
+
 @app.route("/api/status", methods=["GET"])
 def status():
     cookies = get_cookies()
