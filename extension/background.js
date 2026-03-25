@@ -1,48 +1,55 @@
-// Hawki Cookie Sync — sends LinkedIn cookies to the local Hawki server
-// Runs every 5 minutes and on browser startup
+// Hawki Cookie Sync — grabs LinkedIn cookies and stores them
+// for the Hawki app to use
 
-const HAWKI_SERVER = "http://localhost:5001";
-const COOKIE_NAMES = ["li_at", "JSESSIONID", "bcookie", "lidc", "li_sugr"];
+const HAWKI_DOMAINS = [
+  "https://hawki-sigma.vercel.app",
+  "http://localhost:5001"
+];
 
 async function syncCookies() {
   try {
-    const cookies = {};
-    for (const name of COOKIE_NAMES) {
-      const cookie = await chrome.cookies.get({
-        url: "https://www.linkedin.com",
-        name: name,
-      });
-      if (cookie) {
-        cookies[name] = cookie.value;
-      }
-    }
+    const cookie = await chrome.cookies.get({
+      url: "https://www.linkedin.com",
+      name: "li_at",
+    });
 
-    if (!cookies.li_at) {
-      console.log("Hawki: No li_at cookie found — not logged into LinkedIn");
-      await chrome.storage.local.set({ status: "not_logged_in" });
+    if (!cookie || !cookie.value) {
+      console.log("Hawki: No li_at cookie — not logged into LinkedIn");
+      await chrome.storage.local.set({ status: "not_logged_in", li_at: "" });
       return;
     }
 
-    // Send to Hawki server
-    const resp = await fetch(HAWKI_SERVER + "/api/update-cookies", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(cookies),
+    const liAt = cookie.value;
+    console.log("Hawki: Got li_at cookie");
+
+    // Store in extension storage
+    await chrome.storage.local.set({
+      status: "synced",
+      li_at: liAt,
+      lastSync: new Date().toISOString(),
     });
 
-    if (resp.ok) {
-      console.log("Hawki: Cookies synced");
-      await chrome.storage.local.set({
-        status: "synced",
-        lastSync: new Date().toISOString(),
-      });
-    } else {
-      console.log("Hawki: Server error", resp.status);
-      await chrome.storage.local.set({ status: "server_error" });
+    // Inject into Hawki pages' localStorage
+    for (const domain of HAWKI_DOMAINS) {
+      try {
+        // Find any open Hawki tabs and inject
+        const tabs = await chrome.tabs.query({ url: domain + "/*" });
+        for (const tab of tabs) {
+          chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: (key) => { localStorage.setItem("hawki_li_at", key); },
+            args: [liAt],
+          });
+        }
+      } catch (e) {
+        // Tab might not exist, that's fine
+      }
     }
+
+    console.log("Hawki: Cookies synced");
   } catch (e) {
     console.log("Hawki: Sync failed", e.message);
-    await chrome.storage.local.set({ status: "offline" });
+    await chrome.storage.local.set({ status: "error" });
   }
 }
 
@@ -50,8 +57,8 @@ async function syncCookies() {
 chrome.runtime.onInstalled.addListener(syncCookies);
 chrome.runtime.onStartup.addListener(syncCookies);
 
-// Sync every 5 minutes
-chrome.alarms.create("cookieSync", { periodInMinutes: 5 });
+// Sync every 2 minutes
+chrome.alarms.create("cookieSync", { periodInMinutes: 2 });
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "cookieSync") syncCookies();
 });
@@ -61,11 +68,11 @@ chrome.runtime.onMessage.addListener((msg) => {
   if (msg.action === "sync") syncCookies();
 });
 
-// Sync when LinkedIn cookies change
+// Sync immediately when LinkedIn cookies change
 chrome.cookies.onChanged.addListener((changeInfo) => {
   if (
     changeInfo.cookie.domain.includes("linkedin.com") &&
-    COOKIE_NAMES.includes(changeInfo.cookie.name)
+    changeInfo.cookie.name === "li_at"
   ) {
     syncCookies();
   }

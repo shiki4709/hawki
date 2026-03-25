@@ -2,21 +2,32 @@
 <html>
 <head>
   <style>
-    body { width: 260px; padding: 16px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 13px; color: #333; }
-    h1 { font-size: 16px; margin: 0 0 12px; }
-    .status { padding: 8px 12px; border-radius: 6px; margin-bottom: 12px; }
+    body { width: 280px; padding: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; font-size: 13px; color: #333; }
+    h1 { font-size: 16px; margin: 0 0 12px; font-weight: 700; }
+    .status { padding: 10px 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; line-height: 1.4; }
     .status-ok { background: #e8f5e9; color: #2e7d32; }
     .status-err { background: #fff3e0; color: #e65100; }
     .status-off { background: #f5f5f5; color: #999; }
-    .time { font-size: 11px; color: #999; margin-top: 4px; }
-    button { width: 100%; padding: 8px; font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; background: #1a73e8; color: white; }
-    button:hover { opacity: 0.9; }
+    .detail { font-size: 11px; opacity: 0.7; margin-top: 2px; font-family: monospace; }
+    .time { font-size: 11px; opacity: 0.6; margin-top: 2px; }
+    .btns { display: flex; gap: 8px; }
+    button { flex: 1; padding: 8px; font-size: 13px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; }
+    .btn-sync { background: #1a1a1a; color: white; }
+    .btn-sync:hover { opacity: 0.85; }
+    .btn-sync:disabled { opacity: 0.5; cursor: wait; }
+    .btn-open { background: #f0f0f0; color: #333; }
+    .btn-open:hover { background: #e0e0e0; }
+    .note { font-size: 11px; color: #999; margin-top: 10px; line-height: 1.4; }
   </style>
 </head>
 <body>
   <h1>Hawki</h1>
   <div id="status" class="status status-off">Checking...</div>
-  <button id="sync-btn" onclick="manualSync()">Sync Now</button>
+  <div class="btns">
+    <button id="sync-btn" class="btn-sync" onclick="manualSync()">Sync Now</button>
+    <button class="btn-open" onclick="openHawki()">Open Hawki</button>
+  </div>
+  <div class="note">Syncs your LinkedIn cookie to Hawki every 2 minutes. Make sure you're logged into LinkedIn.</div>
   <script src="popup.js"></script>
 </body>
 </html>
