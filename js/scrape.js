@@ -219,6 +219,62 @@ function renderRunner() {
     '</div>' +
     '</div>';
 
+  // ── Onboarding (show when no cookie set) ──
+  if (!localStorage.getItem('hawki_li_at')) {
+    html += '<div class="onboard">' +
+      '<div class="onboard-title">Welcome to Hawki</div>' +
+      '<div class="onboard-desc">Connect your LinkedIn to start finding leads. Takes 30 seconds.</div>' +
+      '<div class="onboard-steps">' +
+
+      '<div class="onboard-step">' +
+      '<div class="onboard-num">1</div>' +
+      '<div class="onboard-text">' +
+      '<strong>Open LinkedIn</strong> in another tab and make sure you\'re logged in' +
+      '</div></div>' +
+
+      '<div class="onboard-step">' +
+      '<div class="onboard-num">2</div>' +
+      '<div class="onboard-text">' +
+      '<strong>Open DevTools</strong> — press <kbd>Cmd+Option+I</kbd> (Mac) or <kbd>Ctrl+Shift+I</kbd> (Windows)' +
+      '</div></div>' +
+
+      '<div class="onboard-step">' +
+      '<div class="onboard-num">3</div>' +
+      '<div class="onboard-text">' +
+      'Click the <strong>Application</strong> tab at the top' +
+      '</div></div>' +
+
+      '<div class="onboard-step">' +
+      '<div class="onboard-num">4</div>' +
+      '<div class="onboard-text">' +
+      'In the left sidebar, expand <strong>Cookies</strong> → click <strong>https://www.linkedin.com</strong>' +
+      '</div></div>' +
+
+      '<div class="onboard-step">' +
+      '<div class="onboard-num">5</div>' +
+      '<div class="onboard-text">' +
+      'Find the row named <strong>li_at</strong> → double-click the <strong>Value</strong> column → copy it' +
+      '</div></div>' +
+
+      '<div class="onboard-step">' +
+      '<div class="onboard-num">6</div>' +
+      '<div class="onboard-text">' +
+      'Paste it below and click <strong>Connect</strong>' +
+      '</div></div>' +
+
+      '</div>' +
+
+      '<div class="onboard-input">' +
+      '<input type="password" class="scrape-url-input" id="onboard-cookie" placeholder="Paste your li_at cookie here...">' +
+      '<button class="scrape-go-btn" onclick="saveOnboardCookie()">Connect</button>' +
+      '</div>' +
+      '<div class="onboard-note">Your cookie stays in your browser. It\'s never stored on our servers.</div>' +
+      '</div>';
+
+    el.innerHTML = html;
+    return;
+  }
+
   // ── Watch List ──
   var watchList = loadWatchList();
   html += '<div class="rc-watch">';
@@ -947,6 +1003,20 @@ function saveClaudeKey() {
     localStorage.removeItem('hawki_claude_key');
     showToast('API key removed — using templates');
   }
+  render();
+}
+
+function saveOnboardCookie() {
+  var cookie = document.getElementById('onboard-cookie').value.trim();
+  if (!cookie) { showToast('Paste your li_at cookie'); return; }
+  localStorage.setItem('hawki_li_at', cookie);
+  // Sync to server
+  var apiUrl = getApiUrl();
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', apiUrl + '/api/update-cookies');
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send(JSON.stringify({ li_at: cookie }));
+  showToast('Connected! Start scraping.');
   render();
 }
 

@@ -792,6 +792,33 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .scrape-empty-state { padding: var(--s-48) 0; text-align: center; color: var(--text-4); font-size: var(--fs-sm); line-height: var(--lh-body); }
 .scrape-empty-icon { font-size: var(--fs-xl); margin-bottom: var(--s-8); opacity: 0.4; }
 
+/* ── Onboarding ── */
+.onboard { max-width: 480px; margin: 40px auto; }
+.onboard-title { font-family: var(--ff-display); font-size: var(--fs-xl); font-weight: 600; text-align: center; margin-bottom: var(--s-8); }
+.onboard-desc { font-size: var(--fs-sm); color: var(--text-3); text-align: center; margin-bottom: var(--s-32); }
+.onboard-steps { margin-bottom: var(--s-24); }
+.onboard-step {
+  display: flex; align-items: flex-start; gap: var(--s-12);
+  padding: var(--s-12) 0; border-bottom: 1px solid var(--rule-faint);
+}
+.onboard-step:last-child { border-bottom: none; }
+.onboard-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--accent); color: oklch(97% 0.008 55);
+  font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.onboard-text { font-size: var(--fs-sm); color: var(--text-2); line-height: var(--lh-body); }
+.onboard-text strong { color: var(--text); }
+.onboard-text kbd {
+  font-family: var(--ff-body); font-size: var(--fs-xs);
+  background: var(--surface); border: 1px solid var(--rule);
+  padding: 1px 5px; border-radius: 3px; color: var(--text);
+}
+.onboard-input { display: flex; gap: var(--s-8); margin-bottom: var(--s-8); }
+.onboard-note { font-size: 11px; color: var(--text-4); text-align: center; }
+
 /* ── Watch List ── */
 .rc-watch { margin-bottom: var(--s-24); }
 .rc-watch-header { display: flex; justify-content: space-between; align-items: center; gap: var(--s-12); margin-bottom: var(--s-8); }
