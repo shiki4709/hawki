@@ -738,44 +738,83 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .scrape-icp-no { color: var(--text-4); }
 
 .scrape-empty-state { padding: var(--s-48) 0; text-align: center; color: var(--text-4); font-size: var(--fs-sm); line-height: var(--lh-body); }
+.scrape-empty-icon { font-size: var(--fs-xl); margin-bottom: var(--s-8); opacity: 0.4; }
 
 /* ── Runner pipeline cards ── */
 .runner-card {
   border: 1px solid var(--rule-faint); border-radius: var(--radius);
-  margin-bottom: var(--s-16); overflow: hidden;
+  margin-bottom: var(--s-24); overflow: hidden;
 }
-.runner-card-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: var(--s-12) var(--s-16); background: var(--bg-sub); gap: var(--s-12);
-}
-.runner-card-info { min-width: 0; }
-.runner-card-url { font-size: var(--fs-sm); font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.runner-card-meta { font-size: var(--fs-xs); color: var(--text-4); margin-top: var(--s-2); }
 
-.runner-pipe {
-  display: flex; align-items: center; padding: var(--s-16);
-  gap: 0; overflow-x: auto;
+/* Hero section */
+.rc-hero {
+  display: flex; align-items: center; gap: var(--s-16);
+  padding: var(--s-20) var(--s-20); background: var(--bg-sub);
 }
-.runner-stage { text-align: center; flex: 1; min-width: 4.5rem; }
-.runner-stage-val {
-  font-family: var(--ff-display); font-size: var(--fs-lg); font-weight: 500;
-  color: var(--text); width: 100%; text-align: center; border: none;
-  background: transparent; font-variant-numeric: tabular-nums;
-  padding: var(--s-4); border-radius: var(--radius-sm);
+.rc-hero-nums { display: flex; gap: var(--s-16); flex-shrink: 0; }
+.rc-num-block { text-align: center; min-width: 3.5rem; }
+.rc-big-num {
+  font-family: var(--ff-display); font-size: var(--fs-xl);
+  font-weight: 600; color: var(--text-2); line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
-.runner-stage-val:focus { outline: none; background: var(--bg-sub); }
-.runner-stage-auto { cursor: default; }
-.runner-stage-label {
-  font-size: var(--fs-xs); color: var(--text-3); margin-top: var(--s-2);
-  white-space: nowrap;
+.rc-num-accent .rc-big-num { color: var(--accent); }
+.rc-big-label { font-size: var(--fs-xs); color: var(--text-4); margin-top: var(--s-4); }
+.rc-hero-right { flex: 1; min-width: 0; }
+.rc-title {
+  font-family: var(--ff-display); font-size: var(--fs-md); font-weight: 500;
+  color: var(--text); text-transform: capitalize;
 }
-.runner-arrow {
-  font-size: 10px; font-weight: 700; color: var(--text-4);
-  padding: 0 var(--s-4); flex-shrink: 0; white-space: nowrap;
+.rc-meta { font-size: var(--fs-xs); color: var(--text-4); margin-top: var(--s-4); }
+.rc-hero-actions { display: flex; gap: var(--s-6); flex-shrink: 0; }
+
+/* Action bar */
+.rc-action { padding: var(--s-12) var(--s-20); border-top: 1px solid var(--rule-faint); }
+
+/* Pipeline tracker */
+.rc-pipeline {
+  display: flex; align-items: center; gap: var(--s-6);
+  padding: var(--s-12) var(--s-20); border-top: 1px solid var(--rule-faint);
+  overflow-x: auto; font-size: var(--fs-xs); color: var(--text-3);
 }
-.runner-arrow.pipe-conv-good { color: var(--hit); }
-.runner-arrow.pipe-conv-ok { color: var(--change); }
-.runner-arrow.pipe-conv-low { color: var(--accent); }
+.rc-pipe-stage { display: flex; align-items: center; gap: var(--s-4); white-space: nowrap; }
+.rc-pipe-val { font-weight: 700; color: var(--text-2); font-variant-numeric: tabular-nums; }
+.rc-pipe-highlight .rc-pipe-val { color: var(--accent); }
+.rc-pipe-arrow { color: var(--text-4); font-size: 10px; }
+.rc-pipe-input {
+  width: 2.5rem; font-family: var(--ff-body); font-size: var(--fs-xs);
+  font-weight: 700; color: var(--text-2); text-align: center;
+  border: 1px solid var(--rule); border-radius: var(--radius-sm);
+  background: transparent; padding: var(--s-2) var(--s-4);
+  font-variant-numeric: tabular-nums;
+}
+.rc-pipe-input:focus { outline: none; border-color: var(--accent); }
+
+/* Lead list */
+.rc-leads { padding: var(--s-8) var(--s-20) var(--s-16); }
+.rc-leads-title {
+  font-size: var(--fs-xs); font-weight: 600; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  padding-bottom: var(--s-8); margin-bottom: var(--s-4);
+  border-bottom: 1px solid var(--rule-faint);
+}
+.rc-lead {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--s-8) 0; border-bottom: 1px solid var(--rule-faint);
+}
+.rc-lead:last-child { border-bottom: none; }
+.rc-lead-info { min-width: 0; flex: 1; }
+.rc-lead-name {
+  font-size: var(--fs-sm); font-weight: 500; color: var(--inbound);
+  text-decoration: none; display: block;
+}
+.rc-lead-name:hover { text-decoration: underline; }
+.rc-lead-title {
+  font-size: var(--fs-xs); color: var(--text-4); margin-top: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rc-leads-dim .rc-lead-name { color: var(--text-3); }
+.rc-leads-dim .rc-lead-title { color: var(--text-4); }
 
 /* Workflow guide */
 .runner-guide { padding: 0 var(--s-16) var(--s-16); }
@@ -797,6 +836,22 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .runner-guide-detail a:hover { text-decoration: underline; }
 .runner-guide-done .runner-guide-step { background: var(--hit-bg); }
 .runner-guide-done .runner-guide-num { color: var(--hit); background: transparent; }
+
+/* Open profiles / Message buttons */
+.runner-open-all { display: flex; align-items: center; gap: var(--s-12); margin-bottom: var(--s-12); }
+.runner-open-btn {
+  font-family: var(--ff-body); font-size: var(--fs-xs); font-weight: 600;
+  color: oklch(97% 0.008 55); background: var(--inbound);
+  border: none; padding: var(--s-6) var(--s-16); border-radius: var(--radius-sm);
+  cursor: pointer; transition: opacity var(--dur-fast) var(--ease-out);
+}
+.runner-open-btn:hover { opacity: 0.85; }
+.runner-open-hint { font-size: var(--fs-xs); color: var(--text-4); }
+.runner-msg-btn {
+  font-size: var(--fs-xs); font-weight: 600; color: var(--inbound);
+  text-decoration: none; white-space: nowrap;
+}
+.runner-msg-btn:hover { text-decoration: underline; }
 
 .runner-leads { padding: 0 var(--s-16) var(--s-12); }
 .runner-leads-toggle {

@@ -13,7 +13,7 @@ var ICP_KEY = 'gtm_icp_v1';
 
 /* --- ICP config --- */
 var DEFAULT_ICP = {
-  titles: ['AE', 'Account Executive', 'SDR', 'BDR', 'Sales Rep', 'Sales Manager', 'Head of Sales', 'VP Sales', 'Revenue', 'GTM', 'Growth'],
+  titles: ['AE', 'Account Executive', 'SDR', 'Sales Development', 'BDR', 'Business Development', 'Sales Rep', 'Sales Manager', 'Head of Sales', 'VP Sales', 'VP of Sales', 'Sales Leader', 'Sales Director', 'Revenue', 'GTM', 'Growth'],
   exclude: ['Recruiter', 'Student', 'Intern']
 };
 
@@ -84,46 +84,83 @@ function generateDemoLeads(postUrl) {
 }
 
 /* --- Run scrape --- */
-function runScrape(postUrl, callback) {
-  var phantomKey = localStorage.getItem('gtm_phantom_key') || '';
-
-  if (phantomKey) {
-    // Real PhantomBuster API call
-    scrapeWithPhantom(postUrl, phantomKey, callback);
-  } else {
-    // Demo mode with realistic delay
-    setTimeout(function() {
-      var leads = generateDemoLeads(postUrl);
-      var scrape = {
-        id: Date.now(),
-        url: postUrl,
-        date: new Date().toISOString(),
-        leads: leads,
-        mode: 'demo'
-      };
-      var scrapes = loadScrapes();
-      scrapes.unshift(scrape);
-      saveScrapes(scrapes);
-      callback(null, scrape);
-    }, 1500);
+function getApiUrl() {
+  // If served from localhost (Flask server), use same origin
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return '';
   }
+  // Otherwise try localhost:5001 (server running separately)
+  return 'http://localhost:5001';
 }
 
-/* --- PhantomBuster integration (ready when API key is configured) --- */
-function scrapeWithPhantom(postUrl, apiKey, callback) {
-  // PhantomBuster API: launch a phantom and poll for results
-  // This requires a "LinkedIn Post Commenters" phantom to be set up
-  // in the PhantomBuster dashboard first.
-  //
-  // For now, fall back to demo mode with a note
-  callback('PhantomBuster integration coming soon. Add your API key in Settings. Using demo data for now.');
+function runScrape(postUrl, callback) {
+  // Try the real API first, fall back to demo mode
+  var apiUrl = getApiUrl();
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', apiUrl + '/api/scrape');
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.timeout = 120000; // 120s timeout — large posts take time
 
-  // When ready, the flow will be:
-  // 1. POST to https://api.phantombuster.com/api/v2/agents/launch
-  //    with the phantom agent ID and postUrl as argument
-  // 2. Poll GET /api/v2/agents/fetch-output until status === 'finished'
-  // 3. Parse the CSV/JSON output into our lead format
-  // 4. Store and return results
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      try {
+        var result = JSON.parse(xhr.responseText);
+        var leads = result.leads.map(function(l) {
+          l.icp_match = matchesICP(l.title);
+          l.scraped_from = postUrl;
+          return l;
+        });
+        var scrape = {
+          id: Date.now(),
+          url: postUrl,
+          date: new Date().toISOString(),
+          leads: leads,
+          mode: 'live'
+        };
+        var scrapes = loadScrapes();
+        scrapes.unshift(scrape);
+        saveScrapes(scrapes);
+        callback(null, scrape);
+      } catch (e) {
+        callback('Failed to parse response: ' + e.message);
+      }
+    } else {
+      try {
+        var err = JSON.parse(xhr.responseText);
+        callback(err.error || 'Server error');
+      } catch (e) {
+        callback('Server error: ' + xhr.status);
+      }
+    }
+  };
+
+  xhr.onerror = function() {
+    // Server not running — fall back to demo mode
+    runDemoScrape(postUrl, callback);
+  };
+
+  xhr.ontimeout = function() {
+    callback('Scrape timed out. The post may have too many engagers.');
+  };
+
+  xhr.send(JSON.stringify({ url: postUrl }));
+}
+
+function runDemoScrape(postUrl, callback) {
+  setTimeout(function() {
+    var leads = generateDemoLeads(postUrl);
+    var scrape = {
+      id: Date.now(),
+      url: postUrl,
+      date: new Date().toISOString(),
+      leads: leads,
+      mode: 'demo'
+    };
+    var scrapes = loadScrapes();
+    scrapes.unshift(scrape);
+    saveScrapes(scrapes);
+    callback(null, scrape);
+  }, 1500);
 }
 
 /* --- CSV export --- */
@@ -202,77 +239,134 @@ function renderRunner() {
       var ago = timeAgo(sc.date);
       var modeLabel = sc.mode === 'demo' ? ' <span class="scrape-demo-badge">Demo</span>' : '';
 
-      // Pipeline numbers — scraped and ICP are real, rest are editable
       var pipeline = sc.pipeline || {};
       var dmsSent = pipeline.dmsSent || 0;
       var replied = pipeline.replied || 0;
       var signedUp = pipeline.signedUp || 0;
 
-      // Pipeline card
+      // Extract a readable post title from URL
+      var postTitle = extractPostTitle(sc.url);
+
       html += '<div class="runner-card">';
 
-      // Card header
-      html += '<div class="runner-card-header">' +
-        '<div class="runner-card-info">' +
-        '<div class="runner-card-url" title="' + sc.url + '">' + truncateUrl(sc.url) + modeLabel + '</div>' +
-        '<div class="runner-card-meta">' + ago + '</div></div>' +
-        '<div class="scrape-result-actions">' +
-        '<button class="scrape-csv-btn" onclick="downloadScrapeCSV(' + scIdx + ',true)">CSV</button>' +
+      // ── Hero section: two numbers + context ──
+      html += '<div class="rc-hero">' +
+        '<div class="rc-hero-nums">' +
+        '<div class="rc-num-block">' +
+        '<div class="rc-big-num">' + total + '</div>' +
+        '<div class="rc-big-label">engagers</div>' +
+        '</div>' +
+        '<div class="rc-num-block rc-num-accent">' +
+        '<div class="rc-big-num">' + matched.length + '</div>' +
+        '<div class="rc-big-label">ICP matches</div>' +
+        '</div>' +
+        '</div>' +
+        '<div class="rc-hero-right">' +
+        '<div class="rc-title">' + postTitle + modeLabel + '</div>' +
+        '<div class="rc-meta">' + ago + ' · ' +
+        Math.round((matched.length / Math.max(total, 1)) * 100) + '% match rate</div>' +
+        '</div>' +
+        '<div class="rc-hero-actions">' +
+        '<button class="scrape-csv-btn" onclick="downloadScrapeCSV(' + scIdx + ',false)">All CSV</button>' +
+        '<button class="scrape-csv-btn scrape-csv-icp" onclick="downloadScrapeCSV(' + scIdx + ',true)">ICP CSV</button>' +
         '<button class="scrape-remove-btn" onclick="removeScrape(' + sc.id + ')">Remove</button>' +
         '</div></div>';
 
-      // Pipeline: Scraped → ICP → DMs → Replied → Signed Up
-      html += '<div class="runner-pipe">';
+      // ── Action bar: primary CTA ──
+      if (matched.length > 0 && dmsSent === 0) {
+        html += '<div class="rc-action">' +
+          '<button class="runner-open-btn" onclick="openICPProfiles(' + scIdx + ')">Open top ' +
+          Math.min(matched.length, 10) + ' profiles to message</button>' +
+          '</div>';
+      }
 
-      // Stage 1: Scraped (auto from scrape)
-      html += renderPipeStage('Scraped', total, null, false);
-      html += renderPipeArrow(total, matched.length);
+      // ── Pipeline: compact horizontal tracker ──
+      html += '<div class="rc-pipeline">' +
+        '<div class="rc-pipe-stage">' +
+        '<span class="rc-pipe-val">' + total + '</span> scraped</div>' +
+        '<span class="rc-pipe-arrow">→</span>' +
+        '<div class="rc-pipe-stage rc-pipe-highlight">' +
+        '<span class="rc-pipe-val">' + matched.length + '</span> ICP</div>' +
+        '<span class="rc-pipe-arrow">→</span>' +
+        '<div class="rc-pipe-stage">' +
+        '<input type="number" class="rc-pipe-input" value="' + dmsSent + '" min="0" ' +
+        'onfocus="this.select()" onchange="updatePipeline(' + sc.id + ',\'dmsSent\',this.value)"> messaged</div>' +
+        '<span class="rc-pipe-arrow">→</span>' +
+        '<div class="rc-pipe-stage">' +
+        '<input type="number" class="rc-pipe-input" value="' + replied + '" min="0" ' +
+        'onfocus="this.select()" onchange="updatePipeline(' + sc.id + ',\'replied\',this.value)"> replied</div>' +
+        '<span class="rc-pipe-arrow">→</span>' +
+        '<div class="rc-pipe-stage">' +
+        '<input type="number" class="rc-pipe-input" value="' + signedUp + '" min="0" ' +
+        'onfocus="this.select()" onchange="updatePipeline(' + sc.id + ',\'signedUp\',this.value)"> signed up</div>' +
+        '</div>';
 
-      // Stage 2: ICP Matches (auto from filter)
-      html += renderPipeStage('ICP Matches', matched.length, null, false);
-      html += renderPipeArrow(matched.length, dmsSent);
+      // ── Lead list: ICP matches shown directly, others collapsed ──
+      if (matched.length > 0) {
+        html += '<div class="rc-leads">';
+        html += '<div class="rc-leads-title">ICP Matches</div>';
+        matched.forEach(function(l) {
+          var profileUrl = l.linkedin_url || '';
+          html += '<div class="rc-lead">' +
+            '<div class="rc-lead-info">' +
+            '<a href="' + profileUrl + '" target="_blank" rel="noopener" class="rc-lead-name">' + l.name + '</a>' +
+            '<div class="rc-lead-title">' + (l.title || 'No headline') + '</div>' +
+            '</div>' +
+            '<a href="' + profileUrl + '" target="_blank" rel="noopener" class="runner-msg-btn">Message</a>' +
+            '</div>';
+        });
+        html += '</div>';
+      }
 
-      // Stage 3: DMs Sent (editable)
-      html += renderPipeStage('DMs Sent', dmsSent, 'updatePipeline(' + sc.id + ',\'dmsSent\',this.value)', true);
-      html += renderPipeArrow(dmsSent, replied);
-
-      // Stage 4: Replied (editable)
-      html += renderPipeStage('Replied', replied, 'updatePipeline(' + sc.id + ',\'replied\',this.value)', true);
-      html += renderPipeArrow(replied, signedUp);
-
-      // Stage 5: Signed Up (editable)
-      html += renderPipeStage('Signed Up', signedUp, 'updatePipeline(' + sc.id + ',\'signedUp\',this.value)', true);
-
-      html += '</div>';
-
-      // Workflow guide — contextual next step
-      html += renderWorkflowGuide(matched.length, dmsSent, replied, signedUp, scIdx);
-
-      // Expandable lead table
-      html += '<details class="runner-leads"><summary class="runner-leads-toggle">' +
-        matched.length + ' ICP leads · ' + (total - matched.length) + ' others</summary>';
-      html += '<table class="scrape-table"><thead><tr>' +
-        '<th>Name</th><th>Title</th><th>Company</th><th>Comment</th>' +
-        '</tr></thead><tbody>';
-
-      var sorted = matched.concat(sc.leads.filter(function(l) { return !l.icp_match; }));
-      sorted.forEach(function(l) {
-        html += '<tr class="' + (l.icp_match ? 'scrape-row-match' : 'scrape-row-miss') + '">' +
-          '<td><a href="' + l.linkedin_url + '" target="_blank" rel="noopener" class="scrape-name-link">' + l.name + '</a></td>' +
-          '<td>' + (l.title || '<span class="scrape-empty">Private</span>') + '</td>' +
-          '<td>' + (l.company || '<span class="scrape-empty">—</span>') + '</td>' +
-          '<td class="scrape-comment">' + (l.comment_text || '<span class="scrape-empty">Liked</span>') + '</td>' +
-          '</tr>';
-      });
-      html += '</tbody></table></details>';
+      // Others — show first 5, collapse the rest
+      var others = sc.leads.filter(function(l) { return !l.icp_match; });
+      if (others.length > 0) {
+        html += '<div class="rc-leads rc-leads-dim">';
+        html += '<div class="rc-leads-title">All engagers (' + others.length + ')</div>';
+        var preview = others.slice(0, 5);
+        preview.forEach(function(l) {
+          var profileUrl = l.linkedin_url || '';
+          html += '<div class="rc-lead">' +
+            '<div class="rc-lead-info">' +
+            '<a href="' + profileUrl + '" target="_blank" rel="noopener" class="rc-lead-name">' + l.name + '</a>' +
+            '<div class="rc-lead-title">' + (l.title || 'No headline') + '</div>' +
+            '</div></div>';
+        });
+        if (others.length > 5) {
+          html += '<details class="runner-leads"><summary class="runner-leads-toggle">' +
+            (others.length - 5) + ' more</summary>';
+          others.slice(5).forEach(function(l) {
+            var profileUrl = l.linkedin_url || '';
+            html += '<div class="rc-lead">' +
+              '<div class="rc-lead-info">' +
+              '<a href="' + profileUrl + '" target="_blank" rel="noopener" class="rc-lead-name">' + l.name + '</a>' +
+              '<div class="rc-lead-title">' + (l.title || 'No headline') + '</div>' +
+              '</div></div>';
+          });
+          html += '</details>';
+        }
+        html += '</div>';
+      }
 
       html += '</div>';
     });
   } else {
-    html += '<div class="scrape-empty-state">Paste a LinkedIn post URL above to scrape engagers, filter by ICP, and track your outreach pipeline.</div>';
+    html += '<div class="scrape-empty-state">' +
+      '<div class="scrape-empty-icon">↑</div>' +
+      'Paste a LinkedIn post URL above to find leads who engage with content in your space</div>';
   }
 
   el.innerHTML = html;
+}
+
+function extractPostTitle(url) {
+  // Turn linkedin.com/posts/rmeadows_most-gtm-playbooks... into "most gtm playbooks..."
+  var match = url.match(/posts\/[^_]+_([^-]+(?:-[^-]+){0,6})/);
+  if (match) {
+    return match[1].replace(/-/g, ' ').replace(/activity.*/, '').trim();
+  }
+  // Fallback: show truncated URL
+  return truncateUrl(url);
 }
 
 /* --- Pipeline rendering helpers --- */
@@ -308,15 +402,14 @@ function renderWorkflowGuide(icpCount, dmsSent, replied, signedUp, scIdx) {
       '<div class="runner-guide-step">' +
       '<span class="runner-guide-num">1</span>' +
       '<div class="runner-guide-text">' +
-      '<strong>Export & load into Dripify</strong>' +
-      '<div class="runner-guide-detail">Click CSV above → Open <a href="https://dripify.io" target="_blank" rel="noopener">Dripify</a> → ' +
-      'Create Campaign → Import CSV → Pick a message template → Start</div>' +
+      '<strong>Open ICP profiles & message them</strong>' +
+      '<div class="runner-guide-detail">Expand the leads below → click "Open top ICP profiles" → each profile opens in a new tab → send a personal message referencing the post they engaged with</div>' +
       '</div></div>' +
       '<div class="runner-guide-step">' +
       '<span class="runner-guide-num">2</span>' +
       '<div class="runner-guide-text">' +
       '<strong>Update DMs Sent</strong>' +
-      '<div class="runner-guide-detail">Once Dripify starts sending, update the "DMs Sent" number above from your Dripify dashboard</div>' +
+      '<div class="runner-guide-detail">After messaging, update the "DMs Sent" number above to track your pipeline</div>' +
       '</div></div></div>';
   }
 
@@ -349,6 +442,19 @@ function renderWorkflowGuide(icpCount, dmsSent, replied, signedUp, scIdx) {
     '<strong>' + signedUp + ' signup' + (signedUp !== 1 ? 's' : '') + ' from this batch</strong>' +
     '<div class="runner-guide-detail">' + convRate + '% conversion from DM to signup. Scrape another post to keep the pipeline fed.</div>' +
     '</div></div></div>';
+}
+
+function openICPProfiles(scIdx) {
+  var scrapes = loadScrapes();
+  if (!scrapes[scIdx]) return;
+  var matched = scrapes[scIdx].leads.filter(function(l) { return l.icp_match && l.linkedin_url; });
+  var toOpen = matched.slice(0, 10);
+  toOpen.forEach(function(l, i) {
+    setTimeout(function() {
+      window.open(l.linkedin_url, '_blank');
+    }, i * 800); // Stagger by 800ms to avoid popup blocker
+  });
+  showToast('Opening ' + toOpen.length + ' profiles...');
 }
 
 function updatePipeline(scrapeId, field, val) {
