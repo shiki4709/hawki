@@ -230,6 +230,8 @@ function renderRunner() {
       var matched = sc.leads.filter(function(l) { return l.icp_match; });
       var total = sc.leads.length;
       var ago = timeAgo(sc.date);
+      var dateStr = new Date(sc.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      var messagedCount = sc.leads.filter(function(l) { return isMessaged(l.linkedin_url); }).length;
       var modeLabel = sc.mode === 'demo' ? ' <span class="scrape-demo-badge">Demo</span>' : '';
 
       var pipeline = sc.pipeline || {};
@@ -256,8 +258,9 @@ function renderRunner() {
         '</div>' +
         '<div class="rc-hero-right">' +
         '<div class="rc-title">' + postTitle + modeLabel + '</div>' +
-        '<div class="rc-meta">' + ago + ' · ' +
-        Math.round((matched.length / Math.max(total, 1)) * 100) + '% match rate</div>' +
+        '<div class="rc-meta">Scraped ' + dateStr +
+        (messagedCount > 0 ? ' · ' + messagedCount + ' messaged' : '') +
+        ' · ' + Math.round((matched.length / Math.max(total, 1)) * 100) + '% ICP</div>' +
         '</div>' +
         '<div class="rc-hero-actions">' +
         '<button class="scrape-csv-btn" onclick="downloadScrapeCSV(' + scIdx + ',false)">All CSV</button>' +

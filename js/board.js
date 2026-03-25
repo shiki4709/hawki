@@ -7,8 +7,6 @@
    ================================================================ */
 
 function render() {
-  var sp = loadSprint();
-  document.getElementById('sprint-label').textContent = sp.name + ' · ' + sp.start + ' – ' + sp.end + ', ' + sp.year;
 
   // Hide mode toggle — not needed
   document.getElementById('mode-toggle').innerHTML = '';
