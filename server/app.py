@@ -229,6 +229,67 @@ Now write ONE message for {first_name}. IMPORTANT — vary the structure, don't 
     return jsonify({"message": message})
 
 
+@app.route("/api/profile-info", methods=["POST"])
+def profile_info():
+    """Get basic profile info from a LinkedIn username."""
+    cookies = get_cookies()
+    if not cookies:
+        return jsonify({"error": "No cookies"}), 400
+
+    data = request.get_json()
+    username = data.get("username", "").strip()
+    if not username:
+        return jsonify({"error": "No username"}), 400
+
+    headers = {
+        "accept": "application/vnd.linkedin.normalized+json+2.1",
+        "csrf-token": cookies.get("JSESSIONID", "").strip('"'),
+        "x-li-lang": "en_US",
+        "x-restli-protocol-version": "2.0.0",
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+    }
+
+    try:
+        url = f"https://www.linkedin.com/voyager/api/identity/dash/profiles?q=memberIdentity&memberIdentity={username}"
+        resp = http_requests.get(url, cookies=cookies, headers=headers, timeout=15, allow_redirects=False)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    if resp.status_code != 200:
+        return jsonify({"error": "Could not fetch profile"}), 400
+
+    result = resp.json()
+    for item in result.get("included", []):
+        if isinstance(item, dict) and item.get("firstName"):
+            return jsonify({
+                "name": f"{item.get('firstName', '')} {item.get('lastName', '')}",
+                "headline": item.get("headline", ""),
+            })
+
+    return jsonify({"error": "Profile not found"}), 404
+
+
+@app.route("/api/update-cookies", methods=["POST"])
+def update_cookies():
+    """Receive fresh LinkedIn cookies from the browser extension."""
+    data = request.get_json()
+    if not data or not data.get("li_at"):
+        return jsonify({"error": "No li_at cookie"}), 400
+
+    # Update cookies.json
+    try:
+        with open("cookies.json", "r") as f:
+            existing = json.load(f)
+    except FileNotFoundError:
+        existing = {}
+
+    existing.update(data)
+    with open("cookies.json", "w") as f:
+        json.dump(existing, f, indent=2)
+
+    return jsonify({"status": "ok", "updated": len(data)})
+
+
 @app.route("/api/status", methods=["GET"])
 def status():
     cookies = get_cookies()

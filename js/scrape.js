@@ -220,7 +220,32 @@ function renderRunner() {
     '</div>' +
     '</div>';
 
-  // (post discovery removed — LinkedIn blocks all search APIs)
+  // ── Watch List ──
+  var watchList = loadWatchList();
+  html += '<div class="rc-watch">';
+  html += '<div class="rc-watch-header">' +
+    '<span class="rc-watch-title">Watch List</span>' +
+    '<div class="rc-watch-add">' +
+    '<input type="text" class="rc-watch-input" id="watch-input" ' +
+    'placeholder="Paste an influencer profile URL..." ' +
+    'onkeydown="if(event.key===\'Enter\')addToWatchList()">' +
+    '<button class="scrape-find-btn" onclick="addToWatchList()">Add</button>' +
+    '</div></div>';
+
+  if (watchList.length > 0) {
+    watchList.forEach(function(w) {
+      html += '<div class="rc-watch-item">' +
+        '<div class="rc-watch-info">' +
+        '<span class="rc-watch-name">' + w.name + '</span>' +
+        (w.headline ? '<span class="rc-watch-headline">' + w.headline.substring(0, 60) + '</span>' : '') +
+        '</div>' +
+        '<div class="rc-watch-actions">' +
+        '<a href="' + w.url + '/recent-activity/all/" target="_blank" rel="noopener" class="rc-watch-view">View posts</a>' +
+        '<button class="scrape-remove-btn" onclick="removeFromWatchList(\'' + w.username + '\')">Remove</button>' +
+        '</div></div>';
+    });
+  }
+  html += '</div>';
 
   // (ICP + API key config moved to Settings modal — gear icon)
 
@@ -443,6 +468,92 @@ function unmarkMessaged(profileUrl) {
 
 function isMessaged(profileUrl) {
   return !!loadMessaged()[profileUrl];
+}
+
+/* --- Influencer Watch List --- */
+var WATCH_KEY = 'hawki_watchlist_v1';
+
+function loadWatchList() {
+  var s = localStorage.getItem(WATCH_KEY);
+  return s ? JSON.parse(s) : [];
+}
+
+function saveWatchList(d) {
+  localStorage.setItem(WATCH_KEY, JSON.stringify(d));
+}
+
+function addToWatchList() {
+  var input = document.getElementById('watch-input');
+  var url = input.value.trim();
+  if (!url || url.indexOf('linkedin.com/in/') < 0) {
+    showToast('Paste a LinkedIn profile URL');
+    return;
+  }
+
+  // Extract username from URL
+  var match = url.match(/linkedin\.com\/in\/([^/?]+)/);
+  var username = match ? match[1] : '';
+  if (!username) return;
+
+  var list = loadWatchList();
+  if (list.some(function(w) { return w.username === username; })) {
+    showToast('Already watching');
+    return;
+  }
+
+  // Fetch their profile info
+  var apiUrl = getApiUrl();
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', apiUrl + '/api/profile-info');
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.timeout = 15000;
+
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      var result = JSON.parse(xhr.responseText);
+      list.unshift({
+        username: username,
+        name: result.name || username,
+        headline: result.headline || '',
+        url: 'https://www.linkedin.com/in/' + username,
+        added: new Date().toISOString(),
+      });
+    } else {
+      // Add with just the username
+      list.unshift({
+        username: username,
+        name: username.replace(/-/g, ' '),
+        headline: '',
+        url: 'https://www.linkedin.com/in/' + username,
+        added: new Date().toISOString(),
+      });
+    }
+    saveWatchList(list);
+    input.value = '';
+    showToast('Added to watch list');
+    render();
+  };
+
+  xhr.onerror = function() {
+    list.unshift({
+      username: username,
+      name: username.replace(/-/g, ' '),
+      headline: '',
+      url: 'https://www.linkedin.com/in/' + username,
+      added: new Date().toISOString(),
+    });
+    saveWatchList(list);
+    input.value = '';
+    render();
+  };
+
+  xhr.send(JSON.stringify({ username: username }));
+}
+
+function removeFromWatchList(username) {
+  var list = loadWatchList().filter(function(w) { return w.username !== username; });
+  saveWatchList(list);
+  render();
 }
 
 /* --- Lead filters (per scrape) --- */

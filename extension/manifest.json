@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Hawki Cookie Sync",
+  "version": "1.0.0",
+  "description": "Auto-syncs your LinkedIn cookies to Hawki so you don't have to copy them manually.",
+  "permissions": ["cookies", "storage"],
+  "host_permissions": [
+    "https://www.linkedin.com/*",
+    "http://localhost:5001/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

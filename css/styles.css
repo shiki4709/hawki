@@ -792,6 +792,30 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .scrape-empty-state { padding: var(--s-48) 0; text-align: center; color: var(--text-4); font-size: var(--fs-sm); line-height: var(--lh-body); }
 .scrape-empty-icon { font-size: var(--fs-xl); margin-bottom: var(--s-8); opacity: 0.4; }
 
+/* ── Watch List ── */
+.rc-watch { margin-bottom: var(--s-24); }
+.rc-watch-header { display: flex; justify-content: space-between; align-items: center; gap: var(--s-12); margin-bottom: var(--s-8); }
+.rc-watch-title { font-size: var(--fs-xs); font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.05em; flex-shrink: 0; }
+.rc-watch-add { display: flex; gap: var(--s-6); flex: 1; }
+.rc-watch-input {
+  flex: 1; padding: var(--s-6) var(--s-12); font-family: var(--ff-body);
+  font-size: var(--fs-xs); border: 1.5px solid var(--rule); border-radius: var(--radius-sm);
+  background: var(--bg); color: var(--text); outline: none;
+}
+.rc-watch-input:focus { border-color: var(--inbound); }
+.rc-watch-input::placeholder { color: var(--text-4); }
+.rc-watch-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: var(--s-8) var(--s-12); border: 1px solid var(--rule-faint);
+  border-radius: var(--radius-sm); margin-bottom: var(--s-4);
+}
+.rc-watch-info { display: flex; align-items: center; gap: var(--s-8); min-width: 0; }
+.rc-watch-name { font-size: var(--fs-sm); font-weight: 500; color: var(--text); text-transform: capitalize; }
+.rc-watch-headline { font-size: var(--fs-xs); color: var(--text-4); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rc-watch-actions { display: flex; gap: var(--s-8); flex-shrink: 0; align-items: center; }
+.rc-watch-view { font-size: var(--fs-xs); font-weight: 500; color: var(--inbound); text-decoration: none; white-space: nowrap; }
+.rc-watch-view:hover { text-decoration: underline; }
+
 /* ── Runner pipeline cards ── */
 .runner-card {
   border: 1px solid var(--rule-faint); border-radius: var(--radius);
