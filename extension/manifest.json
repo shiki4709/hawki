@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Hawki Cookie Sync",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Auto-syncs your LinkedIn cookies to Hawki so you don't have to copy them manually.",
   "permissions": ["cookies", "storage", "alarms", "scripting"],
   "host_permissions": [
     "https://www.linkedin.com/*",
     "https://hawki-sigma.vercel.app/*",
+    "https://hawki*.vercel.app/*",
     "http://localhost:5001/*"
   ],
   "action": {
@@ -16,6 +17,13 @@
   "background": {
     "service_worker": "background.js"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://hawki-sigma.vercel.app/*", "http://localhost:5001/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "icons": {
     "48": "icon.png",
     "128": "icon.png"

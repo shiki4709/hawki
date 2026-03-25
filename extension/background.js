@@ -63,9 +63,15 @@ chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "cookieSync") syncCookies();
 });
 
-// Manual sync from popup
-chrome.runtime.onMessage.addListener((msg) => {
+// Manual sync from popup or page request
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "sync") syncCookies();
+  if (msg.action === "getCookie") {
+    chrome.storage.local.get(["li_at"], (data) => {
+      sendResponse({ li_at: data.li_at || "" });
+    });
+    return true; // keep channel open for async response
+  }
 });
 
 // Sync immediately when LinkedIn cookies change

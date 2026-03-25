@@ -203,14 +203,20 @@ function renderRunner() {
   var el = document.getElementById('view-scrape');
 
   // ── Onboarding (show when no cookie set) ──
-  // Check if extension just synced (it sets hawki_li_at via scripting)
   if (!localStorage.getItem('hawki_li_at')) {
-    // Try to detect if extension is installed by checking after a short delay
-    if (!window._hawkiCheckedExtension) {
-      window._hawkiCheckedExtension = true;
+    // Ask extension for cookie (content script will inject it)
+    if (!window._hawkiAskedExtension) {
+      window._hawkiAskedExtension = true;
+      window.postMessage({ type: 'HAWKI_GET_COOKIE' }, '*');
+      window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'HAWKI_COOKIE_READY') {
+          render();
+        }
+      });
+      // Also check after a delay in case content script already injected
       setTimeout(function() {
         if (localStorage.getItem('hawki_li_at')) render();
-      }, 1500);
+      }, 2000);
     }
     el.innerHTML = '<div class="onboard">' +
       '<div class="onboard-title">Welcome to Hawki</div>' +
