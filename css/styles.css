@@ -86,8 +86,8 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .add-btn { font-family: var(--ff-body); font-size: var(--fs-xs); font-weight: 600; color: var(--accent); background: transparent; border: 1.5px solid var(--rule); padding: var(--s-6) var(--s-12); border-radius: var(--radius-sm); cursor: pointer; transition: all var(--dur-fast) var(--ease-out); white-space: nowrap; }
 .add-btn:hover { border-color: var(--accent); background: var(--accent-bg); }
 
-.settings-btn { width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); border: 1.5px solid var(--rule); background: transparent; color: var(--text-4); cursor: pointer; transition: all var(--dur-fast) var(--ease-out); }
-.settings-btn:hover { border-color: var(--text-4); color: var(--text-2); }
+.settings-btn { width: 2.25rem; height: 2.25rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: none; background: transparent; color: var(--text-4); cursor: pointer; transition: all var(--dur-mid) var(--ease-out); }
+.settings-btn:hover { color: var(--text-2); background: var(--surface); transform: rotate(30deg); }
 
 .sync-all-btn { font-family: var(--ff-body); font-size: var(--fs-xs); font-weight: 600; color: var(--hit); background: transparent; border: 1.5px solid var(--rule); padding: var(--s-4) var(--s-12); border-radius: var(--radius-sm); cursor: pointer; transition: all var(--dur-fast) var(--ease-out); }
 .sync-all-btn:hover { border-color: var(--hit); background: var(--hit-bg); }
