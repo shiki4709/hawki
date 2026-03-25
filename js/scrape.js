@@ -316,26 +316,54 @@ function renderRunner() {
 
       // All leads in one list, sorted by quality, folded after first batch
       if (sorted.length > 0) {
-        // Count for summary
         var commentCount = sorted.filter(function(l) { return l.comment_text; }).length;
         var icpCount = matched.length;
 
+        // Split into 4 groups
+        var grpBoth = sorted.filter(function(l) { return l.icp_match && l.comment_text; });
+        var grpICP = sorted.filter(function(l) { return l.icp_match && !l.comment_text; });
+        var grpComment = sorted.filter(function(l) { return !l.icp_match && l.comment_text; });
+        var grpOther = sorted.filter(function(l) { return !l.icp_match && !l.comment_text; });
+
+        var filters = getLeadFilters(sc.id);
+
         html += '<div class="rc-leads">';
-        html += '<div class="rc-leads-title">' + sorted.length + ' engagers · ' + commentCount + ' commented · ' + icpCount + ' ICP</div>';
 
-        // Show first 15, fold the rest
-        var showLimit = 15;
-        sorted.slice(0, showLimit).forEach(function(l) {
-          html += renderLeadRow(l);
-        });
+        // 4 toggle buttons
+        html += '<div class="rc-filter-bar">' +
+          '<button class="rc-filter-toggle rc-ft-both ' + (filters.both ? 'active' : '') + '" onclick="toggleLeadFilter(' + sc.id + ',\'both\')">' +
+          '<span class="rc-filter-count">' + grpBoth.length + '</span> ICP + Commented</button>' +
+          '<button class="rc-filter-toggle rc-ft-icp ' + (filters.icp ? 'active' : '') + '" onclick="toggleLeadFilter(' + sc.id + ',\'icp\')">' +
+          '<span class="rc-filter-count">' + grpICP.length + '</span> ICP</button>' +
+          '<button class="rc-filter-toggle rc-ft-comment ' + (filters.commented ? 'active' : '') + '" onclick="toggleLeadFilter(' + sc.id + ',\'commented\')">' +
+          '<span class="rc-filter-count">' + grpComment.length + '</span> Commented</button>' +
+          '<button class="rc-filter-toggle rc-ft-other ' + (filters.other ? 'active' : '') + '" onclick="toggleLeadFilter(' + sc.id + ',\'other\')">' +
+          '<span class="rc-filter-count">' + grpOther.length + '</span> Others</button>' +
+          '</div>';
 
-        if (sorted.length > showLimit) {
-          html += '<details class="runner-leads"><summary class="runner-leads-toggle">' +
-            (sorted.length - showLimit) + ' more</summary>';
-          sorted.slice(showLimit).forEach(function(l) {
-            html += renderLeadRow(l);
-          });
-          html += '</details>';
+        // If no filters active, show best group by default
+        var anyActive = filters.both || filters.icp || filters.commented || filters.other;
+
+        function renderGroup(label, leads, showLimit) {
+          var h = '<div class="rc-group-label">' + label + ' (' + leads.length + ')</div>';
+          leads.slice(0, showLimit).forEach(function(l) { h += renderLeadRow(l); });
+          if (leads.length > showLimit) {
+            h += '<details class="runner-leads"><summary class="runner-leads-toggle">' +
+              (leads.length - showLimit) + ' more ' + label.toLowerCase() + '</summary>';
+            leads.slice(showLimit).forEach(function(l) { h += renderLeadRow(l); });
+            h += '</details>';
+          }
+          return h;
+        }
+
+        if (!anyActive) {
+          if (grpBoth.length > 0) html += renderGroup('ICP + Commented', grpBoth, 15);
+          if (grpICP.length > 0) html += renderGroup('ICP Likers', grpICP, 10);
+        } else {
+          if (filters.both && grpBoth.length > 0) html += renderGroup('ICP + Commented', grpBoth, 15);
+          if (filters.icp && grpICP.length > 0) html += renderGroup('ICP Likers', grpICP, 15);
+          if (filters.commented && grpComment.length > 0) html += renderGroup('Commenters', grpComment, 15);
+          if (filters.other && grpOther.length > 0) html += renderGroup('Other Likers', grpOther, 15);
         }
         html += '</div>';
       }
@@ -382,6 +410,19 @@ function renderPipeArrow(from, to) {
   var text = from > 0 ? conv.toFixed(0) + '%' : '—';
   var cls = conv >= 50 ? 'pipe-conv-good' : conv >= 20 ? 'pipe-conv-ok' : 'pipe-conv-low';
   return '<div class="runner-arrow ' + cls + '">' + text + '</div>';
+}
+
+/* --- Lead filters (per scrape) --- */
+var leadFilters = {};
+
+function getLeadFilters(scrapeId) {
+  return leadFilters[scrapeId] || { both: false, icp: false, commented: false, other: false };
+}
+
+function toggleLeadFilter(scrapeId, type) {
+  if (!leadFilters[scrapeId]) leadFilters[scrapeId] = { both: false, icp: false, commented: false, other: false };
+  leadFilters[scrapeId][type] = !leadFilters[scrapeId][type];
+  render();
 }
 
 function renderLeadRow(l) {
