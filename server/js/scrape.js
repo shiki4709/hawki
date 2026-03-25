@@ -203,7 +203,15 @@ function renderRunner() {
   var el = document.getElementById('view-scrape');
 
   // ── Onboarding (show when no cookie set) ──
+  // Check if extension just synced (it sets hawki_li_at via scripting)
   if (!localStorage.getItem('hawki_li_at')) {
+    // Try to detect if extension is installed by checking after a short delay
+    if (!window._hawkiCheckedExtension) {
+      window._hawkiCheckedExtension = true;
+      setTimeout(function() {
+        if (localStorage.getItem('hawki_li_at')) render();
+      }, 1500);
+    }
     el.innerHTML = '<div class="onboard">' +
       '<div class="onboard-title">Welcome to Hawki</div>' +
       '<div class="onboard-desc">Connect your LinkedIn to start finding leads.</div>' +
