@@ -21,7 +21,11 @@ COOKIES = None
 
 
 def get_cookies():
-    # Always reload from file to pick up fresh cookies
+    # Try env var first (for deployed server), then file
+    li_at = os.environ.get("LI_AT", "")
+    jsessionid = os.environ.get("LI_JSESSIONID", "")
+    if li_at:
+        return {"li_at": li_at, "JSESSIONID": jsessionid}
     try:
         return load_cookies("cookies.json")
     except FileNotFoundError:
@@ -139,8 +143,10 @@ def find_posts():
 def draft_message():
     """Use Claude to draft a personalized outreach message."""
     data = request.get_json()
-    # User's key takes priority, then server config
+    # User's key takes priority, then env var, then config file
     api_key = data.get("api_key", "").strip()
+    if not api_key:
+        api_key = os.environ.get("ANTHROPIC_API_KEY", "")
     if not api_key:
         try:
             with open("config.json", "r") as f:
@@ -313,6 +319,8 @@ def static_files(path):
 
 
 if __name__ == "__main__":
-    print("GTM Runner starting on http://localhost:5001")
-    print("Make sure cookies.json exists in the server/ directory")
-    app.run(port=5001, debug=True)
+    import os
+    port = int(os.environ.get("PORT", 5001))
+    debug = os.environ.get("FLASK_DEBUG", "true").lower() == "true"
+    print(f"Hawki starting on http://localhost:{port}")
+    app.run(host="0.0.0.0", port=port, debug=debug)
