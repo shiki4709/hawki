@@ -487,69 +487,118 @@ function renderLeadRow(l) {
 }
 
 function messageAndTrack(profileUrl, firstName, commentText, postTitle) {
+  // Get the full lead data
+  var scrapes = loadScrapes();
+  var lead = null;
+  scrapes.forEach(function(sc) {
+    sc.leads.forEach(function(l) {
+      if (l.linkedin_url === profileUrl) lead = l;
+    });
+  });
+
   var apiKey = localStorage.getItem('hawki_claude_key') || '';
 
-  if (apiKey) {
-    // Use Claude to draft a personalized message
-    showToast('Drafting with AI...');
-    var apiUrl = getApiUrl();
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', apiUrl + '/api/draft-message');
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.timeout = 15000;
+  // Show draft modal
+  showDraftModal(profileUrl, lead, commentText, postTitle, apiKey);
+}
 
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        var result = JSON.parse(xhr.responseText);
-        copyAndOpen(result.message, profileUrl);
-      } else {
-        // Fallback to template
-        copyAndOpen(templateDraft(firstName, commentText, postTitle), profileUrl);
-      }
-    };
+function showDraftModal(profileUrl, lead, commentText, postTitle, apiKey) {
+  var firstName = lead ? lead.name.split(' ')[0] : '';
+  var fullName = lead ? lead.name : firstName;
+  var headline = lead ? lead.title : '';
 
-    xhr.onerror = function() {
-      copyAndOpen(templateDraft(firstName, commentText, postTitle), profileUrl);
-    };
+  qaOpen = true;
+  document.getElementById('modal').classList.add('open');
+  document.querySelector('.chat').innerHTML =
+    '<div class="qa-panel"><div class="qa-header">' +
+    '<h2 class="qa-title">Message ' + fullName + '</h2>' +
+    '<button class="chat-close" onclick="closeModal()">&times;</button></div>' +
+    '<div class="qa-body">' +
+    '<div class="draft-lead-info">' +
+    '<div class="draft-lead-name">' + fullName + '</div>' +
+    '<div class="draft-lead-headline">' + (headline || '') + '</div>' +
+    (commentText ? '<div class="draft-lead-comment">"' + commentText + '"</div>' : '') +
+    '</div>' +
+    '<div class="qa-field">' +
+    '<textarea class="qa-input draft-textarea" id="draft-message" rows="5" placeholder="Drafting...">' +
+    templateDraft(firstName, commentText, postTitle) + '</textarea>' +
+    '</div>' +
+    '<div class="draft-actions">' +
+    '<button class="draft-ai-btn" id="draft-ai-btn" onclick="regenerateDraft(\'' + profileUrl.replace(/'/g, "\\'") + '\',\'' + fullName.replace(/'/g, "\\'") + '\',\'' + (headline || '').replace(/'/g, "\\'").replace(/\n/g, ' ') + '\',\'' + (commentText || '').substring(0, 100).replace(/'/g, "\\'").replace(/\n/g, ' ') + '\',\'' + postTitle.replace(/'/g, "\\'") + '\')">Rewrite with AI</button>' +
+    '</div>' +
+    '</div>' +
+    '<div class="qa-footer">' +
+    '<button class="qa-cancel" onclick="closeModal()">Cancel</button>' +
+    '<button class="qa-submit" onclick="sendDraft(\'' + profileUrl.replace(/'/g, "\\'") + '\')">Copy & Open Profile</button>' +
+    '</div></div>';
 
-    // Get the full lead data for richer context
-    var scrapes = loadScrapes();
-    var lead = null;
-    scrapes.forEach(function(sc) {
-      sc.leads.forEach(function(l) {
-        if (l.linkedin_url === profileUrl) lead = l;
-      });
-    });
+  // Auto-draft with AI if server is available
+  regenerateDraft(profileUrl, fullName, headline || '', (commentText || '').substring(0, 100), postTitle);
+}
 
-    xhr.send(JSON.stringify({
-      api_key: apiKey,
-      name: lead ? lead.name : firstName,
-      headline: lead ? lead.title : '',
-      comment: commentText,
-      post_title: postTitle,
-    }));
-  } else {
-    // No API key — use template
-    copyAndOpen(templateDraft(firstName, commentText, postTitle), profileUrl);
-  }
+function regenerateDraft(profileUrl, name, headline, comment, postTitle) {
+  var btn = document.getElementById('draft-ai-btn');
+  var textarea = document.getElementById('draft-message');
+  if (!btn || !textarea) return;
+
+  btn.textContent = 'Drafting...';
+  btn.disabled = true;
+
+  var apiKey = localStorage.getItem('hawki_claude_key') || '';
+  var apiUrl = getApiUrl();
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', apiUrl + '/api/draft-message');
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.timeout = 15000;
+
+  xhr.onload = function() {
+    btn.textContent = 'Rewrite with AI';
+    btn.disabled = false;
+    if (xhr.status === 200) {
+      var result = JSON.parse(xhr.responseText);
+      textarea.value = result.message;
+    }
+  };
+
+  xhr.onerror = function() {
+    btn.textContent = 'Rewrite with AI';
+    btn.disabled = false;
+  };
+
+  xhr.ontimeout = function() {
+    btn.textContent = 'Rewrite with AI';
+    btn.disabled = false;
+  };
+
+  xhr.send(JSON.stringify({
+    api_key: apiKey,
+    name: name,
+    headline: headline,
+    comment: comment,
+    post_title: postTitle,
+  }));
+}
+
+function sendDraft(profileUrl) {
+  var textarea = document.getElementById('draft-message');
+  var msg = textarea ? textarea.value : '';
+
+  navigator.clipboard.writeText(msg).then(function() {
+    showToast('Message copied — paste it in LinkedIn');
+  }).catch(function() {
+    prompt('Copy this message:', msg);
+  });
 
   markMessaged(profileUrl);
+  window.open(profileUrl, '_blank');
+  closeModal();
 }
 
 function templateDraft(firstName, commentText, postTitle) {
   if (commentText) {
-    return 'Hi ' + firstName + ', saw your comment on the "' + postTitle + '" post — "' + commentText + '". Would love to connect and chat about this.';
+    return 'Hi ' + firstName + ', saw your comment on the "' + postTitle + '" post — "' + commentText.substring(0, 80) + '". Would love to connect and chat about this.';
   }
   return 'Hi ' + firstName + ', noticed you engaged with the "' + postTitle + '" post. Thought we might have a lot to share around this topic — would love to connect.';
-}
-
-function copyAndOpen(msg, profileUrl) {
-  navigator.clipboard.writeText(msg).then(function() {
-    showToast('Message copied to clipboard');
-  }).catch(function() {
-    prompt('Copy this message:', msg);
-  });
-  window.open(profileUrl, '_blank');
 }
 
 function renderWorkflowGuide(icpCount, dmsSent, replied, signedUp, scIdx) {

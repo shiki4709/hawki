@@ -916,6 +916,36 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
   transition: all var(--dur-fast) var(--ease-out); white-space: nowrap;
 }
 .runner-msg-btn:hover { background: var(--inbound-bg); }
+/* Draft modal */
+.draft-lead-info {
+  padding: var(--s-12); background: var(--bg-sub);
+  border-radius: var(--radius-sm); margin-bottom: var(--s-12);
+}
+.draft-lead-name { font-weight: 600; font-size: var(--fs-sm); color: var(--text); }
+.draft-lead-headline { font-size: var(--fs-xs); color: var(--text-3); margin-top: var(--s-2); }
+.draft-lead-comment {
+  font-size: var(--fs-xs); color: var(--text-3); font-style: italic;
+  margin-top: var(--s-6); padding-top: var(--s-6); border-top: 1px solid var(--rule-faint);
+}
+.draft-textarea {
+  width: 100%; min-height: 6rem; resize: vertical;
+  font-family: var(--ff-body); font-size: var(--fs-sm);
+  line-height: var(--lh-body); padding: var(--s-12);
+  border: 1.5px solid var(--rule); border-radius: var(--radius-sm);
+  color: var(--text); background: var(--bg);
+}
+.draft-textarea:focus { outline: none; border-color: var(--accent); }
+.draft-actions { display: flex; gap: var(--s-8); margin-top: var(--s-8); }
+.draft-ai-btn {
+  font-family: var(--ff-body); font-size: var(--fs-xs); font-weight: 600;
+  color: var(--inbound); background: var(--inbound-bg);
+  border: 1px solid var(--inbound); padding: var(--s-4) var(--s-12);
+  border-radius: var(--radius-sm); cursor: pointer;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+.draft-ai-btn:hover { opacity: 0.85; }
+.draft-ai-btn:disabled { opacity: 0.5; cursor: wait; }
+
 .runner-undo-btn {
   font-family: var(--ff-body); font-size: var(--fs-xs); color: var(--text-4);
   background: transparent; border: none; cursor: pointer;
