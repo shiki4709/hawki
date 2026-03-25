@@ -215,39 +215,14 @@ function renderRunner() {
     '</div>' +
     '<div class="scrape-hint-row">' +
     '<a href="https://www.linkedin.com/search/results/content/?keywords=GTM&sortBy=%22date_posted%22" target="_blank" rel="noopener" class="scrape-find-link">Search LinkedIn for posts</a>' +
-    ' · Copy any post URL and paste it above' +
+    ' · Copy any post URL and paste it above · ' +
+    '<span onclick="openSettings()" style="cursor:pointer;color:var(--text-3);text-decoration:underline dotted">Settings</span>' +
     '</div>' +
-    '<div class="scrape-hint">' +
-    '<span onclick="toggleICPConfig()" style="cursor:pointer;text-decoration:underline dotted;color:var(--text-3)">ICP: ' +
-    icp.titles.slice(0, 4).join(', ') + (icp.titles.length > 4 ? '...' : '') + '</span>' +
-    ' · <span onclick="toggleSettings()" style="cursor:pointer;text-decoration:underline dotted;color:var(--text-3)">' +
-    (localStorage.getItem('hawki_claude_key') ? 'AI drafts on' : 'AI drafts off') + '</span></div>' +
     '</div>';
-
-  // Settings (hidden by default)
-  html += '<div id="hawki-settings" style="display:none;margin-bottom:var(--s-24)">' +
-    '<div class="scrape-icp-field">' +
-    '<label class="scrape-icp-label">Claude API Key (for AI-drafted messages)</label>' +
-    '<input type="password" class="qa-input qa-input-sm" id="hawki-api-key" ' +
-    'value="' + (localStorage.getItem('hawki_claude_key') || '') + '" ' +
-    'placeholder="sk-ant-..." onchange="saveClaudeKey()">' +
-    '<div style="font-size:11px;color:var(--text-4);margin-top:4px">Get a key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--inbound)">console.anthropic.com</a> · Without a key, messages use a simple template</div>' +
-    '</div></div>';
 
   // (post discovery removed — LinkedIn blocks all search APIs)
 
-  // ICP config (hidden by default)
-  html += '<div class="scrape-icp-body" id="icp-config" style="display:none;margin-bottom:var(--s-24)">' +
-    '<div class="scrape-icp-field">' +
-    '<label class="scrape-icp-label">Match titles containing:</label>' +
-    '<input type="text" class="qa-input qa-input-sm" id="icp-titles" value="' + icp.titles.join(', ') + '" ' +
-    'placeholder="AE, SDR, VP Sales..." onchange="saveICPFromInput()">' +
-    '</div>' +
-    '<div class="scrape-icp-field">' +
-    '<label class="scrape-icp-label">Exclude titles containing:</label>' +
-    '<input type="text" class="qa-input qa-input-sm" id="icp-exclude" value="' + icp.exclude.join(', ') + '" ' +
-    'placeholder="Recruiter, Student..." onchange="saveICPFromInput()">' +
-    '</div></div>';
+  // (ICP + API key config moved to Settings modal — gear icon)
 
   // ── Pipeline cards (one per scrape) ──
   if (scrapes.length > 0) {

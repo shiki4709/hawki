@@ -286,24 +286,64 @@ function editSprint() {
 }
 
 function openSettings() {
-  var key = getAIKey();
-  var masked = key ? key.slice(0, 8) + '...' + key.slice(-4) : '';
+  var claudeKey = localStorage.getItem('hawki_claude_key') || '';
+  var icp = loadICP();
+  var masked = claudeKey ? claudeKey.slice(0, 12) + '...' + claudeKey.slice(-4) : '';
+
   qaOpen = true;
   document.getElementById('modal').classList.add('open');
   document.querySelector('.chat').innerHTML =
     '<div class="qa-panel"><div class="qa-header"><h2 class="qa-title">Settings</h2>' +
     '<button class="chat-close" onclick="closeModal()">&times;</button></div>' +
     '<div class="qa-body">' +
-    '<div class="qa-field"><label class="qa-label">Anthropic API Key</label>' +
-    '<input type="password" class="qa-input qa-input-sm" id="settings-key" placeholder="sk-ant-..." value="' + key + '">' +
-    '<div style="font-size:var(--fs-xs);color:var(--text-4);margin-top:var(--s-4)">Powers the AI workflow designer. Stored locally only.' +
-    (masked ? ' Current: ' + masked : '') + '</div></div>' +
-    '</div><div class="qa-footer"><button class="qa-submit" onclick="saveSettings()">Save</button></div></div>';
+
+    // ICP Keywords
+    '<div class="qa-field"><label class="qa-label">Target titles (ICP)</label>' +
+    '<input type="text" class="qa-input qa-input-sm" id="settings-icp-titles" ' +
+    'value="' + icp.titles.join(', ') + '" placeholder="AE, Account Executive, SDR...">' +
+    '<div style="font-size:var(--fs-xs);color:var(--text-4);margin-top:var(--s-4)">People with these words in their headline get the ICP badge. Comma-separated.</div></div>' +
+
+    '<div class="qa-field"><label class="qa-label">Exclude titles</label>' +
+    '<input type="text" class="qa-input qa-input-sm" id="settings-icp-exclude" ' +
+    'value="' + icp.exclude.join(', ') + '" placeholder="Recruiter, Student...">' +
+    '<div style="font-size:var(--fs-xs);color:var(--text-4);margin-top:var(--s-4)">People with these words are always excluded from ICP.</div></div>' +
+
+    // Claude API Key
+    '<div class="qa-field"><label class="qa-label">AI Message Drafting</label>' +
+    '<input type="password" class="qa-input qa-input-sm" id="settings-claude-key" ' +
+    'placeholder="sk-ant-..." value="' + claudeKey + '">' +
+    '<div style="font-size:var(--fs-xs);color:var(--text-4);margin-top:var(--s-4)">' +
+    (claudeKey ? 'Connected: ' + masked + ' · Messages are drafted by AI' : 'Optional. Paste your Anthropic API key to enable AI-drafted messages. Get one at <a href="https://console.anthropic.com" target="_blank" style="color:var(--inbound)">console.anthropic.com</a>') +
+    '</div></div>' +
+
+    '</div><div class="qa-footer"><button class="qa-cancel" onclick="closeModal()">Cancel</button>' +
+    '<button class="qa-submit" onclick="saveSettings()">Save</button></div></div>';
 }
 
 function saveSettings() {
-  var key = document.getElementById('settings-key').value.trim();
-  setAIKey(key);
+  // Save ICP
+  var titles = document.getElementById('settings-icp-titles').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+  var exclude = document.getElementById('settings-icp-exclude').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+  saveICP({ titles: titles, exclude: exclude });
+
+  // Re-apply ICP to all stored scrapes
+  var scrapes = loadScrapes();
+  scrapes.forEach(function(sc) {
+    sc.leads.forEach(function(l) {
+      l.icp_match = matchesICP(l.title);
+    });
+  });
+  saveScrapes(scrapes);
+
+  // Save Claude key
+  var key = document.getElementById('settings-claude-key').value.trim();
+  if (key) {
+    localStorage.setItem('hawki_claude_key', key);
+  } else {
+    localStorage.removeItem('hawki_claude_key');
+  }
+
   flash();
   closeModal();
+  render();
 }

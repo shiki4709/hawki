@@ -139,9 +139,16 @@ def find_posts():
 def draft_message():
     """Use Claude to draft a personalized outreach message."""
     data = request.get_json()
+    # User's key takes priority, then server config
     api_key = data.get("api_key", "").strip()
     if not api_key:
-        return jsonify({"error": "No API key provided"}), 400
+        try:
+            with open("config.json", "r") as f:
+                api_key = json.load(f).get("claude_api_key", "")
+        except FileNotFoundError:
+            pass
+    if not api_key:
+        return jsonify({"error": "No API key configured"}), 400
 
     lead_name = data.get("name", "")
     first_name = lead_name.split(" ")[0] if lead_name else ""
