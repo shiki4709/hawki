@@ -279,8 +279,7 @@ function renderRunner() {
         '<span class="rc-pipe-val">' + matched.length + '</span> ICP</div>' +
         '<span class="rc-pipe-arrow">→</span>' +
         '<div class="rc-pipe-stage">' +
-        '<input type="number" class="rc-pipe-input" value="' + dmsSent + '" min="0" ' +
-        'onfocus="this.select()" onchange="updatePipeline(' + sc.id + ',\'dmsSent\',this.value)"> messaged</div>' +
+        '<span class="rc-pipe-val">' + dmsSent + '</span> messaged</div>' +
         '<span class="rc-pipe-arrow">→</span>' +
         '<div class="rc-pipe-stage">' +
         '<input type="number" class="rc-pipe-input" value="' + replied + '" min="0" ' +
