@@ -1,55 +1,32 @@
 /* ================================================================
-   Board — Experiment-centric flow
+   Board — GTM Runner
 
-   Home: list of experiments, sorted by health
-   Experiment: full detail page for one experiment
-   Compare: sprint snapshots
+   Single-page flow:
+   1. Scrape (paste LinkedIn URL → get leads)
+   2. Pipelines (each scrape becomes a tracked pipeline)
    ================================================================ */
 
-var activeMode = 'outbound';
-var activeView = 'home';
-var openExpId = null;
-
-function setMode(m) { activeMode = m; activeView = 'home'; openExpId = null; render(); }
-function setView(v) { activeView = v; render(); }
-function openExp(id) { openExpId = id; activeView = 'experiment'; render(); }
-function goHome() { activeView = 'home'; openExpId = null; render(); }
-
 function render() {
-  var exps = load();
-
   var sp = loadSprint();
   document.getElementById('sprint-label').textContent = sp.name + ' · ' + sp.start + ' – ' + sp.end + ', ' + sp.year;
 
-  var outCount = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === 'outbound' && !allStopped(e); }).length;
-  var inCount = exps.filter(function(e) { return CH[e.ch] && CH[e.ch].mode === 'inbound' && !allStopped(e); }).length;
-  document.getElementById('mode-toggle').innerHTML =
-    '<button class="mode-pill ' + (activeMode === 'outbound' ? 'active' : '') + '" onclick="setMode(\'outbound\')">Out <span class="mode-pill-n">' + outCount + '</span></button>' +
-    '<button class="mode-pill ' + (activeMode === 'inbound' ? 'active' : '') + '" onclick="setMode(\'inbound\')">In <span class="mode-pill-n">' + inCount + '</span></button>';
+  // Hide mode toggle — not needed
+  document.getElementById('mode-toggle').innerHTML = '';
 
-  // Hide/show views
-  document.getElementById('view-home').style.display = activeView === 'home' ? 'block' : 'none';
-  document.getElementById('view-experiment').style.display = activeView === 'experiment' ? 'block' : 'none';
-  document.getElementById('view-integrations').style.display = activeView === 'integrations' ? 'block' : 'none';
-  document.getElementById('view-weekly').style.display = activeView === 'weekly' ? 'block' : 'none';
+  // Hide all old views
+  document.getElementById('view-home').style.display = 'none';
+  document.getElementById('view-experiment').style.display = 'none';
+  document.getElementById('view-integrations').style.display = 'none';
+  document.getElementById('view-weekly').style.display = 'none';
 
-  // Nav
-  if (activeView === 'experiment') {
-    var exp = exps.find(function(e) { return e.id === openExpId; });
-    document.getElementById('view-tabs').innerHTML =
-      '<button class="vtab" onclick="goHome()">← Back</button>' +
-      '<span class="vtab-title">' + (exp ? exp.name : '') + '</span>';
-  } else {
-    document.getElementById('view-tabs').innerHTML =
-      '<button class="vtab ' + (activeView === 'home' ? 'active' : '') + '" onclick="setView(\'home\')">Workflows</button>' +
-      '<button class="vtab ' + (activeView === 'integrations' ? 'active' : '') + '" onclick="setView(\'integrations\')">Integrations</button>' +
-      '<button class="vtab ' + (activeView === 'weekly' ? 'active' : '') + '" onclick="setView(\'weekly\')">Compare</button>';
-  }
+  // Show unified view
+  document.getElementById('view-scrape').style.display = 'block';
 
-  if (activeView === 'home') renderHome(exps);
-  else if (activeView === 'experiment') renderExperimentPage(exps);
-  else if (activeView === 'integrations') renderIntegrations(exps);
-  else if (typeof renderTimeSeries === 'function') renderTimeSeries();
+  // No tabs — single page
+  document.getElementById('view-tabs').innerHTML = '';
+
+  // Render the unified view
+  renderRunner();
 }
 
 /* ── Helpers ── */
