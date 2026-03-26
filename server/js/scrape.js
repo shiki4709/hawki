@@ -104,10 +104,9 @@ function runScrape(postUrl, callback) {
         if (result.error) { callback(result.error); return; }
 
         // Async mode: scrape started, need to poll
-        if (result.status === 'started' && result.runs) {
-          var datasetIds = result.runs.map(function(r) { return r.datasetId; }).join(',');
+        if (result.status === 'started' && result.pollId) {
           showToast('Scraping... this takes 15-30 seconds');
-          pollForResults(postUrl, datasetIds, callback, 0);
+          pollForResults(postUrl, result.pollId, callback, 0);
           return;
         }
 
@@ -141,8 +140,8 @@ function runScrape(postUrl, callback) {
   xhr.send(JSON.stringify({ url: postUrl }));
 }
 
-function pollForResults(postUrl, datasetIds, callback, attempt) {
-  if (attempt > 20) { callback('Scrape timed out after polling'); return; }
+function pollForResults(postUrl, pollId, callback, attempt) {
+  if (attempt > 30) { callback('Scrape timed out after polling'); return; }
 
   setTimeout(function() {
     var apiUrl = getApiUrl();
@@ -156,22 +155,23 @@ function pollForResults(postUrl, datasetIds, callback, attempt) {
         var result = JSON.parse(xhr.responseText);
         if (result.status === 'done' && result.leads && result.leads.length > 0) {
           finishScrape(postUrl, result.leads, callback);
-        } else if (result.status === 'running' || (result.leads && result.leads.length === 0)) {
+        } else if (result.status === 'running') {
           showToast('Still scraping... (' + (attempt + 1) * 3 + 's)');
-          pollForResults(postUrl, datasetIds, callback, attempt + 1);
+          pollForResults(postUrl, pollId, callback, attempt + 1);
         } else {
-          finishScrape(postUrl, result.leads || [], callback);
+          // Done but no leads
+          callback('No leads found for this post');
         }
       } else {
-        pollForResults(postUrl, datasetIds, callback, attempt + 1);
+        pollForResults(postUrl, pollId, callback, attempt + 1);
       }
     };
 
     xhr.onerror = function() {
-      pollForResults(postUrl, datasetIds, callback, attempt + 1);
+      pollForResults(postUrl, pollId, callback, attempt + 1);
     };
 
-    xhr.send(JSON.stringify({ runId: datasetIds }));
+    xhr.send(JSON.stringify({ runId: pollId }));
   }, 3000);
 }
 

@@ -64,35 +64,56 @@ async function startScrape(postUrl, token) {
     }).then(r => r.json()),
   ]);
 
+  const commId = commRun.data?.id || '';
+  const likeId = likeRun.data?.id || '';
+  const commDs = commRun.data?.defaultDatasetId || '';
+  const likeDs = likeRun.data?.defaultDatasetId || '';
+
   return {
     status: 'started',
+    pollId: `${commDs},${likeDs}|${commId},${likeId}`,
     runs: [
-      { id: commRun.data?.id, type: 'commenters', datasetId: commRun.data?.defaultDatasetId },
-      { id: likeRun.data?.id, type: 'likers', datasetId: likeRun.data?.defaultDatasetId },
+      { id: commId, type: 'commenters', datasetId: commDs },
+      { id: likeId, type: 'likers', datasetId: likeDs },
     ],
   };
 }
 
 async function checkRun(runId, token) {
-  // runId is actually comma-separated datasetIds
-  const datasetIds = runId.split(',');
-  let items = [];
-  let allDone = true;
+  // runId format: "datasetId1,datasetId2|runId1,runId2"
+  const parts = runId.split('|');
+  const datasetIds = parts[0].split(',');
+  const runIds = parts[1] ? parts[1].split(',') : [];
 
+  // Check if all runs are finished
+  let allFinished = true;
+  for (const rid of runIds) {
+    if (!rid) continue;
+    try {
+      const resp = await fetch(`https://api.apify.com/v2/actor-runs/${rid}?token=${token}`);
+      if (resp.ok) {
+        const run = await resp.json();
+        const status = run.data?.status;
+        if (status !== 'SUCCEEDED' && status !== 'FAILED' && status !== 'ABORTED') {
+          allFinished = false;
+        }
+      }
+    } catch (e) {}
+  }
+
+  if (!allFinished) {
+    return { status: 'running', leads: [], fetched: 0 };
+  }
+
+  // All runs done — get items from datasets
+  let items = [];
   for (const dsId of datasetIds) {
     if (!dsId) continue;
-    // Check if dataset has items
     const resp = await fetch(`https://api.apify.com/v2/datasets/${dsId}/items?token=${token}`);
     if (resp.ok) {
       const data = await resp.json();
       items = items.concat(data);
-    } else {
-      allDone = false;
     }
-  }
-
-  if (items.length === 0 && !allDone) {
-    return { status: 'running', leads: [], fetched: 0 };
   }
 
   // Parse results
