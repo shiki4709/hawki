@@ -13,7 +13,7 @@ var ICP_KEY = 'gtm_icp_v1';
 
 /* --- ICP config --- */
 var DEFAULT_ICP = {
-  titles: ['AE', 'Account Executive', 'SDR', 'Sales Development', 'BDR', 'Business Development', 'Sales Rep', 'Sales Manager', 'Head of Sales', 'VP Sales', 'VP of Sales', 'Sales Leader', 'Sales Director', 'Revenue', 'GTM', 'Growth'],
+  titles: ['AE', 'Account Executive', 'SDR', 'Sales Development', 'BDR', 'Business Development', 'Sales Rep', 'Sales Manager', 'Head of Sales', 'VP Sales', 'VP of Sales', 'Sales Leader', 'Sales Director', 'Revenue', 'GTM', 'Growth', 'Founder', 'Co-founder', 'CEO', 'CRO', 'Head of Growth'],
   exclude: ['Recruiter', 'Student', 'Intern']
 };
 
@@ -1084,7 +1084,8 @@ function showUseCasePicker() {
     '<div class="scrape-icp-field" style="margin-bottom:var(--s-16)">' +
     '<label class="scrape-icp-label" style="font-weight:600;color:var(--text)">Target titles</label>' +
     '<input type="text" class="qa-input qa-input-sm" id="setup-titles" ' +
-    'placeholder="e.g. Account Executive, VP Sales, Founder, Product Manager...">' +
+    'value="AE, Account Executive, SDR, Sales Development, BDR, Sales Rep, Sales Manager, Head of Sales, VP Sales, Sales Director, Revenue, GTM, Growth, Founder, CEO, CRO" ' +
+    'placeholder="e.g. Account Executive, VP Sales, Founder...">' +
     '<div style="font-size:11px;color:var(--text-4);margin-top:4px">Comma-separated. People with these words in their headline will be highlighted.</div>' +
     '</div>' +
     '<div class="scrape-icp-field" style="margin-bottom:var(--s-16)">' +
