@@ -24,11 +24,9 @@ module.exports = async (req, res) => {
 
 async function scrapeWithApify(postUrl, token) {
   const actorId = 'scraping_solutions~linkedin-posts-engagers-likers-and-commenters-no-cookies';
-
-  // Run the actor synchronously and get dataset items
   const apiUrl = `https://api.apify.com/v2/acts/${actorId}/run-sync-get-dataset-items?token=${token}`;
 
-  // Convert post URL to feed/update format that Apify expects
+  // Convert post URL to feed/update format
   let apifyUrl = postUrl;
   const actMatch = postUrl.match(/activity[- ](\d+)/);
   const shareMatch = postUrl.match(/share[- ](\d+)/);
@@ -38,33 +36,30 @@ async function scrapeWithApify(postUrl, token) {
     apifyUrl = `https://www.linkedin.com/feed/update/urn:li:share:${shareMatch[1]}/`;
   }
 
-  const resp = await fetch(apiUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      url: apifyUrl,
-      type: "commenters and likers",
-      iterations: 18,
-      start: 0,
+  // Run commenters and likers in parallel
+  const [commentersResp, likersResp] = await Promise.all([
+    fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: apifyUrl, type: 'commenters', iterations: 18, start: 0 }),
     }),
-    timeout: 120000,
-  });
+    fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: apifyUrl, type: 'likers', iterations: 18, start: 0 }),
+    }),
+  ]);
 
-  if (!resp.ok) {
-    const errText = await resp.text();
-    throw new Error(`Apify error: ${resp.status} ${errText.substring(0, 200)}`);
+  let items = [];
+  if (commentersResp.ok) {
+    try { items = items.concat(await commentersResp.json()); } catch (e) {}
+  }
+  if (likersResp.ok) {
+    try { items = items.concat(await likersResp.json()); } catch (e) {}
   }
 
-  const rawText = await resp.text();
-  let items;
-  try {
-    items = JSON.parse(rawText);
-  } catch (e) {
-    return { error: 'Failed to parse Apify response', raw: rawText.substring(0, 500) };
-  }
-
-  if (!items || !Array.isArray(items) || items.length === 0) {
-    return { leads: [], total: 0, fetched: 0, commenters: 0, likers: 0, debug: rawText.substring(0, 500) };
+  if (items.length === 0) {
+    return { leads: [], total: 0, fetched: 0, commenters: 0, likers: 0 };
   }
 
   // Parse Apify output into our lead format
@@ -74,7 +69,6 @@ async function scrapeWithApify(postUrl, token) {
   let likerCount = 0;
 
   for (const item of items) {
-    // Apify fields: type, url_profile, name, subtitle, comment (if commenter)
     const profileUrl = item.url_profile || item.profileUrl || item.linkedinUrl || item.url || '';
     if (!profileUrl || seen.has(profileUrl)) continue;
     seen.add(profileUrl);
