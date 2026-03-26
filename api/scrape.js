@@ -43,6 +43,9 @@ async function scrapeWithApify(postUrl, token) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       url: apifyUrl,
+      startPage: 0,
+      numberOfPages: 50,
+      type: 'commenters and likers',
     }),
     timeout: 120000,
   });
