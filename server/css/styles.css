@@ -826,6 +826,22 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .onboard-divider::before { left: 0; }
 .onboard-divider::after { right: 0; }
 .onboard-text code { font-size: var(--fs-xs); background: var(--surface); padding: 1px 4px; border-radius: 3px; }
+/* Use case picker */
+.usecase-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-8); margin-bottom: var(--s-24);
+}
+@media (max-width: 480px) { .usecase-grid { grid-template-columns: 1fr; } }
+.usecase-card {
+  padding: var(--s-16); border: 1.5px solid var(--rule); border-radius: var(--radius);
+  cursor: pointer; transition: all var(--dur-fast) var(--ease-out); text-align: center;
+}
+.usecase-card:hover { border-color: var(--accent); background: var(--accent-bg); }
+.usecase-emoji { font-size: 24px; margin-bottom: var(--s-8); }
+.usecase-name { font-size: var(--fs-sm); font-weight: 700; color: var(--text); margin-bottom: var(--s-4); }
+.usecase-desc { font-size: var(--fs-xs); color: var(--text-3); line-height: var(--lh-body); }
+.usecase-custom { text-align: center; }
+.usecase-or { font-size: var(--fs-xs); color: var(--text-4); margin-bottom: var(--s-8); }
+
 .onboard-input { display: flex; gap: var(--s-8); margin-bottom: var(--s-8); }
 .onboard-note { font-size: 11px; color: var(--text-4); text-align: center; }
 

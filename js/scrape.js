@@ -1032,13 +1032,84 @@ function saveOnboardCookie() {
   var cookie = document.getElementById('onboard-cookie').value.trim();
   if (!cookie) { showToast('Paste your li_at cookie'); return; }
   localStorage.setItem('hawki_li_at', cookie);
-  // Sync to server
-  var apiUrl = getApiUrl();
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', apiUrl + '/api/update-cookies');
-  xhr.setRequestHeader('Content-Type', 'application/json');
-  xhr.send(JSON.stringify({ li_at: cookie }));
-  showToast('Connected! Start scraping.');
+  // Show use case picker
+  showUseCasePicker();
+}
+
+function showUseCasePicker() {
+  var el = document.getElementById('view-scrape');
+  el.innerHTML = '<div class="onboard">' +
+    '<div class="onboard-title">What are you using Hawki for?</div>' +
+    '<div class="onboard-desc">We\'ll set up your filters to find the right people.</div>' +
+    '<div class="usecase-grid">' +
+
+    '<div class="usecase-card" onclick="applyUseCase(\'sales\')">' +
+    '<div class="usecase-emoji">&#x1F3AF;</div>' +
+    '<div class="usecase-name">B2B Sales</div>' +
+    '<div class="usecase-desc">Find AEs, SDRs, and decision-makers who engage with GTM content</div>' +
+    '</div>' +
+
+    '<div class="usecase-card" onclick="applyUseCase(\'recruiting\')">' +
+    '<div class="usecase-emoji">&#x1F465;</div>' +
+    '<div class="usecase-name">Recruiting</div>' +
+    '<div class="usecase-desc">Find engineers, designers, and talent engaging with industry posts</div>' +
+    '</div>' +
+
+    '<div class="usecase-card" onclick="applyUseCase(\'jobs\')">' +
+    '<div class="usecase-emoji">&#x1F4BC;</div>' +
+    '<div class="usecase-name">Job Hunting</div>' +
+    '<div class="usecase-desc">Find hiring managers, recruiters, and founders at companies you want to join</div>' +
+    '</div>' +
+
+    '<div class="usecase-card" onclick="applyUseCase(\'networking\')">' +
+    '<div class="usecase-emoji">&#x1F91D;</div>' +
+    '<div class="usecase-name">Networking</div>' +
+    '<div class="usecase-desc">Connect with people in your industry who share your interests</div>' +
+    '</div>' +
+
+    '</div>' +
+
+    '<div class="usecase-custom">' +
+    '<div class="usecase-or">or set your own keywords</div>' +
+    '<input type="text" class="scrape-url-input" id="custom-icp" placeholder="e.g. Product Manager, Engineering Lead, Founder...">' +
+    '<button class="scrape-go-btn" onclick="applyCustomICP()" style="margin-top:var(--s-8)">Start</button>' +
+    '</div>' +
+
+    '</div>';
+}
+
+var USE_CASE_KEYWORDS = {
+  sales: {
+    titles: ['AE', 'Account Executive', 'SDR', 'Sales Development', 'BDR', 'Business Development', 'Sales Rep', 'Sales Manager', 'Head of Sales', 'VP Sales', 'VP of Sales', 'Sales Leader', 'Sales Director', 'Revenue', 'GTM', 'Growth'],
+    exclude: ['Recruiter', 'Student', 'Intern']
+  },
+  recruiting: {
+    titles: ['Software Engineer', 'Frontend', 'Backend', 'Full Stack', 'Designer', 'Product Designer', 'UX', 'Data Scientist', 'Machine Learning', 'DevOps', 'Engineering Manager'],
+    exclude: ['Recruiter', 'Student', 'Intern']
+  },
+  jobs: {
+    titles: ['Hiring Manager', 'Recruiter', 'Talent', 'Head of', 'VP', 'Director', 'Founder', 'Co-founder', 'CEO', 'CTO', 'COO', 'HR', 'People'],
+    exclude: ['Student', 'Intern']
+  },
+  networking: {
+    titles: ['Founder', 'CEO', 'CTO', 'VP', 'Director', 'Head of', 'Lead', 'Manager', 'Senior', 'Principal'],
+    exclude: ['Student', 'Intern']
+  }
+};
+
+function applyUseCase(type) {
+  var icp = USE_CASE_KEYWORDS[type];
+  saveICP(icp);
+  showToast('Ready! Start scraping posts.');
+  render();
+}
+
+function applyCustomICP() {
+  var input = document.getElementById('custom-icp').value.trim();
+  if (!input) { showToast('Enter some keywords'); return; }
+  var titles = input.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+  saveICP({ titles: titles, exclude: ['Student', 'Intern'] });
+  showToast('Ready! Start scraping posts.');
   render();
 }
 
