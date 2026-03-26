@@ -55,18 +55,18 @@ async function scrapeWithApify(postUrl, token) {
   let likerCount = 0;
 
   for (const item of items) {
-    // Apify returns items with different structures
-    // Each item represents one engager
-    const profileUrl = item.profileUrl || item.linkedinUrl || item.url || '';
+    // Apify fields: type, url_profile, name, subtitle, comment (if commenter)
+    const profileUrl = item.url_profile || item.profileUrl || item.linkedinUrl || item.url || '';
     if (!profileUrl || seen.has(profileUrl)) continue;
     seen.add(profileUrl);
 
-    const name = item.fullName || item.name || item.firstName || '';
-    const headline = item.headline || item.title || item.occupation || '';
-    const comment = item.commentText || item.comment || item.text || '';
+    const name = item.name || item.fullName || item.firstName || '';
+    const headline = item.subtitle || item.headline || item.title || item.occupation || '';
+    const comment = item.comment || item.commentText || item.text || '';
+    const type = item.type || '';
     const company = extractCompany(headline);
 
-    if (comment) commentCount++;
+    if (type === 'commenters' || comment) commentCount++;
     else likerCount++;
 
     leads.push({
