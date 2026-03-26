@@ -42,10 +42,16 @@ async function scrapeWithApify(postUrl, token) {
     throw new Error(`Apify error: ${resp.status} ${errText.substring(0, 200)}`);
   }
 
-  const items = await resp.json();
+  const rawText = await resp.text();
+  let items;
+  try {
+    items = JSON.parse(rawText);
+  } catch (e) {
+    return { error: 'Failed to parse Apify response', raw: rawText.substring(0, 500) };
+  }
 
   if (!items || !Array.isArray(items) || items.length === 0) {
-    return { leads: [], total: 0, fetched: 0, commenters: 0, likers: 0 };
+    return { leads: [], total: 0, fetched: 0, commenters: 0, likers: 0, debug: rawText.substring(0, 500) };
   }
 
   // Parse Apify output into our lead format
