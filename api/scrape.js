@@ -57,7 +57,8 @@ async function startScrape(postUrl, token) {
   if (!commDs || !commId || !likeDs || !likeId) {
     const rawErr = commRun.error || likeRun.error || '';
     const errMsg = typeof rawErr === 'string' ? rawErr : JSON.stringify(rawErr);
-    throw new Error(errMsg || 'Apify failed to start. Check the post URL and try again.');
+    const debugInfo = JSON.stringify({ commStatus: commRun.status, likeStatus: likeRun.status, commData: !!commRun.data, likeData: !!likeRun.data });
+    throw new Error(errMsg || 'Apify failed to start (' + debugInfo + ')');
   }
 
   return {
