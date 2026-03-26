@@ -278,6 +278,9 @@ function renderRunner() {
     '<div class="rc-watch-add">' +
     '<input type="text" class="rc-watch-input" id="watch-input" ' +
     'placeholder="Paste a LinkedIn profile URL..." ' +
+    'onkeydown="if(event.key===\'Enter\')document.getElementById(\'watch-note\').focus()">' +
+    '<input type="text" class="rc-watch-input" id="watch-note" ' +
+    'placeholder="Why watch them? (e.g. GTM thought leader)" ' +
     'onkeydown="if(event.key===\'Enter\')addToWatchList()">' +
     '<button class="scrape-find-btn" onclick="addToWatchList()">Add</button>' +
     '</div></div>';
@@ -586,19 +589,14 @@ function addToWatchList() {
       headline = result.headline || '';
     }
 
-    // Generate a one-liner about why you're watching them
-    var oneliner = '';
-    if (headline) {
-      // Simple one-liner from headline
-      var parts = headline.split('|')[0].split('@')[0].split(' at ')[0].trim();
-      oneliner = parts;
-    }
+    var noteEl = document.getElementById('watch-note');
+    var note = noteEl ? noteEl.value.trim() : '';
 
     list.unshift({
       username: username,
       name: name,
       headline: headline,
-      oneliner: oneliner,
+      oneliner: note,
       url: 'https://www.linkedin.com/in/' + username,
       added: new Date().toISOString(),
     });
