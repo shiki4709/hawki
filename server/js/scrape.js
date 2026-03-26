@@ -141,10 +141,7 @@ function runScrape(postUrl, callback) {
     callback('Scrape timed out. The post may have too many engagers.');
   };
 
-  var payload = { url: postUrl };
-  var liAt = localStorage.getItem('hawki_li_at');
-  if (liAt) payload.li_at = liAt;
-  xhr.send(JSON.stringify(payload));
+  xhr.send(JSON.stringify({ url: postUrl }));
 }
 
 function runDemoScrape(postUrl, callback) {
@@ -202,46 +199,9 @@ function downloadCSV(leads, filename) {
 function renderRunner() {
   var el = document.getElementById('view-scrape');
 
-  // ── Onboarding (show when no cookie set) ──
-  if (!localStorage.getItem('hawki_li_at')) {
-    el.innerHTML = '<div class="onboard">' +
-      '<div class="onboard-title">Welcome to Hawki</div>' +
-      '<div class="onboard-desc">Connect your LinkedIn to start finding leads. Takes 30 seconds.</div>' +
-
-      '<div class="onboard-steps">' +
-
-      '<div class="onboard-step">' +
-      '<div class="onboard-num">1</div>' +
-      '<div class="onboard-text">' +
-      'Open <a href="https://www.linkedin.com" target="_blank" style="color:var(--inbound);font-weight:600">linkedin.com</a> and make sure you\'re logged in' +
-      '</div></div>' +
-
-      '<div class="onboard-step">' +
-      '<div class="onboard-num">2</div>' +
-      '<div class="onboard-text">' +
-      'Press <kbd>Cmd+Option+I</kbd> (Mac) or <kbd>Ctrl+Shift+I</kbd> (Windows) to open DevTools' +
-      '</div></div>' +
-
-      '<div class="onboard-step">' +
-      '<div class="onboard-num">3</div>' +
-      '<div class="onboard-text">' +
-      'Click <strong>Application</strong> tab → expand <strong>Cookies</strong> → click <strong>https://www.linkedin.com</strong>' +
-      '</div></div>' +
-
-      '<div class="onboard-step">' +
-      '<div class="onboard-num">4</div>' +
-      '<div class="onboard-text">' +
-      'Find <strong>li_at</strong> in the list → double-click the <strong>Value</strong> → copy it' +
-      '</div></div>' +
-
-      '</div>' +
-
-      '<div class="onboard-input">' +
-      '<input type="password" class="scrape-url-input" id="onboard-cookie" placeholder="Paste your li_at cookie here...">' +
-      '<button class="scrape-go-btn" onclick="saveOnboardCookie()">Connect</button>' +
-      '</div>' +
-      '<div class="onboard-note">Your cookie stays in your browser only. Sessions refresh every ~30 min — we\'ll let you know when to reconnect.</div>' +
-      '</div>';
+  // ── Onboarding (show when no ICP set — first time user) ──
+  if (!localStorage.getItem(ICP_KEY)) {
+    showUseCasePicker();
     return;
   }
 
@@ -250,20 +210,7 @@ function renderRunner() {
 
   var html = '';
 
-  // ── Connection status ──
-  var liAt = localStorage.getItem('hawki_li_at') || '';
-  var connState = localStorage.getItem('hawki_conn_state') || 'unknown';
-  var statusHtml = '';
-  if (!liAt) {
-    statusHtml = '<span class="status-dot status-dot-off"></span> Not connected';
-  } else if (connState === 'valid') {
-    statusHtml = '<span class="status-dot status-dot-on"></span> Connected';
-  } else if (connState === 'expired') {
-    statusHtml = '<span class="status-dot status-dot-expired"></span> Session expired — click to refresh';
-  } else {
-    statusHtml = '<span class="status-dot status-dot-checking"></span> Checking...';
-  }
-  html += '<div class="conn-status" onclick="' + (connState === 'expired' ? 'showCookieExpired()' : 'checkCookieStatus()') + '">' + statusHtml + '</div>';
+  // (No connection status needed — Apify handles scraping without cookies)
 
   // ── Scrape input ──
   html += '<div class="scrape-input-section">' +
@@ -1014,11 +961,7 @@ function startScrape() {
     btn.style.opacity = '1';
 
     if (err) {
-      if (err.toLowerCase().indexOf('cookie') >= 0 || err.toLowerCase().indexOf('expired') >= 0) {
-        showCookieExpired();
-      } else {
-        showToast(err);
-      }
+      showToast(err);
     } else {
       input.value = '';
       var matched = scrape.leads.filter(function(l) { return l.icp_match; });

@@ -9,220 +9,100 @@ module.exports = async (req, res) => {
 
   const body = req.body || {};
   const url = (body.url || '').trim();
-  const li_at = body.li_at || '';
-  if (!url || !url.includes('linkedin.com')) return res.status(400).json({ error: 'Invalid LinkedIn URL', received: url });
-  if (!li_at) return res.status(400).json({ error: 'No LinkedIn connection. Go to Settings and paste your li_at cookie.' });
+  if (!url || !url.includes('linkedin.com')) return res.status(400).json({ error: 'Invalid LinkedIn URL' });
+
+  const apifyToken = process.env.APIFY_TOKEN || '';
+  if (!apifyToken) return res.status(400).json({ error: 'Apify not configured' });
 
   try {
-    const result = await scrapePost(url, li_at);
+    const result = await scrapeWithApify(url, apifyToken);
     res.json(result);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 };
 
-async function scrapePost(postUrl, liAt) {
-  // Get a valid JSESSIONID from LinkedIn
-  const jsessionid = await getSessionId(liAt);
-  const cookies = { li_at: liAt, JSESSIONID: jsessionid };
-  const headers = buildHeaders(cookies);
+async function scrapeWithApify(postUrl, token) {
+  const actorId = 'scraping_solutions~linkedin-posts-engagers-likers-and-commenters-no-cookies';
 
-  // Extract post ID from URL
-  const actMatch = postUrl.match(/activity[- :_](\d{15,25})/);
-  const ugcMatch = postUrl.match(/ugcPost[- :_](\d{15,25})/);
-  const shareMatch = postUrl.match(/share[- :_](\d{15,25})/);
-  const anyNumMatch = postUrl.match(/(\d{19,20})/);
-  let postId = actMatch ? actMatch[1] : (ugcMatch ? ugcMatch[1] : (shareMatch ? shareMatch[1] : (anyNumMatch ? anyNumMatch[1] : null)));
-  if (!postId) return { error: 'Could not find post ID from URL: ' + postUrl.substring(0, 100) };
+  // Run the actor synchronously and get dataset items
+  const apiUrl = `https://api.apify.com/v2/acts/${actorId}/run-sync-get-dataset-items?token=${token}`;
 
-  // If it's a share URL, look up the real activity ID
-  const isShare = !actMatch && (shareMatch || postUrl.includes('share'));
-  if (isShare) {
-    const realId = await resolveShareToActivity(postId, cookies, headers);
-    if (realId) postId = realId;
+  const resp = await fetch(apiUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      postUrls: [postUrl],
+      scrapeReactions: true,
+      scrapeComments: true,
+    }),
+    timeout: 120000,
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    throw new Error(`Apify error: ${resp.status} ${errText.substring(0, 200)}`);
   }
 
-  // Try both URN types
-  let data = null, urnType = null;
-  for (const ut of ['activity', 'ugcPost']) {
-    const url = `https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(count:10,start:0,threadUrn:urn%3Ali%3A${ut}%3A${postId})&queryId=voyagerSocialDashReactions.cab051ffdf47c41130cdd414e0097402`;
-    const resp = await voyagerFetch(url, cookies, headers);
-    if (resp) {
-      try {
-        const reactions = resp.data.data.socialDashReactionsByReactionType;
-        if (reactions && reactions.paging) {
-          data = resp;
-          urnType = ut;
-          break;
-        }
-      } catch (e) { continue; }
-    }
+  const items = await resp.json();
+
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return { leads: [], total: 0, fetched: 0, commenters: 0, likers: 0 };
   }
 
-  if (!data) return { error: 'Failed to fetch likers. Cookie may be expired.' };
-
-  const total = data.data.data.socialDashReactionsByReactionType.paging.total;
-
-  // Fetch all likers in batches of 100
+  // Parse Apify output into our lead format
   const leads = [];
-  const pages = Math.ceil(total / 100);
-
-  for (let i = 0; i < Math.min(pages, 30); i++) {
-    const url = `https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(count:100,start:${i * 100},threadUrn:urn%3Ali%3A${urnType}%3A${postId})&queryId=voyagerSocialDashReactions.cab051ffdf47c41130cdd414e0097402`;
-    const batch = await voyagerFetch(url, cookies, headers);
-    if (!batch) continue;
-
-    for (const elem of (batch.included || [])) {
-      if (!elem || !elem.actorUrn) continue;
-      const lockup = elem.reactorLockup;
-      if (!lockup) continue;
-
-      const name = lockup.title ? lockup.title.text || '' : '';
-      let headline = '';
-      if (lockup.subtitle) {
-        headline = typeof lockup.subtitle === 'string' ? lockup.subtitle : (lockup.subtitle.text || '');
-      }
-      const profileUrl = lockup.navigationUrl || '';
-
-      let company = '';
-      if (headline) {
-        for (const sep of [' @ ', ' @', ' | ', ' at ']) {
-          if (headline.includes(sep)) {
-            company = headline.split(sep)[1].split('|')[0].trim();
-            break;
-          }
-        }
-      }
-
-      leads.push({ name, title: headline, company, linkedin_url: profileUrl, comment_text: '', scraped_from: postUrl });
-    }
-  }
-
-  // Scrape commenters from post page
-  const commenters = await scrapeCommenters(postUrl, postId, cookies, headers);
-
-  // Merge: commenters first, then likers, deduplicated
   const seen = new Set();
-  const merged = [];
-  for (const c of commenters) {
-    if (c.linkedin_url && !seen.has(c.linkedin_url)) {
-      seen.add(c.linkedin_url);
-      merged.push(c);
-    }
+  let commentCount = 0;
+  let likerCount = 0;
+
+  for (const item of items) {
+    // Apify returns items with different structures
+    // Each item represents one engager
+    const profileUrl = item.profileUrl || item.linkedinUrl || item.url || '';
+    if (!profileUrl || seen.has(profileUrl)) continue;
+    seen.add(profileUrl);
+
+    const name = item.fullName || item.name || item.firstName || '';
+    const headline = item.headline || item.title || item.occupation || '';
+    const comment = item.commentText || item.comment || item.text || '';
+    const company = extractCompany(headline);
+
+    if (comment) commentCount++;
+    else likerCount++;
+
+    leads.push({
+      name: name,
+      title: headline,
+      company: company,
+      linkedin_url: profileUrl,
+      comment_text: comment,
+      scraped_from: postUrl,
+    });
   }
-  for (const l of leads) {
-    if (l.linkedin_url && !seen.has(l.linkedin_url)) {
-      seen.add(l.linkedin_url);
-      merged.push(l);
-    }
-  }
 
-  return { leads: merged, total: total + commenters.length, fetched: merged.length, commenters: commenters.length, likers: leads.length };
-}
+  // Sort: commenters first
+  leads.sort((a, b) => {
+    if (a.comment_text && !b.comment_text) return -1;
+    if (!a.comment_text && b.comment_text) return 1;
+    return 0;
+  });
 
-async function scrapeCommenters(postUrl, postId, cookies, headers) {
-  try {
-    const url = `https://www.linkedin.com/feed/update/urn:li:activity:${postId}`;
-    const resp = await fetch(url, { headers: { ...headers, 'cookie': `li_at=${cookies.li_at}` }, redirect: 'manual' });
-    if (resp.status !== 200) return [];
-
-    let text = await resp.text();
-    // Unescape HTML entities
-    text = text.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&#x27;/g, "'");
-
-    const codeBlocks = text.match(/<code[^>]*>([\s\S]*?)<\/code>/g) || [];
-    const commenters = [];
-    const seenUrls = new Set();
-
-    for (const block of codeBlocks) {
-      const jsonStr = block.replace(/<\/?code[^>]*>/g, '');
-      try {
-        const data = JSON.parse(jsonStr);
-        if (!data || !data.included) continue;
-        for (const item of data.included) {
-          if (!item || !item.entityUrn || !item.entityUrn.includes('fsd_comment') || !item.commenter) continue;
-          const c = item.commenter;
-          const name = c.title ? c.title.text || '' : '';
-          let headline = c.subtitle || '';
-          if (typeof headline === 'object') headline = headline.text || '';
-          const navUrl = c.navigationUrl || '';
-          let commentText = item.commentary ? item.commentary.text || '' : '';
-
-          if (!name || seenUrls.has(navUrl)) continue;
-          seenUrls.add(navUrl);
-
-          let company = '';
-          if (headline) {
-            for (const sep of [' @ ', ' @', ' | ', ' at ']) {
-              if (headline.includes(sep)) {
-                company = headline.split(sep)[1].split('|')[0].trim();
-                break;
-              }
-            }
-          }
-
-          commenters.push({ name, title: headline, company, linkedin_url: navUrl, comment_text: commentText, scraped_from: postUrl });
-        }
-      } catch (e) { continue; }
-    }
-    return commenters;
-  } catch (e) {
-    return [];
-  }
-}
-
-async function resolveShareToActivity(shareId, cookies, headers) {
-  try {
-    const url = `https://www.linkedin.com/voyager/api/feed/updates/urn:li:share:${shareId}`;
-    const resp = await fetch(url, { headers, redirect: 'manual' });
-    if (resp.status !== 200) return null;
-    const text = await resp.text();
-    const match = text.match(/urn:li:activity:(\d+)/);
-    return match ? match[1] : null;
-  } catch (e) {
-    return null;
-  }
-}
-
-function buildHeaders(cookies) {
-  const csrf = (cookies.JSESSIONID || 'ajax:0').replace(/"/g, '');
   return {
-    'accept': 'application/vnd.linkedin.normalized+json+2.1',
-    'accept-encoding': 'gzip, deflate, br',
-    'accept-language': 'en-US,en;q=0.9',
-    'csrf-token': csrf,
-    'x-li-lang': 'en_US',
-    'x-restli-protocol-version': '2.0.0',
-    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-    'cookie': `li_at=${cookies.li_at}; JSESSIONID="${csrf}"`,
+    leads: leads,
+    total: leads.length,
+    fetched: leads.length,
+    commenters: commentCount,
+    likers: likerCount,
   };
 }
 
-// First fetch the LinkedIn page to get a valid JSESSIONID
-async function getSessionId(liAt) {
-  try {
-    const resp = await fetch('https://www.linkedin.com/', {
-      headers: {
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-        'cookie': `li_at=${liAt}`,
-      },
-      redirect: 'manual',
-    });
-    const setCookies = resp.headers.raw()['set-cookie'] || [];
-    for (const c of setCookies) {
-      const match = c.match(/JSESSIONID="?([^";]+)/);
-      if (match) return match[1];
+function extractCompany(headline) {
+  if (!headline) return '';
+  for (const sep of [' @ ', ' @', ' | ', ' at ']) {
+    if (headline.includes(sep)) {
+      return headline.split(sep)[1].split('|')[0].trim();
     }
-  } catch (e) {}
-  return 'ajax:0';
-}
-
-async function voyagerFetch(url, cookies, headers) {
-  try {
-    const resp = await fetch(url, { headers, redirect: 'manual' });
-    if (resp.status === 200) return await resp.json();
-    return null;
-  } catch (e) {
-    return null;
   }
+  return '';
 }
