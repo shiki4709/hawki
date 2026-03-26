@@ -278,9 +278,6 @@ function renderRunner() {
     '<div class="rc-watch-add">' +
     '<input type="text" class="rc-watch-input" id="watch-input" ' +
     'placeholder="Paste a LinkedIn profile URL..." ' +
-    'onkeydown="if(event.key===\'Enter\')document.getElementById(\'watch-note\').focus()">' +
-    '<input type="text" class="rc-watch-input" id="watch-note" ' +
-    'placeholder="Why watch them? (e.g. GTM thought leader)" ' +
     'onkeydown="if(event.key===\'Enter\')addToWatchList()">' +
     '<button class="scrape-find-btn" onclick="addToWatchList()">Add</button>' +
     '</div></div>';
@@ -589,21 +586,48 @@ function addToWatchList() {
       headline = result.headline || '';
     }
 
-    var noteEl = document.getElementById('watch-note');
-    var note = noteEl ? noteEl.value.trim() : '';
-
-    list.unshift({
+    var entry = {
       username: username,
       name: name,
       headline: headline,
-      oneliner: note,
+      oneliner: '',
       url: 'https://www.linkedin.com/in/' + username,
       added: new Date().toISOString(),
-    });
+    };
+    list.unshift(entry);
     saveWatchList(list);
     input.value = '';
     showToast('#' + list.length + ' ' + name + ' added');
     render();
+
+    // Generate one-liner with AI in background
+    if (headline) {
+      var apiUrl = getApiUrl();
+      var xhr2 = new XMLHttpRequest();
+      xhr2.open('POST', apiUrl + '/api/draft-message');
+      xhr2.setRequestHeader('Content-Type', 'application/json');
+      xhr2.timeout = 10000;
+      xhr2.onload = function() {
+        if (xhr2.status === 200) {
+          var result = JSON.parse(xhr2.responseText);
+          var updated = loadWatchList();
+          var found = updated.find(function(w) { return w.username === username; });
+          if (found) {
+            found.oneliner = result.message;
+            saveWatchList(updated);
+            render();
+          }
+        }
+      };
+      xhr2.send(JSON.stringify({
+        name: name,
+        headline: headline,
+        comment: '',
+        post_title: '',
+        instruction: 'Write a 5-8 word description of who this person is based on their headline. No quotes, no greeting, just a brief label. Examples: "GTM thought leader, ex-HubSpot CRO", "Enterprise sales leader at Dynatrace", "AI startup founder and investor". Output only the description.',
+        current_draft: headline,
+      }));
+    }
   };
 
   xhr.onerror = function() {
