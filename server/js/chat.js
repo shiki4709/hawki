@@ -316,14 +316,6 @@ function openSettings() {
     (localStorage.getItem('hawki_li_at') ? 'Connected' : 'Required for scraping. Go to LinkedIn → DevTools (Cmd+Option+I) → Application → Cookies → copy <b>li_at</b> value') +
     '</div></div>' +
 
-    // Claude API Key
-    '<div class="qa-field"><label class="qa-label">AI Message Drafting</label>' +
-    '<input type="password" class="qa-input qa-input-sm" id="settings-claude-key" ' +
-    'placeholder="sk-ant-..." value="' + claudeKey + '">' +
-    '<div style="font-size:var(--fs-xs);color:var(--text-4);margin-top:var(--s-4)">' +
-    (claudeKey ? 'Connected: ' + masked + ' · Messages are drafted by AI' : 'Optional. Paste your Anthropic API key for AI-drafted messages. Get one at <a href="https://console.anthropic.com" target="_blank" style="color:var(--inbound)">console.anthropic.com</a>') +
-    '</div></div>' +
-
     '</div><div class="qa-footer"><button class="qa-cancel" onclick="closeModal()">Cancel</button>' +
     '<button class="qa-submit" onclick="saveSettings()">Save</button></div></div>';
 }
@@ -342,14 +334,6 @@ function saveSettings() {
     });
   });
   saveScrapes(scrapes);
-
-  // Save Claude key
-  var key = document.getElementById('settings-claude-key').value.trim();
-  if (key) {
-    localStorage.setItem('hawki_claude_key', key);
-  } else {
-    localStorage.removeItem('hawki_claude_key');
-  }
 
   // Save LinkedIn cookie and sync to server
   var liAt = document.getElementById('settings-li-at').value.trim();

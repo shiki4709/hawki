@@ -1099,17 +1099,46 @@ var USE_CASE_KEYWORDS = {
 
 function applyUseCase(type) {
   var icp = USE_CASE_KEYWORDS[type];
-  saveICP(icp);
-  showToast('Ready! Start scraping posts.');
-  render();
+  showICPReview(icp, type);
 }
 
 function applyCustomICP() {
   var input = document.getElementById('custom-icp').value.trim();
   if (!input) { showToast('Enter some keywords'); return; }
   var titles = input.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
-  saveICP({ titles: titles, exclude: ['Student', 'Intern'] });
-  showToast('Ready! Start scraping posts.');
+  showICPReview({ titles: titles, exclude: ['Student', 'Intern'] }, 'custom');
+}
+
+function showICPReview(icp, type) {
+  var el = document.getElementById('view-scrape');
+  var labels = { sales: 'B2B Sales', recruiting: 'Recruiting', jobs: 'Job Hunting', networking: 'Networking', custom: 'Custom' };
+
+  el.innerHTML = '<div class="onboard">' +
+    '<div class="onboard-title">Your ICP filter</div>' +
+    '<div class="onboard-desc">People with these words in their headline will be highlighted as matches. Edit if needed.</div>' +
+
+    '<div class="onboard-steps" style="border:none;padding:0">' +
+    '<div class="scrape-icp-field" style="margin-bottom:var(--s-16)">' +
+    '<label class="scrape-icp-label" style="font-weight:600;color:var(--text)">Target titles</label>' +
+    '<input type="text" class="qa-input qa-input-sm" id="review-titles" value="' + icp.titles.join(', ') + '">' +
+    '</div>' +
+    '<div class="scrape-icp-field" style="margin-bottom:var(--s-16)">' +
+    '<label class="scrape-icp-label" style="font-weight:600;color:var(--text)">Exclude titles</label>' +
+    '<input type="text" class="qa-input qa-input-sm" id="review-exclude" value="' + icp.exclude.join(', ') + '">' +
+    '</div>' +
+    '</div>' +
+
+    '<div class="onboard-input">' +
+    '<button class="scrape-go-btn" onclick="confirmICP()" style="width:100%">Start finding leads</button>' +
+    '</div>' +
+    '</div>';
+}
+
+function confirmICP() {
+  var titles = document.getElementById('review-titles').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+  var exclude = document.getElementById('review-exclude').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+  saveICP({ titles: titles, exclude: exclude });
+  showToast('Ready! Paste a LinkedIn post URL to start.');
   render();
 }
 
