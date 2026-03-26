@@ -1077,42 +1077,26 @@ function saveOnboardCookie() {
 function showUseCasePicker() {
   var el = document.getElementById('view-scrape');
   el.innerHTML = '<div class="onboard">' +
-    '<div class="onboard-title">What are you using Hawki for?</div>' +
-    '<div class="onboard-desc">We\'ll set up your filters to find the right people.</div>' +
-    '<div class="usecase-grid">' +
+    '<div class="onboard-title">Welcome to Hawki</div>' +
+    '<div class="onboard-desc">Who are you looking for? Enter the job titles you want to find.</div>' +
 
-    '<div class="usecase-card" onclick="applyUseCase(\'sales\')">' +
-    '<div class="usecase-emoji">&#x1F3AF;</div>' +
-    '<div class="usecase-name">B2B Sales</div>' +
-    '<div class="usecase-desc">Find AEs, SDRs, and decision-makers who engage with GTM content</div>' +
+    '<div class="onboard-steps" style="border:none;padding:0">' +
+    '<div class="scrape-icp-field" style="margin-bottom:var(--s-16)">' +
+    '<label class="scrape-icp-label" style="font-weight:600;color:var(--text)">Target titles</label>' +
+    '<input type="text" class="qa-input qa-input-sm" id="setup-titles" ' +
+    'placeholder="e.g. Account Executive, VP Sales, Founder, Product Manager...">' +
+    '<div style="font-size:11px;color:var(--text-4);margin-top:4px">Comma-separated. People with these words in their headline will be highlighted.</div>' +
+    '</div>' +
+    '<div class="scrape-icp-field" style="margin-bottom:var(--s-16)">' +
+    '<label class="scrape-icp-label" style="font-weight:600;color:var(--text)">Exclude titles (optional)</label>' +
+    '<input type="text" class="qa-input qa-input-sm" id="setup-exclude" value="Student, Intern" ' +
+    'placeholder="e.g. Student, Intern, Recruiter...">' +
+    '</div>' +
     '</div>' +
 
-    '<div class="usecase-card" onclick="applyUseCase(\'recruiting\')">' +
-    '<div class="usecase-emoji">&#x1F465;</div>' +
-    '<div class="usecase-name">Recruiting</div>' +
-    '<div class="usecase-desc">Find engineers, designers, and talent engaging with industry posts</div>' +
+    '<div class="onboard-input">' +
+    '<button class="scrape-go-btn" onclick="saveSetup()" style="width:100%">Start finding leads</button>' +
     '</div>' +
-
-    '<div class="usecase-card" onclick="applyUseCase(\'jobs\')">' +
-    '<div class="usecase-emoji">&#x1F4BC;</div>' +
-    '<div class="usecase-name">Job Hunting</div>' +
-    '<div class="usecase-desc">Find hiring managers, recruiters, and founders at companies you want to join</div>' +
-    '</div>' +
-
-    '<div class="usecase-card" onclick="applyUseCase(\'networking\')">' +
-    '<div class="usecase-emoji">&#x1F91D;</div>' +
-    '<div class="usecase-name">Networking</div>' +
-    '<div class="usecase-desc">Connect with people in your industry who share your interests</div>' +
-    '</div>' +
-
-    '</div>' +
-
-    '<div class="usecase-custom">' +
-    '<div class="usecase-or">or set your own keywords</div>' +
-    '<input type="text" class="scrape-url-input" id="custom-icp" placeholder="e.g. Product Manager, Engineering Lead, Founder...">' +
-    '<button class="scrape-go-btn" onclick="applyCustomICP()" style="margin-top:var(--s-8)">Start</button>' +
-    '</div>' +
-
     '</div>';
 }
 
@@ -1134,6 +1118,15 @@ var USE_CASE_KEYWORDS = {
     exclude: ['Student', 'Intern']
   }
 };
+
+function saveSetup() {
+  var titles = document.getElementById('setup-titles').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+  if (titles.length === 0) { showToast('Enter at least one title'); return; }
+  var exclude = document.getElementById('setup-exclude').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+  saveICP({ titles: titles, exclude: exclude });
+  showToast('Ready! Paste a LinkedIn post URL to start.');
+  render();
+}
 
 function applyUseCase(type) {
   var icp = USE_CASE_KEYWORDS[type];
