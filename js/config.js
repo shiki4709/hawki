@@ -25,7 +25,7 @@ var CH = {
   // ── OUTBOUND ──
   li_outreach: {
     label: 'LinkedIn Outreach',
-    color: 'oklch(48% 0.12 250)',
+    color: '#2196F3',
     metric: 'Reply Rate',
     mode: 'outbound',
     defaultStages: ['Connections sent', 'Replied', 'Signed up'],
@@ -34,7 +34,7 @@ var CH = {
   },
   lead_lists: {
     label: 'Lead Lists',
-    color: 'oklch(50% 0.14 280)',
+    color: '#1a6fc0',
     metric: 'Reply Rate',
     mode: 'outbound',
     defaultStages: ['Posts found', 'Leads scraped', 'DMs sent', 'Replied', 'Signed up'],
@@ -43,7 +43,7 @@ var CH = {
   },
   warm_intros: {
     label: 'Warm Intros',
-    color: 'oklch(50% 0.10 180)',
+    color: '#2a7ab8',
     metric: 'Meeting Rate',
     mode: 'outbound',
     defaultStages: ['Target accounts', 'Mutual connections', 'Intro asks', 'Meetings', 'Signed up'],
@@ -52,7 +52,7 @@ var CH = {
   },
   gifts: {
     label: 'Gift Outreach',
-    color: 'oklch(55% 0.08 320)',
+    color: '#c78520',
     metric: 'Meeting Rate',
     mode: 'outbound',
     defaultStages: ['AEs contacted', 'Replied', 'Gifts sent', 'Meetings', 'Signed up'],
@@ -61,7 +61,7 @@ var CH = {
   },
   email: {
     label: 'Email',
-    color: 'oklch(48% 0.10 155)',
+    color: '#1a6fc0',
     metric: 'Click-to-Signup',
     mode: 'outbound',
     defaultStages: ['Sent', 'Opened', 'Clicked', 'Signed up'],
@@ -70,7 +70,7 @@ var CH = {
   },
   events: {
     label: 'Events',
-    color: 'oklch(55% 0.12 65)',
+    color: '#e8bb5a',
     metric: 'Conv-to-Signup',
     mode: 'outbound',
     defaultStages: ['Events attended', 'Conversations', 'Contacts', 'Signed up'],
@@ -81,7 +81,7 @@ var CH = {
   // ── INBOUND ──
   li_content: {
     label: 'LinkedIn Posts',
-    color: 'oklch(48% 0.12 250)',
+    color: '#2196F3',
     metric: 'Engagement Rate',
     mode: 'inbound',
     defaultStages: ['Posts published', 'Impressions', 'Engagements', 'Followers', 'Inbound DMs'],
@@ -90,7 +90,7 @@ var CH = {
   },
   content_seo: {
     label: 'Content / SEO',
-    color: 'oklch(48% 0.08 30)',
+    color: '#d4653a',
     metric: 'Visit-to-Signup',
     mode: 'inbound',
     defaultStages: ['Pages published', 'Indexed', 'Site visits', 'Signed up'],
@@ -99,7 +99,7 @@ var CH = {
   },
   product: {
     label: 'Product',
-    color: 'oklch(50% 0.015 55)',
+    color: '#6a7088',
     metric: 'Activation Rate',
     mode: 'inbound',
     defaultStages: ['Users targeted', 'Engaged', 'Activated'],

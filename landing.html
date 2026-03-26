@@ -5,25 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Syval — Your GTM team, automated</title>
   <meta name="description" content="AI agents that find your leads, monitor your channels, and create your content.">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #ffffff;
-      --bg-2: #f8f9fb;
-      --text: #111111;
-      --text-2: #555566;
-      --text-3: #999aaa;
-      --border: #e8e8ee;
-      --hawki: #d97706;
-      --hawki-bg: #fffbeb;
-      --pingi: #2563eb;
-      --pingi-bg: #eff6ff;
-      --roari: #dc2626;
-      --roari-bg: #fef2f2;
+      --bg: #f8fafb;
+      --bg-2: #eef4f8;
+      --text: #1a1e2e;
+      --text-2: #3a4058;
+      --text-3: #686e82;
+      --border: #d8e2ea;
+      --hawki: #9a6a10;
+      --hawki-bg: #fdf6e8;
+      --pingi: #1e6898;
+      --pingi-bg: #e6f2fb;
+      --foxxi: #b84a20;
+      --foxxi-bg: #fef0ea;
+      --accent-blue: #2196F3;
+      --accent-orange: #FF8A65;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', -apple-system, sans-serif; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', system-ui, sans-serif; color: var(--text); background: var(--bg); background-image: linear-gradient(135deg, #eef4f8 0%, #fdf4ee 100%); background-attachment: fixed; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
     a { color: inherit; text-decoration: none; }
     .container { max-width: 980px; margin: 0 auto; padding: 0 24px; }
 
@@ -31,9 +34,9 @@
     .mesh {
       position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
       width: 1200px; height: 600px; pointer-events: none; z-index: 0;
-      background: radial-gradient(ellipse at 30% 20%, rgba(99,102,241,0.08) 0%, transparent 50%),
-                  radial-gradient(ellipse at 70% 40%, rgba(59,130,246,0.06) 0%, transparent 50%),
-                  radial-gradient(ellipse at 50% 60%, rgba(52,211,153,0.05) 0%, transparent 50%);
+      background: radial-gradient(ellipse at 30% 20%, rgba(33,150,243,0.08) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 40%, rgba(66,177,240,0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse at 50% 60%, rgba(255,138,101,0.05) 0%, transparent 50%);
       animation: meshMove 12s ease-in-out infinite;
     }
     @keyframes meshMove {
@@ -44,16 +47,17 @@
     .page { position: relative; z-index: 1; }
 
     /* Nav */
-    nav { padding: 18px 0; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.8); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; }
+    nav { padding: 14px 0; border-bottom: 1px solid var(--border); background: rgba(248,250,251,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position: sticky; top: 0; z-index: 10; }
     .nav-inner { display: flex; justify-content: space-between; align-items: center; }
-    .logo { font-size: 19px; font-weight: 800; letter-spacing: -0.03em; color: var(--text); }
+    .logo { font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 19px; font-weight: 700; letter-spacing: -0.03em; color: var(--text); }
     .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a { font-size: 13px; color: var(--text-2); transition: color 0.15s; }
+    .nav-links a { font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 14px; font-weight: 500; color: var(--text-3); transition: color 0.2s; }
     .nav-links a:hover { color: var(--text); }
     .nav-cta {
       font-size: 13px; font-weight: 600; color: #fff !important;
-      background: var(--text); padding: 8px 18px; border-radius: 8px;
+      background: linear-gradient(135deg, #2196F3, #42B1F0, #FF8A65); padding: 8px 18px; border-radius: 10px;
       transition: opacity 0.15s;
+      box-shadow: 0 4px 16px rgba(33,150,243,0.2), 0 2px 6px rgba(255,138,101,0.15);
     }
     .nav-cta:hover { opacity: 0.8; }
 
@@ -65,64 +69,59 @@
       border: 1px solid var(--border); padding: 5px 14px; border-radius: 100px;
       margin-bottom: 24px; background: var(--bg);
     }
-    .hero-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: blink 2s infinite; }
+    .hero-dot { width: 6px; height: 6px; border-radius: 50%; background: #2196F3; animation: blink 2s infinite; }
     @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
     .hero h1 {
-      font-size: clamp(38px, 6.5vw, 68px); font-weight: 800;
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      font-size: clamp(38px, 6.5vw, 68px); font-weight: 700;
       line-height: 1.06; letter-spacing: -0.04em; margin-bottom: 18px; color: var(--text);
     }
     .hero-grad {
-      background: linear-gradient(135deg, #6366f1 0%, #3b82f6 40%, #06b6d4 70%, #10b981 100%);
+      background: linear-gradient(135deg, #1a1e2e 0%, #14578a 50%, #b84a20 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-size: 200% 200%; animation: grad 6s ease infinite;
+      background-clip: text;
     }
-    @keyframes grad {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
     .hero p { font-size: 17px; color: var(--text-2); max-width: 460px; margin: 0 auto 36px; line-height: 1.65; }
     .btn-primary {
       display: inline-block; font-size: 15px; font-weight: 600;
       color: #fff; padding: 14px 36px; border-radius: 10px;
-      background: linear-gradient(135deg, #6366f1, #3b82f6);
+      background: linear-gradient(135deg, #2196F3, #42B1F0, #FF8A65);
       transition: transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 4px 20px rgba(99,102,241,0.25);
+      box-shadow: 0 4px 16px rgba(33,150,243,0.2), 0 2px 6px rgba(255,138,101,0.15);
     }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(99,102,241,0.35); }
+    .btn-primary:hover { transform: translateY(-1px); opacity: 0.92; box-shadow: 0 8px 30px rgba(33,150,243,0.3); }
     .hero-note { font-size: 12px; color: var(--text-3); margin-top: 14px; }
 
     /* Agents */
     .agents { padding: 60px 0 80px; }
-    .s-label { font-size: 12px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; margin-bottom: 8px; }
-    .s-title { font-size: 30px; font-weight: 800; text-align: center; letter-spacing: -0.03em; margin-bottom: 48px; color: var(--text); }
+    .s-label { font-family: 'DM Sans', system-ui, sans-serif; font-size: 12px; font-weight: 500; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.1em; text-align: center; margin-bottom: 8px; }
+    .s-title { font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 30px; font-weight: 700; text-align: center; letter-spacing: -0.03em; margin-bottom: 48px; color: var(--text); }
 
     .agent-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     @media (max-width: 768px) { .agent-grid { grid-template-columns: 1fr; } }
 
     .agent {
-      padding: 32px 26px; border-radius: 14px; border: 1px solid var(--border);
-      background: var(--bg); transition: transform 0.25s, box-shadow 0.25s;
+      padding: 32px 26px; border-radius: 12px; border: 1.5px solid var(--border);
+      background: var(--bg); transition: transform 0.3s, box-shadow 0.3s;
     }
-    .agent:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.06); }
+    .agent:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
 
     .agent-bar { width: 28px; height: 3px; border-radius: 2px; margin-bottom: 18px; }
     .agent.hawki .agent-bar { background: var(--hawki); }
     .agent.pingi .agent-bar { background: var(--pingi); }
-    .agent.roari .agent-bar { background: var(--roari); }
+    .agent.foxxi .agent-bar { background: var(--foxxi); }
 
     .agent-tag { font-size: 11px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-    .agent h3 { font-size: 21px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .agent h3 { font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 21px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
     .agent.hawki h3 { color: var(--hawki); }
     .agent.pingi h3 { color: var(--pingi); }
-    .agent.roari h3 { color: var(--roari); }
+    .agent.foxxi h3 { color: var(--foxxi); }
     .agent > p { font-size: 14px; color: var(--text-2); line-height: 1.6; margin-bottom: 18px; }
     .a-list { list-style: none; }
     .a-list li { font-size: 13px; color: var(--text-2); padding: 7px 0; border-top: 1px solid var(--border); }
-    .a-link { display: inline-block; margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--text-2); transition: color 0.15s; }
-    .a-link:hover { color: var(--text); }
+    .a-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 13px; font-weight: 600; color: #14578a; transition: color 0.2s; }
+    .a-link:hover { color: #1a1e2e; }
     .a-link span { display: inline-block; transition: transform 0.15s; }
     .a-link:hover span { transform: translateX(4px); }
 
@@ -132,29 +131,31 @@
     @media (max-width: 768px) { .flow-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 480px) { .flow-grid { grid-template-columns: 1fr; } }
     .fc {
-      text-align: center; padding: 28px 16px; border-radius: 12px;
-      border: 1px solid var(--border); background: var(--bg);
-      transition: transform 0.25s;
+      text-align: center; padding: 32px 20px; border-radius: 12px;
+      border: 1.5px solid var(--border); background: var(--bg);
+      transition: transform 0.3s, box-shadow 0.3s;
     }
-    .fc:hover { transform: translateY(-3px); }
+    .fc:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
     .fc-n {
       font-size: 24px; font-weight: 800; letter-spacing: -0.03em;
-      background: linear-gradient(135deg, #6366f1, #3b82f6);
+      background: linear-gradient(135deg, #2196F3, #42B1F0, #FF8A65);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
       margin-bottom: 10px;
     }
-    .fc h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-    .fc p { font-size: 12px; color: var(--text-3); line-height: 1.5; }
+    .fc h3 { font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .fc p { font-size: 13px; color: var(--text-3); line-height: 1.5; }
 
     /* Bottom */
     .bottom { padding: 100px 0; text-align: center; }
-    .bottom h2 { font-size: 34px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 12px; }
+    .bottom h2 { font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 34px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 12px; }
     .bottom p { font-size: 15px; color: var(--text-2); margin-bottom: 28px; }
 
     /* Footer */
     footer { padding: 24px 0; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-3); }
-    footer a { color: var(--text-3); }
-    footer a:hover { color: var(--text-2); }
+    footer span { font-family: 'Space Grotesk', system-ui, sans-serif; font-weight: 600; }
+    footer a { color: var(--text-3); transition: color 0.2s; }
+    footer a:hover { color: var(--text); }
 
     /* Fade */
     .fi { opacity: 0; transform: translateY(16px); animation: fu 0.7s ease forwards; }
@@ -166,8 +167,6 @@
   </style>
 </head>
 <body>
-
-<div class="mesh"></div>
 
 <div class="page">
 
@@ -221,10 +220,10 @@
       <a href="https://github.com/shiki4709/pingi-ai" class="a-link">Get Pingi <span>&rarr;</span></a>
     </div>
 
-    <div class="agent roari">
+    <div class="agent foxxi">
       <div class="agent-bar"></div>
       <div class="agent-tag">Content Creation</div>
-      <h3>Roari</h3>
+      <h3>Foxxi</h3>
       <p>Turn any source into platform-native posts. Create content for LinkedIn, X, Substack, and more.</p>
       <ul class="a-list">
         <li>Multi-platform publishing</li>
@@ -232,7 +231,7 @@
         <li>Brand voice matching</li>
         <li>Content calendar</li>
       </ul>
-      <a href="https://github.com/shiki4709/human-content-os" class="a-link">Get Roari <span>&rarr;</span></a>
+      <a href="https://github.com/shiki4709/human-content-os" class="a-link">Get Foxxi <span>&rarr;</span></a>
     </div>
 
   </div>
@@ -242,7 +241,7 @@
   <div class="s-label">Workflow</div>
   <div class="s-title">How they work together</div>
   <div class="flow-grid">
-    <div class="fc"><div class="fc-n">01</div><h3>Create</h3><p>Roari publishes content across your channels</p></div>
+    <div class="fc"><div class="fc-n">01</div><h3>Create</h3><p>Foxxi publishes content across your channels</p></div>
     <div class="fc"><div class="fc-n">02</div><h3>Discover</h3><p>Hawki finds leads engaging with relevant posts</p></div>
     <div class="fc"><div class="fc-n">03</div><h3>Engage</h3><p>AI drafts personalized messages you send</p></div>
     <div class="fc"><div class="fc-n">04</div><h3>Follow up</h3><p>Pingi monitors replies and drafts follow-ups</p></div>
