@@ -37,11 +37,33 @@ function renderXEngage() {
   html += '<div class="tab-intro">' +
     '<div class="tab-intro-title">Stay visible on X without living in the feed</div>' +
     '<div class="tab-intro-desc">Add accounts and topics to monitor. We surface the best tweets to reply to and draft context-aware responses.</div>' +
-    '<div class="tab-intro-telegram">' +
-    '<strong>Get tweets pushed to Telegram</strong> — connect your Telegram for real-time tweet alerts with one-tap reply. ' +
-    '<a href="https://pingi-ai.vercel.app" target="_blank" style="color:var(--accent);font-weight:600">Set up Telegram →</a>' +
-    '</div>' +
     '</div>';
+
+  // Telegram onboarding card
+  var telegramConnected = localStorage.getItem('hawki_telegram_connected');
+  if (!telegramConnected) {
+    html += '<div class="x-telegram-card">' +
+      '<div class="x-telegram-icon">💬</div>' +
+      '<div class="x-telegram-body">' +
+      '<div class="x-telegram-title">Connect Telegram for real-time tweets</div>' +
+      '<div class="x-telegram-desc">Get tweets pushed directly to your Telegram as they happen. One-tap to draft a reply, one-tap to post. No need to check this page.</div>' +
+      '<div class="x-telegram-steps">' +
+      '<div class="x-telegram-step"><span class="x-step-num">1</span> Open Telegram and search for <strong>@pingi_x_bot</strong></div>' +
+      '<div class="x-telegram-step"><span class="x-step-num">2</span> Tap <strong>Start</strong> and enter your email</div>' +
+      '<div class="x-telegram-step"><span class="x-step-num">3</span> Tweets from your watched accounts will be pushed automatically</div>' +
+      '</div>' +
+      '<div class="x-telegram-actions">' +
+      '<a href="https://t.me/pingi_x_bot" target="_blank" class="scrape-go-btn" style="text-decoration:none;display:inline-block">Open in Telegram</a>' +
+      '<button class="scrape-csv-btn" onclick="dismissTelegram()" style="font-size:12px">Skip for now</button>' +
+      '</div>' +
+      '</div>' +
+      '</div>';
+  } else {
+    html += '<div class="x-telegram-connected">' +
+      '✓ Telegram connected — tweets are pushed to your chat. ' +
+      '<span onclick="resetTelegram()" style="cursor:pointer;color:var(--text-4);text-decoration:underline">Reconnect</span>' +
+      '</div>';
+  }
 
   // Setup section
   html += '<div class="scrape-input-section">';
@@ -252,6 +274,21 @@ function rewriteXDraft(idx) {
   if (!xTweets[idx]) return;
   xTweets[idx]._draft = undefined;
   draftXReply(idx);
+}
+
+function dismissTelegram() {
+  localStorage.setItem('hawki_telegram_connected', 'skipped');
+  render();
+}
+
+function resetTelegram() {
+  localStorage.removeItem('hawki_telegram_connected');
+  render();
+}
+
+function markTelegramConnected() {
+  localStorage.setItem('hawki_telegram_connected', 'connected');
+  render();
 }
 
 function formatNum(n) {

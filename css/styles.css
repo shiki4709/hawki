@@ -729,6 +729,18 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .tab-intro-desc { font-size: var(--fs-sm); color: var(--text-3); line-height: 1.6; max-width: 560px; }
 .tab-intro-telegram { margin-top: var(--s-12); font-size: var(--fs-xs); color: var(--text-2); padding: var(--s-12) var(--s-16); border-radius: var(--radius); background: var(--bg-sub); line-height: 1.5; }
 
+/* X Engage — Telegram onboarding */
+.x-telegram-card { display: flex; gap: var(--s-16); padding: var(--s-20); border: 1.5px solid var(--rule); border-radius: var(--radius); background: var(--bg-sub); margin-bottom: var(--s-24); }
+.x-telegram-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+.x-telegram-body { flex: 1; }
+.x-telegram-title { font-family: var(--ff-head); font-size: var(--fs-base); font-weight: 700; color: var(--text); margin-bottom: var(--s-4); }
+.x-telegram-desc { font-size: var(--fs-sm); color: var(--text-3); line-height: 1.55; margin-bottom: var(--s-12); }
+.x-telegram-steps { margin-bottom: var(--s-16); }
+.x-telegram-step { font-size: var(--fs-sm); color: var(--text-2); padding: var(--s-4) 0; display: flex; align-items: baseline; gap: var(--s-8); }
+.x-step-num { font-family: var(--ff-head); font-size: 11px; font-weight: 700; color: var(--accent); background: rgba(33,150,243,0.1); width: 20px; height: 20px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.x-telegram-actions { display: flex; gap: var(--s-8); align-items: center; }
+.x-telegram-connected { font-size: var(--fs-xs); color: var(--text-3); padding: var(--s-12) var(--s-16); border-radius: var(--radius); background: var(--bg-sub); margin-bottom: var(--s-16); }
+
 /* X Engage */
 .x-tags { display: flex; flex-wrap: wrap; gap: var(--s-6); margin-bottom: var(--s-8); }
 .x-tag { font-family: var(--ff-head); font-size: var(--fs-xs); font-weight: 500; padding: 4px 12px; border-radius: 100px; background: var(--bg-sub); color: var(--text-2); display: inline-flex; align-items: center; gap: 6px; }
