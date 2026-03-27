@@ -324,7 +324,10 @@ function renderRunner() {
         '<div class="post-finder-title">' + escapeHtml((p.title || 'Untitled post').substring(0, 80)) + '</div>' +
         '<div class="post-finder-meta">by ' + escapeHtml(p.author || 'Unknown') + (p.snippet ? ' — ' + escapeHtml(p.snippet.substring(0, 120)) : '') + '</div>' +
         '</div>' +
-        '<button class="scrape-go-btn" style="font-size:12px;padding:6px 14px;flex-shrink:0" onclick="useFindResult(\'' + p.url.replace(/'/g, "\\'") + '\')">Scrape</button>' +
+        '<div class="post-finder-actions">' +
+        '<a href="' + p.url + '" target="_blank" rel="noopener" class="post-finder-link" onclick="event.stopPropagation()">View</a>' +
+        '<button class="scrape-go-btn" style="font-size:12px;padding:6px 14px" onclick="useFindResult(\'' + p.url.replace(/'/g, "\\'") + '\')">Scrape</button>' +
+        '</div>' +
         '</div>';
     });
     html += '<div style="text-align:right;margin-top:8px"><span onclick="clearFoundPosts()" style="cursor:pointer;font-size:12px;color:var(--text-4)">Clear</span></div>';
