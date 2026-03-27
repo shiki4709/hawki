@@ -8,9 +8,15 @@ var XTOPICS_KEY = 'hawki_x_topics_v1';
 var xTweets = [];
 var xSearching = false;
 
+var DEFAULT_X_ACCOUNTS = ['markroberge', 'jaaborin', 'kaboross', 'samblond'];
+var DEFAULT_X_TOPICS = ['GTM strategy', 'B2B sales', 'outbound'];
+
 function loadXWatch() {
   var s = localStorage.getItem(XWATCH_KEY);
-  return s ? JSON.parse(s) : [];
+  if (s) return JSON.parse(s);
+  // First time — pre-populate with suggestions
+  saveXWatch(DEFAULT_X_ACCOUNTS);
+  return DEFAULT_X_ACCOUNTS;
 }
 
 function saveXWatch(list) {
@@ -19,7 +25,10 @@ function saveXWatch(list) {
 
 function loadXTopics() {
   var s = localStorage.getItem(XTOPICS_KEY);
-  return s ? JSON.parse(s) : [];
+  if (s) return JSON.parse(s);
+  // First time — pre-populate with suggestions
+  saveXTopics(DEFAULT_X_TOPICS);
+  return DEFAULT_X_TOPICS;
 }
 
 function saveXTopics(list) {
