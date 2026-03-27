@@ -295,7 +295,7 @@ function renderRunner() {
     '<button class="scrape-go-btn" id="scrape-go" onclick="startScrape()">Scrape</button>' +
     '</div>' +
     '<div class="scrape-hint-row">' +
-    '<a href="https://www.linkedin.com/search/results/content/?keywords=GTM&sortBy=%22date_posted%22" target="_blank" rel="noopener" class="scrape-find-link">Search LinkedIn for posts</a>' +
+    '<span onclick="togglePostFinder()" style="cursor:pointer;color:var(--inbound);font-weight:500">Find posts to scrape</span>' +
     ' · <span onclick="openSettings()" style="cursor:pointer;color:var(--text-3);text-decoration:underline dotted">Settings</span>' +
     '</div>' +
     '<div class="scrape-icp-bar" onclick="openSettings()">' +
@@ -305,6 +305,33 @@ function renderRunner() {
     '<span class="scrape-icp-edit">Edit</span>' +
     '</div>' +
     '</div>';
+
+  // ── Post Finder (hidden by default) ──
+  html += '<div class="post-finder" id="post-finder" style="display:none">' +
+    '<div class="post-finder-row">' +
+    '<input type="text" class="scrape-url-input" id="find-keywords" ' +
+    'placeholder="Search keywords (e.g. GTM playbook, sales hiring)" ' +
+    'onkeydown="if(event.key===\'Enter\')findPosts()">' +
+    '<select id="find-timeframe" class="post-finder-select">' +
+    '<option value="week">Past week</option>' +
+    '<option value="month" selected>Past month</option>' +
+    '<option value="year">Past year</option>' +
+    '</select>' +
+    '<button class="scrape-go-btn" id="find-go" onclick="findPosts()">Search</button>' +
+    '</div>';
+
+  if (foundPosts.length > 0) {
+    html += '<div class="post-finder-results">';
+    foundPosts.forEach(function(p) {
+      html += '<div class="post-finder-item" onclick="useFindResult(\'' + p.url.replace(/'/g, "\\'") + '\')">' +
+        '<div class="post-finder-title">' + (p.title || 'Untitled post').substring(0, 80) + '</div>' +
+        '<div class="post-finder-meta">' + (p.author || 'Unknown') + (p.snippet ? ' · ' + p.snippet.substring(0, 100) + '...' : '') + '</div>' +
+        '</div>';
+    });
+    html += '<div style="text-align:right;margin-top:8px"><span onclick="clearFoundPosts()" style="cursor:pointer;font-size:12px;color:var(--text-4)">Clear results</span></div>';
+    html += '</div>';
+  }
+  html += '</div>';
 
   // ── Watch List ──
   var watchList = loadWatchList();
@@ -987,6 +1014,27 @@ function downloadSalesNavCSV(idx) {
 
 /* --- Find posts --- */
 var foundPosts = [];
+
+function togglePostFinder() {
+  var el = document.getElementById('post-finder');
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  if (el.style.display === 'block') {
+    var input = document.getElementById('find-keywords');
+    if (input) input.focus();
+  }
+}
+
+function useFindResult(url) {
+  var input = document.getElementById('scrape-url');
+  if (input) {
+    input.value = url;
+    input.focus();
+    showToast('Post URL pasted — click Scrape to find leads');
+  }
+  var finder = document.getElementById('post-finder');
+  if (finder) finder.style.display = 'none';
+}
 
 function getFoundPosts() { return foundPosts; }
 
