@@ -18,13 +18,14 @@ module.exports = async (req, res) => {
   else if (timeframe === 'month') freshness = '&freshness=pm';
   else if (timeframe === 'year') freshness = '&freshness=py';
 
-  // Don't use site: — Brave API handles it poorly. Search broadly, filter results.
-  const query = `linkedin post ${keywords.trim()}`;
+  // Use site: for API (works well), drop it for HTML fallback
+  const apiQuery = `site:linkedin.com/posts/ ${keywords.trim()}`;
+  const fallbackQuery = `linkedin post ${keywords.trim()}`;
 
   if (braveKey) {
     // Brave Search API — clean JSON, no scraping
     try {
-      const apiUrl = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=20${freshness}`;
+      const apiUrl = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(apiQuery)}&count=20${freshness}`;
       const resp = await fetch(apiUrl, {
         headers: { 'X-Subscription-Token': braveKey, 'Accept': 'application/json' },
         timeout: 10000,
@@ -44,7 +45,7 @@ module.exports = async (req, res) => {
   }
 
   // Fallback: scrape Brave Search HTML
-  const searchUrl = `https://search.brave.com/search?q=${encodeURIComponent(query)}${freshness.replace('freshness', 'tf')}`;
+  const searchUrl = `https://search.brave.com/search?q=${encodeURIComponent(fallbackQuery)}${freshness.replace('freshness', 'tf')}`;
   let html;
   try {
     const resp = await fetch(searchUrl, {
@@ -73,11 +74,14 @@ function parseBraveAPIResults(data) {
     const url = r.url || '';
     if (!url.includes('linkedin.com/posts/')) continue;
     const clean = url.replace(/[?&](utm_\w+|trk|rcm)=[^&]*/g, '').replace(/[&?]$/, '');
-    const actMatch = clean.match(/activity-(\d+)/);
-    if (!actMatch || seen.has(actMatch[1])) continue;
-    seen.add(actMatch[1]);
 
-    const postMatch = clean.match(/linkedin\.com\/posts\/([^_]+)_(.+?)(?:-activity|-\d)/);
+    // Deduplicate by activity ID or full URL
+    const actMatch = clean.match(/activity-(\d+)/);
+    const dedupKey = actMatch ? actMatch[1] : clean;
+    if (seen.has(dedupKey)) continue;
+    seen.add(dedupKey);
+
+    const postMatch = clean.match(/linkedin\.com\/posts\/([^_]+?)[-_](.+?)(?:-activity|-\d|$)/);
     const author = postMatch ? postMatch[1].replace(/-/g, ' ') : '';
 
     posts.push({
@@ -85,7 +89,7 @@ function parseBraveAPIResults(data) {
       author,
       title: (r.title || '').substring(0, 120),
       snippet: (r.description || '').substring(0, 200),
-      activity_id: actMatch[1],
+      activity_id: actMatch ? actMatch[1] : '',
     });
   }
   return posts;
