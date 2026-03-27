@@ -295,8 +295,7 @@ function renderRunner() {
     '<button class="scrape-go-btn" id="scrape-go" onclick="startScrape()">Scrape</button>' +
     '</div>' +
     '<div class="scrape-hint-row">' +
-    '<span onclick="togglePostFinder()" style="cursor:pointer;color:var(--inbound);font-weight:500">Find posts to scrape</span>' +
-    ' · <span onclick="openSettings()" style="cursor:pointer;color:var(--text-3);text-decoration:underline dotted">Settings</span>' +
+    '<span onclick="openSettings()" style="cursor:pointer;color:var(--text-3);text-decoration:underline dotted">Settings</span>' +
     '</div>' +
     '<div class="scrape-icp-bar" onclick="openSettings()">' +
     '<span class="scrape-icp-label-text">ICP:</span> ' +
@@ -306,29 +305,29 @@ function renderRunner() {
     '</div>' +
     '</div>';
 
-  // ── Post Finder (hidden by default) ──
-  html += '<div class="post-finder" id="post-finder" style="display:none">' +
+  // ── Post Finder — always visible ──
+  html += '<div class="post-finder">' +
+    '<div class="post-finder-label">Or find posts to scrape</div>' +
     '<div class="post-finder-row">' +
     '<input type="text" class="scrape-url-input" id="find-keywords" ' +
-    'placeholder="Search keywords (e.g. GTM playbook, sales hiring)" ' +
+    'placeholder="e.g. GTM playbook, sales hiring, engineering leadership" ' +
     'onkeydown="if(event.key===\'Enter\')findPosts()">' +
-    '<select id="find-timeframe" class="post-finder-select">' +
-    '<option value="week">Past week</option>' +
-    '<option value="month" selected>Past month</option>' +
-    '<option value="year">Past year</option>' +
-    '</select>' +
-    '<button class="scrape-go-btn" id="find-go" onclick="findPosts()">Search</button>' +
+    '<input type="hidden" id="find-timeframe" value="month">' +
+    '<button class="scrape-go-btn" id="find-go" onclick="findPosts()">Find</button>' +
     '</div>';
 
   if (foundPosts.length > 0) {
     html += '<div class="post-finder-results">';
     foundPosts.forEach(function(p) {
-      html += '<div class="post-finder-item" onclick="useFindResult(\'' + p.url.replace(/'/g, "\\'") + '\')">' +
-        '<div class="post-finder-title">' + (p.title || 'Untitled post').substring(0, 80) + '</div>' +
-        '<div class="post-finder-meta">' + (p.author || 'Unknown') + (p.snippet ? ' · ' + p.snippet.substring(0, 100) + '...' : '') + '</div>' +
+      html += '<div class="post-finder-item">' +
+        '<div class="post-finder-info">' +
+        '<div class="post-finder-title">' + escapeHtml((p.title || 'Untitled post').substring(0, 80)) + '</div>' +
+        '<div class="post-finder-meta">by ' + escapeHtml(p.author || 'Unknown') + (p.snippet ? ' — ' + escapeHtml(p.snippet.substring(0, 120)) : '') + '</div>' +
+        '</div>' +
+        '<button class="scrape-go-btn" style="font-size:12px;padding:6px 14px;flex-shrink:0" onclick="useFindResult(\'' + p.url.replace(/'/g, "\\'") + '\')">Scrape</button>' +
         '</div>';
     });
-    html += '<div style="text-align:right;margin-top:8px"><span onclick="clearFoundPosts()" style="cursor:pointer;font-size:12px;color:var(--text-4)">Clear results</span></div>';
+    html += '<div style="text-align:right;margin-top:8px"><span onclick="clearFoundPosts()" style="cursor:pointer;font-size:12px;color:var(--text-4)">Clear</span></div>';
     html += '</div>';
   }
   html += '</div>';
@@ -1015,25 +1014,18 @@ function downloadSalesNavCSV(idx) {
 /* --- Find posts --- */
 var foundPosts = [];
 
-function togglePostFinder() {
-  var el = document.getElementById('post-finder');
-  if (!el) return;
-  el.style.display = el.style.display === 'none' ? 'block' : 'none';
-  if (el.style.display === 'block') {
-    var input = document.getElementById('find-keywords');
-    if (input) input.focus();
-  }
-}
-
 function useFindResult(url) {
   var input = document.getElementById('scrape-url');
   if (input) {
     input.value = url;
-    input.focus();
-    showToast('Post URL pasted — click Scrape to find leads');
+    startScrape();
   }
-  var finder = document.getElementById('post-finder');
-  if (finder) finder.style.display = 'none';
+}
+
+function escapeHtml(str) {
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }
 
 function getFoundPosts() { return foundPosts; }

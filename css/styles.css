@@ -709,15 +709,16 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .scrape-go-btn:hover { opacity: 0.92; transform: translateY(-1px); }
 
 /* Post finder */
-.post-finder { margin-bottom: var(--s-16); padding: var(--s-16); border: 1.5px solid var(--rule); border-radius: var(--radius); background: var(--bg-2); }
+.post-finder { margin-bottom: var(--s-24); }
+.post-finder-label { font-family: var(--ff-head); font-size: var(--fs-xs); font-weight: 600; color: var(--text-4); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--s-8); }
 .post-finder-row { display: flex; gap: var(--s-8); }
-.post-finder-select { padding: var(--s-8) var(--s-12); font-family: var(--ff-body); font-size: var(--fs-xs); border: 1.5px solid var(--rule); border-radius: var(--radius); background: var(--bg); color: var(--text); }
-.post-finder-results { margin-top: var(--s-12); }
-.post-finder-item { padding: var(--s-10) var(--s-12); border-bottom: 1px solid var(--rule); cursor: pointer; transition: background 0.15s; }
-.post-finder-item:hover { background: var(--bg); }
+.post-finder-results { margin-top: var(--s-12); border: 1.5px solid var(--rule); border-radius: var(--radius); overflow: hidden; }
+.post-finder-item { padding: var(--s-12) var(--s-16); border-bottom: 1px solid var(--rule); display: flex; align-items: center; gap: var(--s-12); transition: background 0.15s; }
+.post-finder-item:hover { background: var(--bg-2); }
 .post-finder-item:last-of-type { border-bottom: none; }
-.post-finder-title { font-family: var(--ff-head); font-size: var(--fs-sm); font-weight: 600; color: var(--text); margin-bottom: 2px; }
-.post-finder-meta { font-size: var(--fs-xs); color: var(--text-3); line-height: 1.4; }
+.post-finder-info { flex: 1; min-width: 0; }
+.post-finder-title { font-family: var(--ff-head); font-size: var(--fs-sm); font-weight: 600; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.post-finder-meta { font-size: var(--fs-xs); color: var(--text-3); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .scrape-time-select {
   padding: var(--s-8) var(--s-12); font-family: var(--ff-body); font-size: var(--fs-xs);
   border: 1.5px solid var(--rule); border-radius: var(--radius);

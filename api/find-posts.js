@@ -18,7 +18,8 @@ module.exports = async (req, res) => {
   else if (timeframe === 'month') freshness = '&freshness=pm';
   else if (timeframe === 'year') freshness = '&freshness=py';
 
-  const query = `site:linkedin.com/posts/ ${keywords.trim()}`;
+  // Don't use site: — Brave API handles it poorly. Search broadly, filter results.
+  const query = `linkedin post ${keywords.trim()}`;
 
   if (braveKey) {
     // Brave Search API — clean JSON, no scraping
