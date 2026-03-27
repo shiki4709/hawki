@@ -43,18 +43,23 @@ function renderXEngage() {
   var telegramConnected = localStorage.getItem('hawki_telegram_connected');
   if (!telegramConnected) {
     html += '<div class="x-telegram-card">' +
-      '<div class="x-telegram-icon">💬</div>' +
       '<div class="x-telegram-body">' +
       '<div class="x-telegram-title">Connect Telegram for real-time tweets</div>' +
-      '<div class="x-telegram-desc">Get tweets pushed directly to your Telegram as they happen. One-tap to draft a reply, one-tap to post. No need to check this page.</div>' +
+      '<div class="x-telegram-desc">Get tweets pushed to Telegram as they happen. Draft and post replies without opening X.</div>' +
       '<div class="x-telegram-steps">' +
-      '<div class="x-telegram-step"><span class="x-step-num">1</span> Open Telegram and search for <strong>@pingi_x_bot</strong></div>' +
-      '<div class="x-telegram-step"><span class="x-step-num">2</span> Tap <strong>Start</strong> and enter your email</div>' +
-      '<div class="x-telegram-step"><span class="x-step-num">3</span> Tweets from your watched accounts will be pushed automatically</div>' +
+      '<div class="x-telegram-step"><span class="x-step-num">1</span> Open <a href="https://t.me/pingi_x_bot" target="_blank" style="color:var(--accent);font-weight:600">@pingi_x_bot</a> in Telegram and tap <strong>Start</strong></div>' +
+      '<div class="x-telegram-step"><span class="x-step-num">2</span> Enter your invite code when prompted' +
+      '<div style="display:flex;gap:8px;margin-top:6px">' +
+      '<input type="text" class="qa-input qa-input-sm" id="x-invite-code" placeholder="Invite code" value="" style="max-width:180px;font-size:13px">' +
+      '<button class="scrape-csv-btn" style="font-size:12px" onclick="copyInviteCode()">Copy code</button>' +
+      '</div></div>' +
+      '<div class="x-telegram-step"><span class="x-step-num">3</span> Set your niche and target ICP in the bot — it matches what you set up here</div>' +
+      '<div class="x-telegram-step"><span class="x-step-num">4</span> Tweets from your watched accounts + topics push automatically</div>' +
       '</div>' +
       '<div class="x-telegram-actions">' +
       '<a href="https://t.me/pingi_x_bot" target="_blank" class="scrape-go-btn" style="text-decoration:none;display:inline-block">Open in Telegram</a>' +
-      '<button class="scrape-csv-btn" onclick="dismissTelegram()" style="font-size:12px">Skip for now</button>' +
+      '<button class="scrape-csv-btn" onclick="markTelegramConnected()" style="font-size:12px">I\'ve connected</button>' +
+      '<button class="scrape-csv-btn" onclick="dismissTelegram()" style="font-size:12px;color:var(--text-4)">Skip for now</button>' +
       '</div>' +
       '</div>' +
       '</div>';
@@ -64,6 +69,17 @@ function renderXEngage() {
       '<span onclick="resetTelegram()" style="cursor:pointer;color:var(--text-4);text-decoration:underline">Reconnect</span>' +
       '</div>';
   }
+
+  // ICP for X (editable, synced from unified ICP)
+  var icp = loadICP();
+  html += '<div class="x-icp-section">' +
+    '<div class="post-finder-label">Your ICP (shared across all tabs)</div>' +
+    '<div class="scrape-icp-bar" onclick="openSettings()" style="cursor:pointer">' +
+    '<span class="scrape-icp-label-text">Targeting:</span> ' +
+    '<span class="scrape-icp-keywords">' + icp.titles.join(', ') + '</span>' +
+    '<span class="scrape-icp-edit">Edit</span>' +
+    '</div>' +
+    '</div>';
 
   // Setup section
   html += '<div class="scrape-input-section">';
@@ -274,6 +290,16 @@ function rewriteXDraft(idx) {
   if (!xTweets[idx]) return;
   xTweets[idx]._draft = undefined;
   draftXReply(idx);
+}
+
+function copyInviteCode() {
+  var input = document.getElementById('x-invite-code');
+  if (!input || !input.value.trim()) { showToast('Enter an invite code first'); return; }
+  navigator.clipboard.writeText(input.value.trim()).then(function() {
+    showToast('Invite code copied — paste it in Telegram');
+  }).catch(function() {
+    prompt('Copy this code:', input.value.trim());
+  });
 }
 
 function dismissTelegram() {
