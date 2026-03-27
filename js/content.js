@@ -10,6 +10,12 @@ function renderContent() {
   var el = document.getElementById('view-content');
   var html = '';
 
+  // Tab intro
+  html += '<div class="tab-intro">' +
+    '<div class="tab-intro-title">Turn any source into platform-native content</div>' +
+    '<div class="tab-intro-desc">Paste a URL, article, notes, or any raw material. We generate a LinkedIn post and X thread ready to copy and publish.</div>' +
+    '</div>';
+
   // Source input
   html += '<div class="scrape-input-section">';
   html += '<div class="post-finder-label">Source material</div>' +

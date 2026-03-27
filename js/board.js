@@ -20,15 +20,16 @@ function render() {
 
   // Tab navigation
   var tabs = [
-    { id: 'leads', label: 'Find Leads', view: 'view-scrape' },
-    { id: 'x-engage', label: 'X Engage', view: 'view-x-engage' },
-    { id: 'content', label: 'Content', view: 'view-content' },
+    { id: 'leads', label: 'Find Leads', desc: 'LinkedIn', view: 'view-scrape' },
+    { id: 'x-engage', label: 'X Engage', desc: 'Replies', view: 'view-x-engage' },
+    { id: 'content', label: 'Content', desc: 'Multi-platform', view: 'view-content' },
   ];
 
   var tabHtml = '';
   tabs.forEach(function(t) {
     tabHtml += '<button class="vtab' + (activeTab === t.id ? ' active' : '') +
-      '" onclick="switchTab(\'' + t.id + '\')">' + t.label + '</button>';
+      '" onclick="switchTab(\'' + t.id + '\')">' + t.label +
+      '<span class="vtab-desc">' + t.desc + '</span></button>';
   });
   document.getElementById('view-tabs').innerHTML = tabHtml;
 

@@ -115,6 +115,8 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .vtab { padding: var(--s-12) var(--s-20); font-size: var(--fs-sm); font-weight: 500; color: var(--text-4); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: var(--ff-body); transition: color var(--dur-fast) var(--ease-out); margin-bottom: -1px; display: flex; align-items: center; gap: var(--s-6); }
 .vtab:hover { color: var(--text-2); }
 .vtab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.vtab-desc { font-size: 10px; font-weight: 400; color: var(--text-4); margin-left: 4px; }
+.vtab.active .vtab-desc { color: var(--text-3); }
 .vtab-badge { font-size: 10px; font-weight: 700; color: #ffffff; background: var(--gradient-main); padding: 1px 5px; border-radius: 10px; }
 .view { display: none; }
 .vtab-title { font-family: var(--ff-display); font-size: var(--fs-sm); font-weight: 500; color: var(--text); padding: var(--s-8) var(--s-12); }
@@ -720,6 +722,12 @@ body { font-family: var(--ff-body); font-size: var(--fs-base); line-height: var(
 .post-finder-title { font-family: var(--ff-head); font-size: var(--fs-sm); font-weight: 600; color: var(--text); margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .post-finder-meta { font-size: var(--fs-xs); color: var(--text-3); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .post-finder-actions { display: flex; gap: var(--s-8); align-items: center; flex-shrink: 0; }
+
+/* Tab intro */
+.tab-intro { margin-bottom: var(--s-24); }
+.tab-intro-title { font-family: var(--ff-head); font-size: var(--fs-lg); font-weight: 700; color: var(--text); margin-bottom: var(--s-4); }
+.tab-intro-desc { font-size: var(--fs-sm); color: var(--text-3); line-height: 1.6; max-width: 560px; }
+.tab-intro-telegram { margin-top: var(--s-12); font-size: var(--fs-xs); color: var(--text-2); padding: var(--s-12) var(--s-16); border-radius: var(--radius); background: var(--bg-sub); line-height: 1.5; }
 
 /* X Engage */
 .x-tags { display: flex; flex-wrap: wrap; gap: var(--s-6); margin-bottom: var(--s-8); }

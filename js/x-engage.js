@@ -42,6 +42,16 @@ function renderXEngage() {
 
   var html = '';
 
+  // Tab intro
+  html += '<div class="tab-intro">' +
+    '<div class="tab-intro-title">Stay visible on X without living in the feed</div>' +
+    '<div class="tab-intro-desc">Add accounts and topics to monitor. We surface the best tweets to reply to and draft context-aware responses.</div>' +
+    '<div class="tab-intro-telegram">' +
+    '<strong>Get tweets pushed to Telegram</strong> — connect your Telegram for real-time tweet alerts with one-tap reply. ' +
+    '<a href="https://pingi-ai.vercel.app" target="_blank" style="color:var(--accent);font-weight:600">Set up Telegram →</a>' +
+    '</div>' +
+    '</div>';
+
   // Setup section
   html += '<div class="scrape-input-section">';
 

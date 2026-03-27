@@ -284,7 +284,11 @@ function renderRunner() {
 
   var html = '';
 
-  // (No connection status needed — Apify handles scraping without cookies)
+  // Tab intro
+  html += '<div class="tab-intro">' +
+    '<div class="tab-intro-title">Find qualified leads from any LinkedIn post</div>' +
+    '<div class="tab-intro-desc">Paste a post URL or search for posts by keyword. We scrape every engager, filter to your ICP, and draft personalized DMs.</div>' +
+    '</div>';
 
   // ── Scrape input ──
   html += '<div class="scrape-input-section">' +
