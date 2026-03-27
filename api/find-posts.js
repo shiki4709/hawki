@@ -10,43 +10,94 @@ module.exports = async (req, res) => {
   const { keywords, timeframe } = req.body || {};
   if (!keywords || !keywords.trim()) return res.status(400).json({ error: 'No keywords provided' });
 
-  let timeFilter = '';
-  if (timeframe === 'week') timeFilter = '&tf=pw';
-  else if (timeframe === 'month') timeFilter = '&tf=pm';
-  else if (timeframe === 'year') timeFilter = '&tf=py';
+  // Try Brave Search API first (clean JSON), fall back to Google
+  const braveKey = process.env.BRAVE_SEARCH_KEY || '';
+
+  let freshness = '';
+  if (timeframe === 'week') freshness = '&freshness=pw';
+  else if (timeframe === 'month') freshness = '&freshness=pm';
+  else if (timeframe === 'year') freshness = '&freshness=py';
 
   const query = `site:linkedin.com/posts/ ${keywords.trim()}`;
-  const searchUrl = `https://search.brave.com/search?q=${encodeURIComponent(query)}${timeFilter}`;
 
+  if (braveKey) {
+    // Brave Search API — clean JSON, no scraping
+    try {
+      const apiUrl = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=20${freshness}`;
+      const resp = await fetch(apiUrl, {
+        headers: { 'X-Subscription-Token': braveKey, 'Accept': 'application/json' },
+        timeout: 10000,
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        const posts = parseBraveAPIResults(data);
+        return res.json({ posts, query: keywords.trim(), source: 'brave-api' });
+      }
+    } catch (e) {
+      // Fall through to scraping
+    }
+  }
+
+  // Fallback: scrape Brave Search HTML
+  const searchUrl = `https://search.brave.com/search?q=${encodeURIComponent(query)}${freshness.replace('freshness', 'tf')}`;
   let html;
   try {
     const resp = await fetch(searchUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
-        'Accept': 'text/html',
+        'Accept': 'text/html,application/xhtml+xml',
+        'Accept-Language': 'en-US,en;q=0.9',
       },
       timeout: 15000,
     });
     html = await resp.text();
   } catch (e) {
-    return res.status(500).json({ error: 'Search request failed: ' + e.message });
+    return res.status(500).json({ error: 'Search failed: ' + e.message });
   }
 
-  // Decode HTML entities
+  const posts = parseBraveHTML(html);
+  res.json({ posts, query: keywords.trim(), source: 'brave-scrape' });
+};
+
+function parseBraveAPIResults(data) {
+  const results = data.web?.results || [];
+  const seen = new Set();
+  const posts = [];
+
+  for (const r of results) {
+    const url = r.url || '';
+    if (!url.includes('linkedin.com/posts/')) continue;
+    const clean = url.replace(/[?&](utm_\w+|trk|rcm)=[^&]*/g, '').replace(/[&?]$/, '');
+    const actMatch = clean.match(/activity-(\d+)/);
+    if (!actMatch || seen.has(actMatch[1])) continue;
+    seen.add(actMatch[1]);
+
+    const postMatch = clean.match(/linkedin\.com\/posts\/([^_]+)_(.+?)(?:-activity|-\d)/);
+    const author = postMatch ? postMatch[1].replace(/-/g, ' ') : '';
+
+    posts.push({
+      url: clean,
+      author,
+      title: (r.title || '').substring(0, 120),
+      snippet: (r.description || '').substring(0, 200),
+      activity_id: actMatch[1],
+    });
+  }
+  return posts;
+}
+
+function parseBraveHTML(html) {
   html = html.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
 
-  // Extract LinkedIn post URLs
   const urlMatches = html.match(/linkedin\.com\/posts\/([^\s"<>]+activity-\d+[^\s"<>]*)/g) || [];
   const urls = urlMatches.map(u => 'https://www.' + u);
 
-  // Extract snippets and titles from Brave results
   const snippetMatches = html.match(/<p class="snippet-description[^"]*"[^>]*>([\s\S]*?)<\/p>/g) || [];
   const snippets = snippetMatches.map(s => s.replace(/<[^>]+>/g, '').trim());
 
   const titleMatches = html.match(/<span class="snippet-title"[^>]*>([\s\S]*?)<\/span>/g) || [];
   const titles = titleMatches.map(t => t.replace(/<[^>]+>/g, '').trim());
 
-  // Deduplicate and build results
   const seen = new Set();
   const posts = [];
   let snippetIdx = 0;
@@ -58,7 +109,6 @@ module.exports = async (req, res) => {
     seen.add(actMatch[1]);
 
     const snippet = snippetIdx < snippets.length ? snippets[snippetIdx++] : '';
-
     const postMatch = clean.match(/linkedin\.com\/posts\/([^_]+)_(.+?)(?:-activity|-\d)/);
     const author = postMatch ? postMatch[1].replace(/-/g, ' ') : '';
     const searchTitle = posts.length < titles.length ? titles[posts.length] : '';
@@ -72,6 +122,5 @@ module.exports = async (req, res) => {
       activity_id: actMatch[1],
     });
   }
-
-  res.json({ posts, query: keywords.trim() });
-};
+  return posts;
+}
